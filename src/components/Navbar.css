@@ -33,3 +33,114 @@
 .navbar-links a:hover {
   color: var(--brand-blue);
 }
+
+/* ---------- MOBILE MENU BUTTON ---------- */
+
+.menu-toggle {
+  width: 42px;
+  height: 42px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  width: 19px;
+  height: 2px;
+  display: block;
+  border-radius: 10px;
+  background: var(--text-primary);
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+
+/* ---------- MOBILE NAVIGATION ---------- */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    height: 70px;
+    position: relative;
+    z-index: 1000;
+    padding: 0 6%;
+  }
+
+  .navbar-logo {
+    position: relative;
+    z-index: 1002;
+    font-size: 21px;
+  }
+
+  .menu-toggle {
+    display: flex;
+    position: relative;
+    z-index: 1002;
+  }
+
+  .navbar-links {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+
+    padding: 18px 6% 28px;
+
+    background: rgba(7, 11, 20, 0.98);
+    border-bottom: 1px solid var(--border-color);
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .navbar-links.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .navbar-links a {
+    width: 100%;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 16px;
+  }
+
+  .navbar-links a:last-child {
+    border-bottom: 0;
+  }
+
+
+  /* ---------- HAMBURGER → X ---------- */
+
+  .menu-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
