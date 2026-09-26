@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Home.css'
 import ServiceCard from '../components/ServiceCard'
@@ -6,8 +7,28 @@ import StoreCategory from '../components/StoreCategory'
 import ProjectCard from '../components/ProjectCard'
 import ValueCard from '../components/ValueCard'
 import TestimonialCard from '../components/TestimonialCard'
+import Reveal from '../components/Reveal'
 
 function Home() {
+
+  const [projects, setProjects] = useState([])
+
+useEffect(() => {
+  async function loadProjects() {
+    try {
+      const response = await fetch('/api/projects')
+      const data = await response.json()
+
+      if (data.success) {
+        setProjects(data.projects)
+      }
+    } catch (error) {
+      console.error('Failed to load projects:', error)
+    }
+  }
+
+  loadProjects()
+}, [])
   return (
     <main>
 
@@ -30,22 +51,28 @@ function Home() {
             and real business needs.
           </p>
 
-          <div className="hero-buttons">
+        <div className="hero-buttons">
+  <Link to="/services" className="btn btn-primary">
+    Explore Our Services
+  </Link>
 
-            <a href="/services" className="btn btn-primary">
-              Explore Our Services
-            </a>
-
-            <a href="/contact" className="btn btn-secondary">
-              Start a Project
-            </a>
-
-          </div>
+  <Link to="/contact" className="btn btn-secondary">
+    Start a Project
+  </Link>
+</div>
 <div className="hero-visual" aria-hidden="true">
 
-  <div className="hero-orbit hero-orbit-one"></div>
-  <div className="hero-orbit hero-orbit-two"></div>
-  <div className="hero-orbit hero-orbit-three"></div>
+  <div className="hero-orbit hero-orbit-one">
+    <span className="orbit-marker"></span>
+  </div>
+
+  <div className="hero-orbit hero-orbit-two">
+    <span className="orbit-marker"></span>
+  </div>
+
+  <div className="hero-orbit hero-orbit-three">
+    <span className="orbit-marker"></span>
+  </div>
 
   <div className="hero-core">
     <span>B</span>
@@ -61,6 +88,7 @@ function Home() {
       </section>
 <section className="intro">
 
+<Reveal>
   <div className="intro-content">
 
     <p className="section-label">
@@ -81,52 +109,62 @@ function Home() {
     </p>
 
   </div>
-
+</Reveal>
 </section>
 <section className="services-section">
 
   <div className="services-container">
 
-    <div className="services-heading">
+    <Reveal>
+      <div className="services-heading">
 
-      <div>
-        <p className="section-label">WHAT WE DO</p>
+        <div>
+          <p className="section-label">WHAT WE DO</p>
 
-        <h2>
-          From idea to
-          <span> digital reality.</span>
-        </h2>
+          <h2>
+            From idea to
+            <span> digital reality.</span>
+          </h2>
+        </div>
+
+        <p className="services-intro">
+          We design and develop technology that helps businesses,
+          organizations and ideas move forward.
+        </p>
+
       </div>
-
-      <p className="services-intro">
-        We design and develop technology that helps businesses,
-        organizations and ideas move forward.
-      </p>
-
-    </div>
+    </Reveal>
 
 
     <div className="services-grid">
 
-      <ServiceCard
-        title="Website Development"
-        description="Modern, responsive websites designed around your brand, audience and business goals."
-      />
+      <Reveal delay={0}>
+        <ServiceCard
+          title="Website Development"
+          description="Modern, responsive websites designed around your brand, audience and business goals."
+        />
+      </Reveal>
 
-      <ServiceCard
-        title="Applications"
-        description="Web, desktop and mobile applications built to make work simpler and experiences better."
-      />
+      <Reveal delay={100}>
+        <ServiceCard
+          title="Applications"
+          description="Web, desktop and mobile applications built to make work simpler and experiences better."
+        />
+      </Reveal>
 
-      <ServiceCard
-        title="Custom Software"
-        description="Software designed around real workflows, from business systems to specialized digital tools."
-      />
+      <Reveal delay={200}>
+        <ServiceCard
+          title="Custom Software"
+          description="Software designed around real workflows, from business systems to specialized digital tools."
+        />
+      </Reveal>
 
-      <ServiceCard
-        title="Game Development"
-        description="Interactive games and digital experiences built with creativity, technology and engaging ideas."
-      />
+      <Reveal delay={300}>
+        <ServiceCard
+          title="Game Development"
+          description="Interactive games and digital experiences built with creativity, technology and engaging ideas."
+        />
+      </Reveal>
 
     </div>
 
@@ -269,14 +307,19 @@ function Home() {
 
     <div className="projects-grid">
 
+  {projects
+    .filter((project) => project.featured === 1)
+    .map((project) => (
       <ProjectCard
-        title="Stockly POS"
-        category="BITRECA PRODUCT"
-        description="A point-of-sale and business management platform built for retail operations, inventory, purchases, services and reporting."
-        tags={['C#', 'SQL Server', 'Desktop']}
+        key={project.id}
+        title={project.title}
+        category={project.category}
+        description={project.description}
+        tags={[]}
       />
+    ))}
 
-    </div>
+</div>
 
   </div>
 
