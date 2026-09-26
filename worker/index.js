@@ -142,6 +142,141 @@ if (
       }
     }
 
+    // Update an existing project
+if (
+  url.pathname.startsWith('/api/admin/projects/') &&
+  request.method === 'PUT'
+) {
+  try {
+    const id = url.pathname.split('/').pop()
+    const body = await request.json()
+
+    const {
+      title,
+      slug,
+      category,
+      description,
+      image_url,
+      status,
+      featured,
+    } = body
+
+    if (!title || !slug || !category || !description) {
+      return Response.json(
+        {
+          success: false,
+          message:
+            'Title, slug, category and description are required.',
+        },
+        { status: 400 }
+      )
+    }
+
+    if (!['draft', 'published'].includes(status)) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Invalid project status.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const result = await env.bitreca_db
+      .prepare(`
+        UPDATE projects
+        SET
+          title = ?,
+          slug = ?,
+          category = ?,
+          description = ?,
+          image_url = ?,
+          status = ?,
+          featured = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `)
+      .bind(
+        title,
+        slug,
+        category,
+        description,
+        image_url || null,
+        status,
+        featured ? 1 : 0,
+        id
+      )
+      .run()
+
+    if (result.meta.changes === 0) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Project not found.',
+        },
+        { status: 404 }
+      )
+    }
+
+    return Response.json({
+      success: true,
+      message: 'Project updated successfully.',
+    })
+  } catch (error) {
+    console.error(error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not update project.',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// Delete an existing project
+if (
+  url.pathname.startsWith('/api/admin/projects/') &&
+  request.method === 'DELETE'
+) {
+  try {
+    const id = url.pathname.split('/').pop()
+
+    const result = await env.bitreca_db
+      .prepare(`
+        DELETE FROM projects
+        WHERE id = ?
+      `)
+      .bind(id)
+      .run()
+
+    if (result.meta.changes === 0) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Project not found.',
+        },
+        { status: 404 }
+      )
+    }
+
+    return Response.json({
+      success: true,
+      message: 'Project deleted successfully.',
+    })
+  } catch (error) {
+    console.error(error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not delete project.',
+      },
+      { status: 500 }
+    )
+  }
+}
     return new Response('Not Found', {
       status: 404,
     })
