@@ -1,3 +1,78 @@
+
+async function createSessionToken(secret) {
+  const encoder = new TextEncoder()
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    {
+      name: 'HMAC',
+      hash: 'SHA-256',
+    },
+    false,
+    ['sign']
+  )
+
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode('bitreca-admin')
+  )
+
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+function createSessionCookie(token) {
+  return [
+    `bitreca_admin_session=${token}`,
+    'HttpOnly',
+    'Path=/',
+    'SameSite=Strict',
+    'Max-Age=28800',
+  ].join('; ')
+}
+
+function getCookie(request, name) {
+  const cookieHeader = request.headers.get('Cookie')
+
+  if (!cookieHeader) {
+    return null
+  }
+
+  const cookies = cookieHeader.split(';')
+
+  for (const cookie of cookies) {
+    const [cookieName, ...cookieValue] = cookie
+      .trim()
+      .split('=')
+
+    if (cookieName === name) {
+      return cookieValue.join('=')
+    }
+  }
+
+  return null
+}
+
+async function isAdminAuthenticated(request, env) {
+  const sessionCookie = getCookie(
+    request,
+    'bitreca_admin_session'
+  )
+
+  if (!sessionCookie) {
+    return false
+  }
+
+  const expectedToken = await createSessionToken(
+    env.SESSION_SECRET
+  )
+
+  return sessionCookie === expectedToken
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
@@ -9,6 +84,128 @@ export default {
         message: 'Bitreca API is running',
       })
     }
+
+// Admin login
+if (
+  url.pathname === '/api/admin/login' &&
+  request.method === 'POST'
+) {
+  try {
+    const body = await request.json()
+
+    const { username, password } = body
+
+    if (
+      username !== env.ADMIN_USERNAME ||
+      password !== env.ADMIN_PASSWORD
+    ) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Invalid username or password.',
+        },
+        { status: 401 }
+      )
+    }
+
+    const sessionToken = await createSessionToken(
+  env.SESSION_SECRET
+)
+
+return Response.json(
+  {
+    success: true,
+    message: 'Login successful.',
+  },
+  {
+    headers: {
+      'Set-Cookie': createSessionCookie(sessionToken),
+    },
+  }
+)
+  } catch (error) {
+    console.error(error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not process login.',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// Admin logout
+if (
+  url.pathname === '/api/admin/logout' &&
+  request.method === 'POST'
+) {
+  return Response.json(
+    {
+      success: true,
+      message: 'Logged out successfully.',
+    },
+    {
+      headers: {
+        'Set-Cookie': [
+          'bitreca_admin_session=',
+          'HttpOnly',
+          'Path=/',
+          'SameSite=Strict',
+          'Max-Age=0',
+        ].join('; '),
+      },
+    }
+  )
+}
+
+// Check admin session
+if (
+  url.pathname === '/api/admin/session' &&
+  request.method === 'GET'
+) {
+  const authenticated = await isAdminAuthenticated(
+    request,
+    env
+  )
+
+  if (!authenticated) {
+    return Response.json(
+      {
+        success: false,
+        authenticated: false,
+      },
+      { status: 401 }
+    )
+  }
+
+  return Response.json({
+    success: true,
+    authenticated: true,
+  })
+}
+
+// Protect all admin API routes except login
+if (
+  url.pathname.startsWith('/api/admin/') &&
+  url.pathname !== '/api/admin/login'
+) {
+  const authenticated = await isAdminAuthenticated(
+    request,
+    env
+  )
+
+  if (!authenticated) {
+    return Response.json(
+      {
+        success: false,
+        message: 'Unauthorized.',
+      },
+      { status: 401 }
+    )
+  }
+}
 
     // Get published projects for the public website
     if (

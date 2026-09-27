@@ -1,9 +1,30 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import './AdminLayout.css'
 
 function AdminLayout({ children }) {
-  return (
+ const navigate = useNavigate()
+
+async function handleLogout() {
+  try {
+    const response = await fetch('/api/admin/logout', {
+      method: 'POST',
+    })
+
+    if (!response.ok) {
+      throw new Error('Logout failed.')
+    }
+
+    navigate('/admin/login', {
+      replace: true,
+    })
+  } catch (error) {
+    console.error('Logout failed:', error)
+    alert('Could not log out. Please try again.')
+  }
+}
+ 
+    return (
     <div className="admin-layout">
 
       <aside className="admin-sidebar">
@@ -50,9 +71,17 @@ function AdminLayout({ children }) {
             <strong>Bitreca Admin</strong>
           </div>
 
-          <div className="admin-header-user">
-            Administrator
-          </div>
+          <div className="admin-user-area">
+  <span>Administrator</span>
+
+  <button
+    type="button"
+    className="admin-logout-button"
+    onClick={handleLogout}
+  >
+    Logout
+  </button>
+</div>
         </header>
 
         <div className="admin-content">

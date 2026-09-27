@@ -46,6 +46,20 @@ function AdminProjects() {
     }))
   }
 
+function closeProjectForm() {
+  setShowCreateForm(false)
+  setEditingProject(null)
+
+  setFormData({
+    title: '',
+    slug: '',
+    category: '',
+    description: '',
+    status: 'draft',
+    featured: false,
+  })
+}
+
 function handleEditProject(project) {
   setEditingProject(project)
 
@@ -114,6 +128,56 @@ async function handleUpdateProject(event) {
   } catch (error) {
     console.error('Failed to update project:', error)
     alert('Something went wrong while updating the project.')
+  }
+}
+
+async function handleTogglePublish(project) {
+  const newStatus =
+    project.status === 'published'
+      ? 'draft'
+      : 'published'
+
+  try {
+    const response = await fetch(
+      `/api/admin/projects/${project.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...project,
+          status: newStatus,
+        }),
+      }
+    )
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      alert(data.message || 'Could not update project status.')
+      return
+    }
+
+    setProjects((currentProjects) =>
+      currentProjects.map((currentProject) =>
+        currentProject.id === project.id
+          ? {
+              ...currentProject,
+              status: newStatus,
+            }
+          : currentProject
+      )
+    )
+  } catch (error) {
+    console.error(
+      'Failed to update project status:',
+      error
+    )
+
+    alert(
+      'Something went wrong while updating the project status.'
+    )
   }
 }
 
@@ -228,7 +292,20 @@ async function handleDeleteProject(project) {
         <button
           type="button"
           className="admin-primary-button"
-          onClick={() => setShowCreateForm(true)}
+          onClick={() => {
+  setEditingProject(null)
+
+  setFormData({
+    title: '',
+    slug: '',
+    category: '',
+    description: '',
+    status: 'draft',
+    featured: false,
+  })
+
+  setShowCreateForm(true)
+}}
         >
           + New Project
         </button>
@@ -246,7 +323,7 @@ async function handleDeleteProject(project) {
             <button
               type="button"
               className="admin-close-button"
-              onClick={() => setShowCreateForm(false)}
+             onClick={closeProjectForm}
             >
               ×
             </button>
@@ -361,7 +438,7 @@ async function handleDeleteProject(project) {
               <button
                 type="button"
                 className="admin-secondary-button"
-                onClick={() => setShowCreateForm(false)}
+                onClick={closeProjectForm}
               >
                 Cancel
               </button>
@@ -422,6 +499,15 @@ async function handleDeleteProject(project) {
     onClick={() => handleEditProject(project)}
   >
     Edit
+  </button>
+
+  <button
+    type="button"
+    onClick={() => handleTogglePublish(project)}
+  >
+    {project.status === 'published'
+      ? 'Unpublish'
+      : 'Publish'}
   </button>
 
   <button

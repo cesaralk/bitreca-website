@@ -1,0 +1,239 @@
+/* =========================================================
+   BITRECA ADMIN LOGIN
+   ========================================================= */
+
+.admin-login-page {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(59, 130, 246, 0.12),
+      transparent 35%
+    ),
+    #070b14;
+
+  color: #ffffff;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 36px;
+
+  background: rgba(12, 18, 32, 0.96);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+
+/* Brand */
+
+.admin-login-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 36px;
+}
+
+.admin-login-logo {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #3b82f6;
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.admin-login-brand div {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-login-brand strong {
+  color: #ffffff;
+
+  font-size: 14px;
+  letter-spacing: 1.4px;
+}
+
+.admin-login-brand div span {
+  margin-top: 2px;
+
+  color: #667085;
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+
+/* Heading */
+
+.admin-login-heading {
+  margin-bottom: 28px;
+}
+
+.admin-login-heading h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.admin-login-heading p {
+  margin: 8px 0 0;
+
+  color: #8f9bad;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* Form */
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.admin-login-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.admin-login-field label {
+  color: #cbd5e1;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-login-field input {
+  width: 100%;
+
+  padding: 12px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #070b14;
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-login-field input:focus {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+
+/* Error */
+
+.admin-login-error {
+  padding: 10px 12px;
+
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+
+  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* Sign in button */
+
+.admin-login-button {
+  width: 100%;
+
+  margin-top: 4px;
+  padding: 12px 18px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #3b82f6;
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.admin-login-button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.admin-login-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.admin-login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+
+/* Mobile */
+
+@media (max-width: 500px) {
+  .admin-login-page {
+    padding: 16px;
+  }
+
+  .admin-login-card {
+    padding: 26px 22px;
+  }
+
+  .admin-login-heading h1 {
+    font-size: 24px;
+  }
+}

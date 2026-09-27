@@ -140,3 +140,35 @@
     padding: 20px;
   }
 }
+
+.admin-user-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-user-area span {
+  color: #aeb8c8;
+  font-size: 14px;
+}
+
+.admin-logout-button {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  background: transparent;
+  color: #aeb8c8;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-logout-button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}

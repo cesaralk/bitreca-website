@@ -18,8 +18,9 @@ import Contact from './pages/Contact'
 
 // NEW ADMIN PAGE
 import AdminProjects from './pages/AdminProjects'
+import AdminLogin from './pages/AdminLogin'
 import AdminLayout from './components/AdminLayout'
-
+import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 
 function AppContent() {
   const location = useLocation()
@@ -39,12 +40,18 @@ function AppContent() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
 
-        <Route
+<Route
+  path="/admin/login"
+  element={<AdminLogin />}
+/>
+    <Route
   path="/admin/projects"
   element={
-    <AdminLayout>
-      <AdminProjects />
-    </AdminLayout>
+    <ProtectedAdminRoute>
+      <AdminLayout>
+        <AdminProjects />
+      </AdminLayout>
+    </ProtectedAdminRoute>
   }
 />
       </Routes>
