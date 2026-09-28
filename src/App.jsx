@@ -21,6 +21,7 @@ import AdminProjects from './pages/AdminProjects'
 import AdminLogin from './pages/AdminLogin'
 import AdminLayout from './components/AdminLayout'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
+import AdminDashboard from './pages/AdminDashboard'
 
 function AppContent() {
   const location = useLocation()
@@ -44,11 +45,22 @@ function AppContent() {
   path="/admin/login"
   element={<AdminLogin />}
 />
+<Route
+  path="/admin"
+  element={
+    <ProtectedAdminRoute>
+      <AdminLayout>
+        <AdminDashboard />
+      </AdminLayout>
+    </ProtectedAdminRoute>
+  }
+/>
     <Route
   path="/admin/projects"
   element={
     <ProtectedAdminRoute>
       <AdminLayout>
+        
         <AdminProjects />
       </AdminLayout>
     </ProtectedAdminRoute>
