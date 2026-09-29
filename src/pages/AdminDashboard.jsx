@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import './AdminDashboard.css'
 
 function AdminDashboard() {
@@ -78,6 +79,28 @@ function AdminDashboard() {
           </div>
         </div>
       )}
+
+<div className="dashboard-section">
+  <div className="dashboard-section-header">
+    <div>
+      <h2>Quick Actions</h2>
+      <p>Common administration tasks.</p>
+    </div>
+  </div>
+
+  <div className="dashboard-actions">
+    <Link
+  to="/admin/projects"
+  className="dashboard-action"
+>
+  <strong>Manage Projects</strong>
+  <span>
+    Create, edit, publish and manage Bitreca projects.
+  </span>
+</Link>
+  </div>
+</div>
+
     </div>
   )
 }
