@@ -264,80 +264,101 @@ if (
   })
 }
 
-    // Create a new project
-    if (
-      url.pathname === '/api/admin/projects' &&
-      request.method === 'POST'
-    ) {
-      try {
-        const body = await request.json()
+   // Create a new project
+if (
+  url.pathname === '/api/admin/projects' &&
+  request.method === 'POST'
+) {
+  try {
+    const body = await request.json()
 
-        const {
+    const {
+      title,
+      slug,
+      category,
+      description,
+      image_url,
+      status = 'draft',
+      featured = 0,
+    } = body
+
+    // Basic validation
+    if (!title || !slug || !category || !description) {
+      return Response.json(
+        {
+          success: false,
+          message:
+            'Title, slug, category and description are required.',
+        },
+        { status: 400 }
+      )
+    }
+
+    // Check whether the slug is already being used
+    const existingProject = await env.bitreca_db
+      .prepare(`
+        SELECT id
+        FROM projects
+        WHERE slug = ?
+        LIMIT 1
+      `)
+      .bind(slug)
+      .first()
+
+    if (existingProject) {
+      return Response.json(
+        {
+          success: false,
+          message: 'A project with this slug already exists.',
+        },
+        { status: 409 }
+      )
+    }
+
+    const result = await env.bitreca_db
+      .prepare(`
+        INSERT INTO projects (
           title,
           slug,
           category,
           description,
           image_url,
-          status = 'draft',
-          featured = 0,
-        } = body
-
-        // Basic validation
-        if (!title || !slug || !category || !description) {
-          return Response.json(
-            {
-              success: false,
-              message:
-                'Title, slug, category and description are required.',
-            },
-            { status: 400 }
-          )
-        }
-
-        const result = await env.bitreca_db
-          .prepare(`
-            INSERT INTO projects (
-              title,
-              slug,
-              category,
-              description,
-              image_url,
-              status,
-              featured
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-          `)
-          .bind(
-            title,
-            slug,
-            category,
-            description,
-            image_url || null,
-            status,
-            featured
-          )
-          .run()
-
-        return Response.json(
-          {
-            success: true,
-            message: 'Project created successfully.',
-            projectId: result.meta.last_row_id,
-          },
-          { status: 201 }
+          status,
+          featured
         )
-      } catch (error) {
-        console.error(error)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      .bind(
+        title,
+        slug,
+        category,
+        description,
+        image_url || null,
+        status,
+        featured
+      )
+      .run()
 
-        return Response.json(
-          {
-            success: false,
-            message: 'Could not create project.',
-          },
-          { status: 500 }
-        )
-      }
-    }
+    return Response.json(
+      {
+        success: true,
+        message: 'Project created successfully.',
+        projectId: result.meta.last_row_id,
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error(error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not create project.',
+      },
+      { status: 500 }
+    )
+  }
+}
 
     // Update an existing project
 if (
