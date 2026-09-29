@@ -294,6 +294,31 @@ if (
       )
     }
 
+// Validate slug format
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+if (!slugPattern.test(slug)) {
+  return Response.json(
+    {
+      success: false,
+      message:
+        'Slug can only contain lowercase letters, numbers and hyphens.',
+    },
+    { status: 400 }
+  )
+}
+
+// Validate project status
+if (!['draft', 'published'].includes(status)) {
+  return Response.json(
+    {
+      success: false,
+      message: 'Status must be either draft or published.',
+    },
+    { status: 400 }
+  )
+}
+
     // Check whether the slug is already being used
     const existingProject = await env.bitreca_db
       .prepare(`
@@ -335,7 +360,7 @@ if (
         description,
         image_url || null,
         status,
-        featured
+        featured ? 1 : 0
       )
       .run()
 
