@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './AdminProjects.css'
+import { useNavigate } from 'react-router-dom'
 
 function AdminProjects() {
   const [projects, setProjects] = useState([])
@@ -17,26 +18,37 @@ function AdminProjects() {
     status: 'draft',
     featured: false,
   })
+const navigate = useNavigate()
 
   useEffect(() => {
-    async function loadProjects() {
-      try {
-        const response = await fetch('/api/admin/projects')
-        const data = await response.json()
+  async function loadProjects() {
+    try {
+      const response = await fetch('/api/admin/projects')
+      const data = await response.json()
 
-        if (data.success) {
-          setProjects(data.projects)
-        }
-      } catch (error) {
-        console.error('Failed to load admin projects:', error)
-      } finally {
-        setLoading(false)
+      if (response.status === 401) {
+        navigate('/admin/login', { replace: true })
+        return
       }
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || 'Could not load projects.'
+        )
+      }
+
+      if (data.success) {
+        setProjects(data.projects)
+      }
+    } catch (error) {
+      console.error('Failed to load admin projects:', error)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    loadProjects()
-  }, [])
-
+  loadProjects()
+}, [navigate])
   function handleFormChange(event) {
     const { name, value, type, checked } = event.target
 
