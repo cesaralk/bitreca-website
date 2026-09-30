@@ -385,7 +385,7 @@ if (!['draft', 'published'].includes(status)) {
   }
 }
 
-    // Update an existing project
+// Update an existing project
 if (
   url.pathname.startsWith('/api/admin/projects/') &&
   request.method === 'PUT'
@@ -404,6 +404,7 @@ if (
       featured,
     } = body
 
+    // Basic validation
     if (!title || !slug || !category || !description) {
       return Response.json(
         {
@@ -415,6 +416,21 @@ if (
       )
     }
 
+    // Validate slug format
+    const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+    if (!slugPattern.test(slug)) {
+      return Response.json(
+        {
+          success: false,
+          message:
+            'Slug can only contain lowercase letters, numbers and hyphens.',
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate project status
     if (!['draft', 'published'].includes(status)) {
       return Response.json(
         {
@@ -422,6 +438,28 @@ if (
           message: 'Invalid project status.',
         },
         { status: 400 }
+      )
+    }
+
+    // Check whether another project already uses this slug
+    const existingProject = await env.bitreca_db
+      .prepare(`
+        SELECT id
+        FROM projects
+        WHERE slug = ?
+          AND id != ?
+        LIMIT 1
+      `)
+      .bind(slug, id)
+      .first()
+
+    if (existingProject) {
+      return Response.json(
+        {
+          success: false,
+          message: 'A project with this slug already exists.',
+        },
+        { status: 409 }
       )
     }
 
