@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import './AdminProjects.css'
 import { useNavigate } from 'react-router-dom'
+import { adminApi } from '../utils/adminApi'
+
 
 function AdminProjects() {
   const [projects, setProjects] = useState([])
@@ -20,28 +22,34 @@ function AdminProjects() {
   })
 const navigate = useNavigate()
 
-  useEffect(() => {
+ useEffect(() => {
   async function loadProjects() {
     try {
-      const response = await fetch('/api/admin/projects')
-      const data = await response.json()
+      const {
+        response,
+        data,
+        unauthorized,
+      } = await adminApi('/api/admin/projects')
 
-      if (response.status === 401) {
+      if (unauthorized) {
         navigate('/admin/login', { replace: true })
         return
       }
 
       if (!response.ok) {
         throw new Error(
-          data.message || 'Could not load projects.'
+          data?.message || 'Could not load projects.'
         )
       }
 
-      if (data.success) {
+      if (data?.success) {
         setProjects(data.projects)
       }
     } catch (error) {
-      console.error('Failed to load admin projects:', error)
+      console.error(
+        'Failed to load admin projects:',
+        error
+      )
     } finally {
       setLoading(false)
     }
@@ -49,6 +57,7 @@ const navigate = useNavigate()
 
   loadProjects()
 }, [navigate])
+
   function handleFormChange(event) {
     const { name, value, type, checked } = event.target
 
@@ -95,7 +104,11 @@ async function handleUpdateProject(event) {
   }
 
   try {
-    const response = await fetch(
+    const {
+      response,
+      data,
+      unauthorized,
+    } = await adminApi(
       `/api/admin/projects/${editingProject.id}`,
       {
         method: 'PUT',
@@ -109,17 +122,35 @@ async function handleUpdateProject(event) {
       }
     )
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      alert(data.message || 'Could not update project.')
+    if (unauthorized) {
+      navigate('/admin/login', { replace: true })
       return
     }
 
-    const projectsResponse = await fetch('/api/admin/projects')
-    const projectsData = await projectsResponse.json()
+    if (!response.ok) {
+      alert(data?.message || 'Could not update project.')
+      return
+    }
 
-    if (projectsData.success) {
+    // Reload projects after updating
+    const {
+      response: projectsResponse,
+      data: projectsData,
+      unauthorized: projectsUnauthorized,
+    } = await adminApi('/api/admin/projects')
+
+    if (projectsUnauthorized) {
+      navigate('/admin/login', { replace: true })
+      return
+    }
+
+    if (!projectsResponse.ok) {
+      throw new Error(
+        projectsData?.message || 'Could not reload projects.'
+      )
+    }
+
+    if (projectsData?.success) {
       setProjects(projectsData.projects)
     }
 
@@ -139,7 +170,10 @@ async function handleUpdateProject(event) {
     alert('Project updated successfully.')
   } catch (error) {
     console.error('Failed to update project:', error)
-    alert('Something went wrong while updating the project.')
+
+    alert(
+      'Something went wrong while updating the project.'
+    )
   }
 }
 
@@ -150,7 +184,11 @@ async function handleTogglePublish(project) {
       : 'published'
 
   try {
-    const response = await fetch(
+    const {
+      response,
+      data,
+      unauthorized,
+    } = await adminApi(
       `/api/admin/projects/${project.id}`,
       {
         method: 'PUT',
@@ -164,10 +202,15 @@ async function handleTogglePublish(project) {
       }
     )
 
-    const data = await response.json()
+    if (unauthorized) {
+      navigate('/admin/login', { replace: true })
+      return
+    }
 
     if (!response.ok) {
-      alert(data.message || 'Could not update project status.')
+      alert(
+        data?.message || 'Could not update project status.'
+      )
       return
     }
 
@@ -203,38 +246,56 @@ async function handleDeleteProject(project) {
   }
 
   try {
-    const response = await fetch(
+    const {
+      response,
+      data,
+      unauthorized,
+    } = await adminApi(
       `/api/admin/projects/${project.id}`,
       {
         method: 'DELETE',
       }
     )
 
-    const data = await response.json()
+    if (unauthorized) {
+      navigate('/admin/login', { replace: true })
+      return
+    }
 
     if (!response.ok) {
-      alert(data.message || 'Could not delete project.')
+      alert(data?.message || 'Could not delete project.')
       return
     }
 
     setProjects((currentProjects) =>
       currentProjects.filter(
-        (currentProject) => currentProject.id !== project.id
+        (currentProject) =>
+          currentProject.id !== project.id
       )
     )
 
     alert('Project deleted successfully.')
   } catch (error) {
-    console.error('Failed to delete project:', error)
-    alert('Something went wrong while deleting the project.')
+    console.error(
+      'Failed to delete project:',
+      error
+    )
+
+    alert(
+      'Something went wrong while deleting the project.'
+    )
   }
 }
 
-  async function handleCreateProject(event) {
+async function handleCreateProject(event) {
   event.preventDefault()
 
   try {
-    const response = await fetch('/api/admin/projects', {
+    const {
+      response,
+      data,
+      unauthorized,
+    } = await adminApi('/api/admin/projects', {
       method: 'POST',
 
       headers: {
@@ -247,17 +308,35 @@ async function handleDeleteProject(project) {
       }),
     })
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      alert(data.message || 'Could not create project.')
+    if (unauthorized) {
+      navigate('/admin/login', { replace: true })
       return
     }
 
-    const projectsResponse = await fetch('/api/admin/projects')
-    const projectsData = await projectsResponse.json()
+    if (!response.ok) {
+      alert(data?.message || 'Could not create project.')
+      return
+    }
 
-    if (projectsData.success) {
+    // Reload projects after creating
+    const {
+      response: projectsResponse,
+      data: projectsData,
+      unauthorized: projectsUnauthorized,
+    } = await adminApi('/api/admin/projects')
+
+    if (projectsUnauthorized) {
+      navigate('/admin/login', { replace: true })
+      return
+    }
+
+    if (!projectsResponse.ok) {
+      throw new Error(
+        projectsData?.message || 'Could not reload projects.'
+      )
+    }
+
+    if (projectsData?.success) {
       setProjects(projectsData.projects)
     }
 
@@ -275,17 +354,12 @@ async function handleDeleteProject(project) {
     alert('Project created successfully.')
   } catch (error) {
     console.error('Failed to create project:', error)
-    alert('Something went wrong while creating the project.')
-  }
-}
 
-  if (loading) {
-    return (
-      <div className="admin-projects-loading">
-        Loading projects...
-      </div>
+    alert(
+      'Something went wrong while creating the project.'
     )
   }
+}
 
   return (
     <div className="admin-projects">
@@ -479,59 +553,64 @@ async function handleDeleteProject(project) {
           <span></span>
         </div>
 
-        {projects.map((project) => (
-          <div
-            className="admin-project-row"
-            key={project.id}
-          >
-            <div className="admin-project-name">
-              <strong>{project.title}</strong>
-              <span>/{project.slug}</span>
-            </div>
+   {loading ? (
+  <div className="admin-projects-loading">
+    Loading projects...
+  </div>
+) : (
+  projects.map((project) => (
+    <div
+      className="admin-project-row"
+      key={project.id}
+    >
+      <div className="admin-project-name">
+        <strong>{project.title}</strong>
+        <span>/{project.slug}</span>
+      </div>
 
-            <div className="admin-project-category">
-              {project.category}
-            </div>
+      <div className="admin-project-category">
+        {project.category}
+      </div>
 
-            <div>
-              <span
-                className={`admin-status admin-status-${project.status}`}
-              >
-                {project.status}
-              </span>
-            </div>
+      <div>
+        <span
+          className={`admin-status admin-status-${project.status}`}
+        >
+          {project.status}
+        </span>
+      </div>
 
-            <div className="admin-project-featured">
-              {project.featured === 1 ? 'Yes' : 'No'}
-            </div>
+      <div className="admin-project-featured">
+        {project.featured === 1 ? 'Yes' : 'No'}
+      </div>
 
-  <div className="admin-project-actions">
-  <button
-    type="button"
-    onClick={() => handleEditProject(project)}
-  >
-    Edit
-  </button>
+      <div className="admin-project-actions">
+        <button
+          type="button"
+          onClick={() => handleEditProject(project)}
+        >
+          Edit
+        </button>
 
-  <button
-    type="button"
-    onClick={() => handleTogglePublish(project)}
-  >
-    {project.status === 'published'
-      ? 'Unpublish'
-      : 'Publish'}
-  </button>
+        <button
+          type="button"
+          onClick={() => handleTogglePublish(project)}
+        >
+          {project.status === 'published'
+            ? 'Unpublish'
+            : 'Publish'}
+        </button>
 
-  <button
-    type="button"
-    onClick={() => handleDeleteProject(project)}
-  >
-    Delete
-  </button>
-</div>
-
-          </div>
-        ))}
+        <button
+          type="button"
+          onClick={() => handleDeleteProject(project)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  ))
+)}
 
       </div>
 
