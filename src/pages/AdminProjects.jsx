@@ -13,13 +13,14 @@ function AdminProjects() {
   const [editingProject, setEditingProject] = useState(null)
 
   const [formData, setFormData] = useState({
-    title: '',
-    slug: '',
-    category: '',
-    description: '',
-    status: 'draft',
-    featured: false,
-  })
+  title: '',
+  slug: '',
+  category: '',
+  description: '',
+  image_url: '',
+  status: 'draft',
+  featured: false,
+})
 const adminRequest = useAdminApi()
 
 useEffect(() => {
@@ -75,6 +76,7 @@ function closeProjectForm() {
     slug: '',
     category: '',
     description: '',
+    image_url: '',
     status: 'draft',
     featured: false,
   })
@@ -88,6 +90,7 @@ function handleEditProject(project) {
     slug: project.slug,
     category: project.category,
     description: project.description,
+    image_url: project.image_url || '',
     status: project.status,
     featured: project.featured === 1,
   })
@@ -155,13 +158,14 @@ const {
     setEditingProject(null)
 
     setFormData({
-      title: '',
-      slug: '',
-      category: '',
-      description: '',
-      status: 'draft',
-      featured: false,
-    })
+  title: '',
+  slug: '',
+  category: '',
+  description: '',
+  image_url: '',
+  status: 'draft',
+  featured: false,
+})
 
     setShowCreateForm(false)
 
@@ -335,13 +339,14 @@ const {
     }
 
     setFormData({
-      title: '',
-      slug: '',
-      category: '',
-      description: '',
-      status: 'draft',
-      featured: false,
-    })
+  title: '',
+  slug: '',
+  category: '',
+  description: '',
+  image_url: '',
+  status: 'draft',
+  featured: false,
+})
 
     setShowCreateForm(false)
 
@@ -380,6 +385,7 @@ const {
     slug: '',
     category: '',
     description: '',
+    image_url: '',
     status: 'draft',
     featured: false,
   })
@@ -477,7 +483,20 @@ const {
                 onChange={handleFormChange}
               />
             </div>
+<div className="admin-form-field admin-form-field-full">
+  <label htmlFor="project-image-url">
+    Project Image URL
+  </label>
 
+  <input
+    id="project-image-url"
+    name="image_url"
+    type="url"
+    placeholder="https://example.com/project-image.jpg"
+    value={formData.image_url}
+    onChange={handleFormChange}
+  />
+</div>
             <div className="admin-form-field">
               <label htmlFor="project-status">
                 Status
