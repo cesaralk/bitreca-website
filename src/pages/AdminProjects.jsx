@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
+
 import './AdminProjects.css'
-import { useNavigate } from 'react-router-dom'
-import { adminApi } from '../utils/adminApi'
+import { useAdminApi } from '../hooks/useAdminApi'
 
 
 function AdminProjects() {
@@ -20,21 +20,20 @@ function AdminProjects() {
     status: 'draft',
     featured: false,
   })
-const navigate = useNavigate()
+const adminRequest = useAdminApi()
 
- useEffect(() => {
+useEffect(() => {
   async function loadProjects() {
     try {
-      const {
-        response,
-        data,
-        unauthorized,
-      } = await adminApi('/api/admin/projects')
+      const result = await adminRequest(
+        '/api/admin/projects'
+      )
 
-      if (unauthorized) {
-        navigate('/admin/login', { replace: true })
+      if (!result) {
         return
       }
+
+      const { response, data } = result
 
       if (!response.ok) {
         throw new Error(
@@ -56,7 +55,7 @@ const navigate = useNavigate()
   }
 
   loadProjects()
-}, [navigate])
+}, [adminRequest])
 
   function handleFormChange(event) {
     const { name, value, type, checked } = event.target
@@ -104,28 +103,25 @@ async function handleUpdateProject(event) {
   }
 
   try {
-    const {
-      response,
-      data,
-      unauthorized,
-    } = await adminApi(
-      `/api/admin/projects/${editingProject.id}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          featured: formData.featured ? 1 : 0,
-        }),
-      }
-    )
+    const result = await adminRequest(
+  `/api/admin/projects/${editingProject.id}`,
+  {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...formData,
+      featured: formData.featured ? 1 : 0,
+    }),
+  }
+)
 
-    if (unauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!result) {
+  return
+}
+
+const { response, data } = result
 
     if (!response.ok) {
       alert(data?.message || 'Could not update project.')
@@ -133,16 +129,18 @@ async function handleUpdateProject(event) {
     }
 
     // Reload projects after updating
-    const {
-      response: projectsResponse,
-      data: projectsData,
-      unauthorized: projectsUnauthorized,
-    } = await adminApi('/api/admin/projects')
+  const projectsResult = await adminRequest(
+  '/api/admin/projects'
+)
 
-    if (projectsUnauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!projectsResult) {
+  return
+}
+
+const {
+  response: projectsResponse,
+  data: projectsData,
+} = projectsResult
 
     if (!projectsResponse.ok) {
       throw new Error(
@@ -184,28 +182,25 @@ async function handleTogglePublish(project) {
       : 'published'
 
   try {
-    const {
-      response,
-      data,
-      unauthorized,
-    } = await adminApi(
-      `/api/admin/projects/${project.id}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...project,
-          status: newStatus,
-        }),
-      }
-    )
+   const result = await adminRequest(
+  `/api/admin/projects/${project.id}`,
+  {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...project,
+      status: newStatus,
+    }),
+  }
+)
 
-    if (unauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!result) {
+  return
+}
+
+const { response, data } = result
 
     if (!response.ok) {
       alert(
@@ -246,21 +241,18 @@ async function handleDeleteProject(project) {
   }
 
   try {
-    const {
-      response,
-      data,
-      unauthorized,
-    } = await adminApi(
-      `/api/admin/projects/${project.id}`,
-      {
-        method: 'DELETE',
-      }
-    )
+  const result = await adminRequest(
+  `/api/admin/projects/${project.id}`,
+  {
+    method: 'DELETE',
+  }
+)
 
-    if (unauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!result) {
+  return
+}
+
+const { response, data } = result
 
     if (!response.ok) {
       alert(data?.message || 'Could not delete project.')
@@ -291,27 +283,27 @@ async function handleCreateProject(event) {
   event.preventDefault()
 
   try {
-    const {
-      response,
-      data,
-      unauthorized,
-    } = await adminApi('/api/admin/projects', {
-      method: 'POST',
+   const result = await adminRequest(
+  '/api/admin/projects',
+  {
+    method: 'POST',
 
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    headers: {
+      'Content-Type': 'application/json',
+    },
 
-      body: JSON.stringify({
-        ...formData,
-        featured: formData.featured ? 1 : 0,
-      }),
-    })
+    body: JSON.stringify({
+      ...formData,
+      featured: formData.featured ? 1 : 0,
+    }),
+  }
+)
 
-    if (unauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!result) {
+  return
+}
+
+const { response, data } = result
 
     if (!response.ok) {
       alert(data?.message || 'Could not create project.')
@@ -319,16 +311,18 @@ async function handleCreateProject(event) {
     }
 
     // Reload projects after creating
-    const {
-      response: projectsResponse,
-      data: projectsData,
-      unauthorized: projectsUnauthorized,
-    } = await adminApi('/api/admin/projects')
+    const projectsResult = await adminRequest(
+  '/api/admin/projects'
+)
 
-    if (projectsUnauthorized) {
-      navigate('/admin/login', { replace: true })
-      return
-    }
+if (!projectsResult) {
+  return
+}
+
+const {
+  response: projectsResponse,
+  data: projectsData,
+} = projectsResult
 
     if (!projectsResponse.ok) {
       throw new Error(
