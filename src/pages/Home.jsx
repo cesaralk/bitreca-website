@@ -316,6 +316,7 @@ useEffect(() => {
         category={project.category}
         description={project.description}
         tags={[]}
+        imageUrl={project.image_url}
       />
     ))}
 

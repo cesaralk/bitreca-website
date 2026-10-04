@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-function ProjectCard({ title, category, description, tags }) {
+function ProjectCard({ title, category, description, tags, imageUrl }) {
   return (
     <article className="project-card">
 
@@ -13,8 +13,16 @@ function ProjectCard({ title, category, description, tags }) {
           </div>
 
           <div className="project-preview">
-            <span>{title}</span>
-          </div>
+  {imageUrl ? (
+    <img
+      src={imageUrl}
+      alt={title}
+      className="project-preview-image"
+    />
+  ) : (
+    <span>{title}</span>
+  )}
+</div>
         </div>
       </div>
 
