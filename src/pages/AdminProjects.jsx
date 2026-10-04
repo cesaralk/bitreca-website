@@ -67,6 +67,49 @@ useEffect(() => {
     }))
   }
 
+  async function handleImageUpload(event) {
+  const file = event.target.files?.[0]
+
+  if (!file) {
+    return
+  }
+
+  const uploadData = new FormData()
+  uploadData.append('file', file)
+
+  try {
+    const result = await adminRequest(
+      '/api/admin/media/upload',
+      {
+        method: 'POST',
+        body: uploadData,
+      }
+    )
+
+    if (!result) {
+      return
+    }
+
+    const { response, data } = result
+
+    if (!response.ok) {
+      alert(data?.message || 'Could not upload image.')
+      return
+    }
+
+    setFormData((current) => ({
+  ...current,
+  image_url: data.url,
+}))
+
+  } catch (error) {
+    console.error('Image upload failed:', error)
+
+    alert('Something went wrong while uploading the image.')
+  }
+}
+
+
 function closeProjectForm() {
   setShowCreateForm(false)
   setEditingProject(null)
@@ -488,14 +531,29 @@ const {
     Project Image URL
   </label>
 
+<input
+  id="project-image-file"
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  onChange={handleImageUpload}
+/>
+
   <input
     id="project-image-url"
     name="image_url"
-    type="url"
+    type="text"
     placeholder="https://example.com/project-image.jpg"
     value={formData.image_url}
     onChange={handleFormChange}
   />
+  {formData.image_url && (
+  <div className="admin-project-image-preview">
+    <img
+      src={formData.image_url}
+      alt="Project preview"
+    />
+  </div>
+)}
 </div>
             <div className="admin-form-field">
               <label htmlFor="project-status">

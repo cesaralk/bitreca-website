@@ -207,6 +207,129 @@ if (
   }
 }
 
+// Upload media to R2
+if (
+  url.pathname === '/api/admin/media/upload' &&
+  request.method === 'POST'
+) {
+  try {
+    const formData = await request.formData()
+    const file = formData.get('file')
+
+    if (!file || typeof file === 'string') {
+      return Response.json(
+        {
+          success: false,
+          message: 'Please choose an image to upload.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+    ]
+
+    if (!allowedTypes.includes(file.type)) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Only JPG, PNG and WebP images are allowed.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const maxFileSize = 5 * 1024 * 1024
+
+    if (file.size > maxFileSize) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Image must be 5 MB or smaller.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const extension =
+      file.name.split('.').pop()?.toLowerCase() || 'jpg'
+
+    const fileName =
+      `projects/${crypto.randomUUID()}.${extension}`
+
+    await env.bitreca_media.put(fileName, file, {
+      httpMetadata: {
+        contentType: file.type,
+      },
+    })
+
+   return Response.json({
+  success: true,
+  message: 'Image uploaded successfully.',
+  key: fileName,
+  url: `/api/media/${fileName}`,
+})
+
+  } catch (error) {
+    console.error('Media upload failed:', error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not upload image.',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// Serve media files from R2
+if (
+  url.pathname.startsWith('/api/media/') &&
+  request.method === 'GET'
+) {
+  try {
+    const key = url.pathname.replace('/api/media/', '')
+
+    if (!key) {
+      return new Response('Media file not specified.', {
+        status: 400,
+      })
+    }
+
+    const object = await env.bitreca_media.get(key)
+
+    if (!object) {
+      return new Response('Media file not found.', {
+        status: 404,
+      })
+    }
+
+    const headers = new Headers()
+
+    object.writeHttpMetadata(headers)
+
+    headers.set('etag', object.httpEtag)
+    headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable'
+    )
+
+    return new Response(object.body, {
+      headers,
+    })
+  } catch (error) {
+    console.error('Media download failed:', error)
+
+    return new Response('Could not load media file.', {
+      status: 500,
+    })
+  }
+}
+
     // Get published projects for the public website
     if (
       url.pathname === '/api/projects' &&

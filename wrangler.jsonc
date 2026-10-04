@@ -18,5 +18,13 @@
 			"database_name": "bitreca-db",
 			"database_id": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a"
 		}
-	]
+	],
+
+
+"r2_buckets": [
+  {
+    "binding": "bitreca_media",
+    "bucket_name": "bitreca-media"
+  }
+]
 }
