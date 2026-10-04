@@ -13,6 +13,7 @@ import Services from './pages/Services'
 import Products from './pages/Products'
 import Store from './pages/Store'
 import Projects from './pages/Projects'
+import ProjectDetails from './pages/ProjectDetails'
 import About from './pages/About'
 import Contact from './pages/Contact'
 
@@ -38,6 +39,10 @@ function AppContent() {
         <Route path="/products" element={<Products />} />
         <Route path="/store" element={<Store />} />
         <Route path="/projects" element={<Projects />} />
+        <Route
+  path="/projects/:slug"
+  element={<ProjectDetails />}
+/>
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
 

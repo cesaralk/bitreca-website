@@ -83,6 +83,7 @@ function Projects() {
                   description={project.description}
                   tags={[]}
                   imageUrl={project.image_url}
+                  slug={project.slug}
                 />
               ))}
             </div>

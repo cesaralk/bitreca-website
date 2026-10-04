@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-function ProjectCard({ title, category, description, tags, imageUrl }) {
+function ProjectCard({ title, category, description, tags, imageUrl, slug, }) {
   return (
     <article className="project-card">
 
@@ -44,9 +44,12 @@ function ProjectCard({ title, category, description, tags, imageUrl }) {
           ))}
         </div>
 
-        <Link to="/projects" className="project-link">
-          View Project <span>→</span>
-        </Link>
+        <Link
+  to={`/projects/${slug}`}
+  className="project-link"
+>
+  View Project <span>→</span>
+</Link>
 
       </div>
 

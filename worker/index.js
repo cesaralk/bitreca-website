@@ -387,6 +387,73 @@ if (
   })
 }
 
+// Get one published project by slug
+if (
+  url.pathname.startsWith('/api/projects/') &&
+  request.method === 'GET'
+) {
+  try {
+    const slug = url.pathname
+      .replace('/api/projects/', '')
+      .trim()
+
+    if (!slug) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Project slug is required.',
+        },
+        { status: 400 }
+      )
+    }
+
+    const project = await env.bitreca_db
+      .prepare(`
+        SELECT
+          id,
+          title,
+          slug,
+          category,
+          description,
+          image_url,
+          featured,
+          created_at,
+          updated_at
+        FROM projects
+        WHERE slug = ?
+          AND status = 'published'
+        LIMIT 1
+      `)
+      .bind(slug)
+      .first()
+
+    if (!project) {
+      return Response.json(
+        {
+          success: false,
+          message: 'Project not found.',
+        },
+        { status: 404 }
+      )
+    }
+
+    return Response.json({
+      success: true,
+      project,
+    })
+  } catch (error) {
+    console.error('Could not load project:', error)
+
+    return Response.json(
+      {
+        success: false,
+        message: 'Could not load project.',
+      },
+      { status: 500 }
+    )
+  }
+}
+
    // Create a new project
 if (
   url.pathname === '/api/admin/projects' &&
