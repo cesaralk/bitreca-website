@@ -18,6 +18,10 @@ function AdminProjects() {
   category: '',
   description: '',
   image_url: '',
+  overview: '',
+  technologies: '',
+  project_url: '',
+  content: '',
   status: 'draft',
   featured: false,
 })
@@ -120,8 +124,12 @@ function closeProjectForm() {
     category: '',
     description: '',
     image_url: '',
-    status: 'draft',
-    featured: false,
+overview: '',
+technologies: '',
+project_url: '',
+content: '',
+status: 'draft',
+featured: false,
   })
 }
 
@@ -134,6 +142,10 @@ function handleEditProject(project) {
     category: project.category,
     description: project.description,
     image_url: project.image_url || '',
+    overview: project.overview || '',
+technologies: project.technologies || '',
+project_url: project.project_url || '',
+content: project.content || '',
     status: project.status,
     featured: project.featured === 1,
   })
@@ -205,9 +217,13 @@ const {
   slug: '',
   category: '',
   description: '',
-  image_url: '',
-  status: 'draft',
-  featured: false,
+image_url: '',
+overview: '',
+technologies: '',
+project_url: '',
+content: '',
+status: 'draft',
+featured: false,
 })
 
     setShowCreateForm(false)
@@ -386,9 +402,13 @@ const {
   slug: '',
   category: '',
   description: '',
-  image_url: '',
-  status: 'draft',
-  featured: false,
+image_url: '',
+overview: '',
+technologies: '',
+project_url: '',
+content: '',
+status: 'draft',
+featured: false,
 })
 
     setShowCreateForm(false)
@@ -428,9 +448,13 @@ const {
     slug: '',
     category: '',
     description: '',
-    image_url: '',
-    status: 'draft',
-    featured: false,
+   image_url: '',
+overview: '',
+technologies: '',
+project_url: '',
+content: '',
+status: 'draft',
+featured: false,
   })
 
   setShowCreateForm(true)
@@ -526,6 +550,67 @@ const {
                 onChange={handleFormChange}
               />
             </div>
+            
+<div className="admin-form-field admin-form-field-full">
+  <label htmlFor="project-overview">
+    Project Overview
+  </label>
+
+  <textarea
+    id="project-overview"
+    name="overview"
+    rows="6"
+    placeholder="Explain what this project does, who it helps, and what problems it solves..."
+    value={formData.overview}
+    onChange={handleFormChange}
+  />
+</div>
+
+<div className="admin-form-field admin-form-field-full">
+  <label htmlFor="project-technologies">
+    Technologies Used
+  </label>
+
+  <input
+    id="project-technologies"
+    name="technologies"
+    type="text"
+    placeholder="Example: C#, .NET, SQL Server"
+    value={formData.technologies}
+    onChange={handleFormChange}
+  />
+</div>
+
+<div className="admin-form-field admin-form-field-full">
+  <label htmlFor="project-url">
+    Project URL
+  </label>
+
+  <input
+    id="project-url"
+    name="project_url"
+    type="url"
+    placeholder="https://example.com"
+    value={formData.project_url}
+    onChange={handleFormChange}
+  />
+</div>
+
+<div className="admin-form-field admin-form-field-full">
+  <label htmlFor="project-content">
+    Detailed Content
+  </label>
+
+  <textarea
+    id="project-content"
+    name="content"
+    rows="8"
+    placeholder="Describe the project's features, capabilities, challenges, and solutions..."
+    value={formData.content}
+    onChange={handleFormChange}
+  />
+</div>
+
 <div className="admin-form-field admin-form-field-full">
   <label htmlFor="project-image-url">
     Project Image URL

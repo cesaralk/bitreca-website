@@ -371,11 +371,15 @@ if (
         slug,
         category,
         description,
-        image_url,
-        status,
-        featured,
-        created_at,
-        updated_at
+       image_url,
+overview,
+technologies,
+project_url,
+content,
+status,
+featured,
+created_at,
+updated_at
       FROM projects
       ORDER BY created_at DESC
     `)
@@ -416,9 +420,13 @@ if (
           category,
           description,
           image_url,
-          featured,
-          created_at,
-          updated_at
+overview,
+technologies,
+project_url,
+content,
+featured,
+created_at,
+updated_at
         FROM projects
         WHERE slug = ?
           AND status = 'published'
@@ -463,14 +471,18 @@ if (
     const body = await request.json()
 
     const {
-      title,
-      slug,
-      category,
-      description,
-      image_url,
-      status = 'draft',
-      featured = 0,
-    } = body
+  title,
+  slug,
+  category,
+  description,
+  image_url,
+  overview,
+  technologies,
+  project_url,
+  content,
+  status = 'draft',
+  featured = 0,
+} = body
 
     // Basic validation
     if (!title || !slug || !category || !description) {
@@ -531,28 +543,36 @@ if (!['draft', 'published'].includes(status)) {
     }
 
     const result = await env.bitreca_db
-      .prepare(`
-        INSERT INTO projects (
-          title,
-          slug,
-          category,
-          description,
-          image_url,
-          status,
-          featured
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-      .bind(
-        title,
-        slug,
-        category,
-        description,
-        image_url || null,
-        status,
-        featured ? 1 : 0
-      )
-      .run()
+  .prepare(`
+    INSERT INTO projects (
+      title,
+      slug,
+      category,
+      description,
+      image_url,
+      overview,
+      technologies,
+      project_url,
+      content,
+      status,
+      featured
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `)
+  .bind(
+    title,
+    slug,
+    category,
+    description,
+    image_url || null,
+    overview || null,
+    technologies || null,
+    project_url || null,
+    content || null,
+    status,
+    featured ? 1 : 0
+  )
+  .run()
 
     return Response.json(
       {
@@ -585,15 +605,18 @@ if (
     const body = await request.json()
 
     const {
-      title,
-      slug,
-      category,
-      description,
-      image_url,
-      status,
-      featured,
-    } = body
-
+  title,
+  slug,
+  category,
+  description,
+  image_url,
+  overview,
+  technologies,
+  project_url,
+  content,
+  status,
+  featured,
+} = body
     // Basic validation
     if (!title || !slug || !category || !description) {
       return Response.json(
@@ -653,31 +676,41 @@ if (
       )
     }
 
-    const result = await env.bitreca_db
-      .prepare(`
-        UPDATE projects
-        SET
-          title = ?,
-          slug = ?,
-          category = ?,
-          description = ?,
-          image_url = ?,
-          status = ?,
-          featured = ?,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `)
-      .bind(
-        title,
-        slug,
-        category,
-        description,
-        image_url || null,
-        status,
-        featured ? 1 : 0,
-        id
-      )
-      .run()
+    
+const result = await env.bitreca_db
+  .prepare(`
+    UPDATE projects
+    SET
+      title = ?,
+      slug = ?,
+      category = ?,
+      description = ?,
+      image_url = ?,
+      overview = ?,
+      technologies = ?,
+      project_url = ?,
+      content = ?,
+      status = ?,
+      featured = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `)
+  .bind(
+    title,
+    slug,
+    category,
+    description,
+    image_url || null,
+    overview || null,
+    technologies || null,
+    project_url || null,
+    content || null,
+    status,
+    featured ? 1 : 0,
+    id
+  )
+  .run()
+
 
     if (result.meta.changes === 0) {
       return Response.json(

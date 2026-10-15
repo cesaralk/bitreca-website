@@ -33,3 +33,4 @@ dist-ssr
 # Local Cloudflare secrets
 .dev.vars
 .dev.vars.*
+bitreca-production-backup.sql
