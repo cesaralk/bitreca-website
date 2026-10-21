@@ -19,19 +19,22 @@ import Contact from './pages/Contact'
 
 // NEW ADMIN PAGE
 import AdminProjects from './pages/AdminProjects'
+import AdminPortfolios from './pages/AdminPortfolios'
 import AdminLogin from './pages/AdminLogin'
 import AdminLayout from './components/AdminLayout'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import AdminDashboard from './pages/AdminDashboard'
+import PortfolioTemplate from './pages/PortfolioTemplate'
 
 function AppContent() {
   const location = useLocation()
 
   const isAdmin = location.pathname.startsWith('/admin')
+  const isPortfolio = location.pathname.startsWith('/portfolio/')
 
   return (
     <>
-      {!isAdmin && <Navbar />}
+    {!isAdmin && !isPortfolio && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -39,6 +42,7 @@ function AppContent() {
         <Route path="/products" element={<Products />} />
         <Route path="/store" element={<Store />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/portfolio/demo" element={<PortfolioTemplate />} />
         <Route
   path="/projects/:slug"
   element={<ProjectDetails />}
@@ -71,9 +75,21 @@ function AppContent() {
     </ProtectedAdminRoute>
   }
 />
+
+<Route
+  path="/admin/portfolios"
+  element={
+    <ProtectedAdminRoute>
+      <AdminLayout>
+        <AdminPortfolios />
+      </AdminLayout>
+    </ProtectedAdminRoute>
+  }
+/>
+
       </Routes>
 
-      {!isAdmin && <Footer />}
+      {!isAdmin && !isPortfolio && <Footer />}
     </>
   )
 }

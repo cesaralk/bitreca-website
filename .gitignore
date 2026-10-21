@@ -34,3 +34,4 @@ dist-ssr
 .dev.vars
 .dev.vars.*
 bitreca-production-backup.sql
+deployment-check/

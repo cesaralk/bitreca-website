@@ -26,8 +26,9 @@ async function createSessionToken(secret) {
 
 function createSessionCookie(token) {
   return [
-    `bitreca_admin_session=${token}`,
+    `__Host-bitreca_admin_session=${token}`,
     'HttpOnly',
+    'Secure',
     'Path=/',
     'SameSite=Strict',
     'Max-Age=28800',
@@ -59,7 +60,7 @@ function getCookie(request, name) {
 async function isAdminAuthenticated(request, env) {
   const sessionCookie = getCookie(
     request,
-    'bitreca_admin_session'
+    '__Host-bitreca_admin_session'
   )
 
   if (!sessionCookie) {
@@ -76,6 +77,24 @@ async function isAdminAuthenticated(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
+
+    // Reject cross-origin requests that modify admin data.
+if (
+  url.pathname.startsWith('/api/admin/') &&
+  !['GET', 'HEAD', 'OPTIONS'].includes(request.method)
+) {
+  const origin = request.headers.get('Origin')
+
+  if (origin !== url.origin) {
+    return Response.json(
+      {
+        success: false,
+        message: 'Cross-origin admin requests are not allowed.',
+      },
+      { status: 403 }
+    )
+  }
+}
 
     // Health check
     if (url.pathname === '/api/health') {
@@ -149,12 +168,13 @@ if (
     {
       headers: {
         'Set-Cookie': [
-          'bitreca_admin_session=',
-          'HttpOnly',
-          'Path=/',
-          'SameSite=Strict',
-          'Max-Age=0',
-        ].join('; '),
+  '__Host-bitreca_admin_session=',
+  'HttpOnly',
+  'Secure',
+  'Path=/',
+  'SameSite=Strict',
+  'Max-Age=0',
+].join('; '),
       },
     }
   )
@@ -241,7 +261,39 @@ if (
         { status: 400 }
       )
     }
+// Verify the actual file signature, not just the MIME type.
+const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer())
 
+const isJpeg =
+  bytes[0] === 0xff &&
+  bytes[1] === 0xd8 &&
+  bytes[2] === 0xff
+
+const isPng =
+  bytes.length >= 8 &&
+  [137, 80, 78, 71, 13, 10, 26, 10].every(
+    (value, index) => bytes[index] === value
+  )
+
+const isWebp =
+  bytes.length >= 12 &&
+  String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' &&
+  String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP'
+
+const validImage =
+  (file.type === 'image/jpeg' && isJpeg) ||
+  (file.type === 'image/png' && isPng) ||
+  (file.type === 'image/webp' && isWebp)
+
+if (!validImage) {
+  return Response.json(
+    {
+      success: false,
+      message: 'Invalid image content.',
+    },
+    { status: 400 }
+  )
+}
     const maxFileSize = 5 * 1024 * 1024
 
     if (file.size > maxFileSize) {
@@ -254,11 +306,16 @@ if (
       )
     }
 
-    const extension =
-      file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const extensionsByType = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+}
 
-    const fileName =
-      `projects/${crypto.randomUUID()}.${extension}`
+const extension = extensionsByType[file.type]
+
+const fileName =
+  `projects/${crypto.randomUUID()}.${extension}`
 
     await env.bitreca_media.put(fileName, file, {
       httpMetadata: {
@@ -286,17 +343,33 @@ if (
   }
 }
 
-// Serve media files from R2
+
+// Serve only Bitreca project images from R2
 if (
   url.pathname.startsWith('/api/media/') &&
   request.method === 'GET'
 ) {
   try {
-    const key = url.pathname.replace('/api/media/', '')
+    const key = url.pathname.slice('/api/media/'.length)
 
-    if (!key) {
-      return new Response('Media file not specified.', {
+    let decodedKey
+
+    try {
+      decodedKey = decodeURIComponent(key)
+    } catch {
+      return new Response('Invalid media path.', {
         status: 400,
+      })
+    }
+
+    // Only allow the expected project-image key format.
+    // Never expose PortfolioForest website files here.
+    if (
+      key !== decodedKey ||
+      !/^projects\/[0-9a-f-]{36}\.(jpg|png|webp)$/.test(key)
+    ) {
+      return new Response('Not found.', {
+        status: 404,
       })
     }
 
@@ -313,6 +386,7 @@ if (
     object.writeHttpMetadata(headers)
 
     headers.set('etag', object.httpEtag)
+    headers.set('X-Content-Type-Options', 'nosniff')
     headers.set(
       'Cache-Control',
       'public, max-age=31536000, immutable'
@@ -329,6 +403,7 @@ if (
     })
   }
 }
+
 
     // Get published projects for the public website
     if (
@@ -457,6 +532,677 @@ updated_at
         success: false,
         message: 'Could not load project.',
       },
+      { status: 500 }
+    )
+  }
+}
+
+  // PortfolioForest - List all portfolios (admin only)
+  if (
+    url.pathname === '/api/admin/portfolios' &&
+    request.method === 'GET'
+  ) {
+    try {
+      const result = await env.bitreca_db
+        .prepare(`
+          SELECT
+            id,
+            name,
+            slug,
+            profession,
+            description,
+            thumbnail_url,
+            storage_prefix,
+            status,
+            featured,
+            created_at,
+            updated_at
+          FROM portfolios
+          ORDER BY created_at DESC, id DESC
+        `)
+        .all()
+
+      return Response.json({
+        success: true,
+        portfolios: result.results,
+      })
+    } catch (error) {
+      console.error('Could not load portfolios:', error)
+
+      return Response.json(
+        {
+          success: false,
+          message: 'Could not load portfolios.',
+        },
+        { status: 500 }
+      )
+    }
+  }
+
+  // PortfolioForest - Create a portfolio (admin only)
+  if (
+    url.pathname === '/api/admin/portfolios' &&
+    request.method === 'POST'
+  ) {
+    try {
+      const body = await request.json()
+
+      const name = typeof body.name === 'string'
+        ? body.name.trim()
+        : ''
+
+      const slug = typeof body.slug === 'string'
+        ? body.slug.trim()
+        : ''
+
+      const profession = typeof body.profession === 'string'
+        ? body.profession.trim()
+        : ''
+
+      const description = typeof body.description === 'string'
+        ? body.description.trim()
+        : ''
+
+      if (!name || !slug) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Name and slug are required.',
+          },
+          { status: 400 }
+        )
+      }
+
+      const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+      if (!slugPattern.test(slug)) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Slug must contain lowercase letters, numbers or hyphens.',
+          },
+          { status: 400 }
+        )
+      }
+
+      if (
+        name.length > 150 ||
+        slug.length > 100 ||
+        profession.length > 200 ||
+        description.length > 2000
+      ) {
+        return Response.json(
+          {
+            success: false,
+            message: 'One or more fields are too long.',
+          },
+          { status: 400 }
+        )
+      }
+
+      const existingPortfolio = await env.bitreca_db
+        .prepare(`
+          SELECT id FROM portfolios
+          WHERE slug = ?
+          LIMIT 1
+        `)
+        .bind(slug)
+        .first()
+
+      if (existingPortfolio) {
+        return Response.json(
+          {
+            success: false,
+            message: 'A portfolio with this slug already exists.',
+          },
+          { status: 409 }
+        )
+      }
+
+      const storagePrefix = `portfolios/${slug}/`
+
+      const result = await env.bitreca_db
+        .prepare(`
+          INSERT INTO portfolios (
+            name,
+            slug,
+            profession,
+            description,
+            storage_prefix,
+            status,
+            featured
+          )
+          VALUES (?, ?, ?, ?, ?, 'draft', 0)
+        `)
+        .bind(
+          name,
+          slug,
+          profession || null,
+          description || null,
+          storagePrefix
+        )
+        .run()
+
+      return Response.json(
+        {
+          success: true,
+          message: 'Portfolio created successfully.',
+          portfolioId: result.meta.last_row_id,
+        },
+        { status: 201 }
+      )
+    } catch (error) {
+      console.error('Could not create portfolio:', error)
+
+      if (
+        error?.message?.includes('UNIQUE constraint failed')
+      ) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Portfolio slug or storage location already exists.',
+          },
+          { status: 409 }
+        )
+      }
+
+      return Response.json(
+        {
+          success: false,
+          message: 'Could not create portfolio.',
+        },
+        { status: 500 }
+      )
+    }
+  }
+  // PortfolioForest - Update a portfolio (admin only)
+  if (
+    /^\/api\/admin\/portfolios\/[0-9]+$/.test(url.pathname) &&
+    request.method === 'PUT'
+  ) {
+    try {
+      const id = Number(url.pathname.split('/').pop())
+      const body = await request.json()
+
+      const name = typeof body.name === 'string'
+        ? body.name.trim()
+        : ''
+
+      const slug = typeof body.slug === 'string'
+        ? body.slug.trim()
+        : ''
+
+      const profession = typeof body.profession === 'string'
+        ? body.profession.trim()
+        : ''
+
+      const description = typeof body.description === 'string'
+        ? body.description.trim()
+        : ''
+
+      if (!name || !slug) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Name and slug are required.',
+          },
+          { status: 400 }
+        )
+      }
+
+      const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+      if (!slugPattern.test(slug)) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Invalid portfolio slug.',
+          },
+          { status: 400 }
+        )
+      }
+
+      if (
+        name.length > 150 ||
+        slug.length > 100 ||
+        profession.length > 200 ||
+        description.length > 2000
+      ) {
+        return Response.json(
+          {
+            success: false,
+            message: 'One or more fields are too long.',
+          },
+          { status: 400 }
+        )
+      }
+
+      const existing = await env.bitreca_db
+        .prepare(`
+          SELECT id, slug, storage_prefix
+          FROM portfolios
+          WHERE id = ?
+        `)
+        .bind(id)
+        .first()
+
+      if (!existing) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Portfolio not found.',
+          },
+          { status: 404 }
+        )
+      }
+
+      // Keep the storage location unchanged when editing a slug.
+      // This prevents breaking future R2 file references.
+      const duplicate = await env.bitreca_db
+        .prepare(`
+          SELECT id
+          FROM portfolios
+          WHERE slug = ? AND id != ?
+          LIMIT 1
+        `)
+        .bind(slug, id)
+        .first()
+
+      if (duplicate) {
+        return Response.json(
+          {
+            success: false,
+            message: 'This portfolio slug is already in use.',
+          },
+          { status: 409 }
+        )
+      }
+
+      await env.bitreca_db
+        .prepare(`
+          UPDATE portfolios
+          SET
+            name = ?,
+            slug = ?,
+            profession = ?,
+            description = ?,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `)
+        .bind(
+          name,
+          slug,
+          profession || null,
+          description || null,
+          id
+        )
+        .run()
+
+      return Response.json({
+        success: true,
+        message: 'Portfolio updated successfully.',
+      })
+    } catch (error) {
+      console.error('Could not update portfolio:', error)
+
+      if (error?.message?.includes('UNIQUE constraint failed')) {
+        return Response.json(
+          {
+            success: false,
+            message: 'Portfolio slug already exists.',
+          },
+          { status: 409 }
+        )
+      }
+
+      return Response.json(
+        {
+          success: false,
+          message: 'Could not update portfolio.',
+        },
+        { status: 500 }
+      )
+    }
+  }
+
+// PortfolioForest - Upload a website file (admin only)
+if (
+  /^\/api\/admin\/portfolios\/[0-9]+\/upload$/.test(url.pathname) &&
+  request.method === 'POST'
+) {
+  try {
+    const id = Number(url.pathname.split('/')[4])
+
+    const portfolio = await env.bitreca_db
+      .prepare('SELECT id, storage_prefix FROM portfolios WHERE id = ?')
+      .bind(id)
+      .first()
+
+    if (!portfolio) {
+      return Response.json(
+        { success: false, message: 'Portfolio not found.' },
+        { status: 404 }
+      )
+    }
+
+    const formData = await request.formData()
+    const file = formData.get('file')
+
+    if (!(file instanceof File)) {
+      return Response.json(
+        { success: false, message: 'Please select a file.' },
+        { status: 400 }
+      )
+    }
+
+    // First version: only allow index.html
+    if (file.name !== 'index.html') {
+      return Response.json(
+        { success: false, message: 'Only index.html is supported for now.' },
+        { status: 400 }
+      )
+    }
+
+    // Limit uploads to 2 MB
+    if (file.size === 0 || file.size > 2 * 1024 * 1024) {
+      return Response.json(
+        { success: false, message: 'File must be between 1 byte and 2 MB.' },
+        { status: 400 }
+      )
+    }
+
+    const key = `${portfolio.storage_prefix}index.html`
+
+    await env.bitreca_media.put(key, file.stream(), {
+      httpMetadata: {
+        contentType: 'text/html; charset=utf-8',
+      },
+    })
+
+    return Response.json({
+      success: true,
+      message: 'Portfolio HTML uploaded successfully.',
+      key,
+    })
+  } catch (error) {
+    console.error('Portfolio upload failed:', error)
+
+    return Response.json(
+      { success: false, message: 'Could not upload portfolio file.' },
+      { status: 500 }
+    )
+  }
+}
+// PortfolioForest - Upload a complete website folder (admin only)
+if (
+  /^\/api\/admin\/portfolios\/[0-9]+\/upload-folder$/.test(url.pathname) &&
+  request.method === 'POST'
+) {
+  try {
+    const id = Number(url.pathname.split('/')[4])
+
+    const portfolio = await env.bitreca_db
+      .prepare('SELECT storage_prefix FROM portfolios WHERE id = ?')
+      .bind(id)
+      .first()
+
+    if (!portfolio) {
+      return Response.json(
+        { success: false, message: 'Portfolio not found.' },
+        { status: 404 }
+      )
+    }
+
+    const formData = await request.formData()
+    const files = formData.getAll('files')
+    const paths = formData.getAll('paths')
+
+    if (
+      files.length === 0 ||
+      files.length !== paths.length ||
+      files.length > 100
+    ) {
+      return Response.json(
+        { success: false, message: 'Invalid website folder or too many files.' },
+        { status: 400 }
+      )
+    }
+
+    const allowedTypes = {
+      html: 'text/html; charset=utf-8',
+      css: 'text/css; charset=utf-8',
+      js: 'text/javascript; charset=utf-8',
+      json: 'application/json',
+      png: 'image/png',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      gif: 'image/gif',
+      webp: 'image/webp',
+      svg: 'image/svg+xml',
+      ico: 'image/x-icon',
+      txt: 'text/plain; charset=utf-8',
+      woff: 'font/woff',
+      woff2: 'font/woff2',
+    }
+
+    const uploads = []
+    const seenPaths = new Set()
+    let totalSize = 0
+    let hasIndex = false
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const path = paths[i]
+
+      if (!(file instanceof File) || typeof path !== 'string') {
+        return Response.json(
+          { success: false, message: 'Invalid file or path.' },
+          { status: 400 }
+        )
+      }
+
+      const parts = path.split('/')
+      const extension = path.split('.').pop().toLowerCase()
+
+      if (
+        !path ||
+        path.length > 250 ||
+        path.includes('\\') ||
+        parts.some(
+          (part) =>
+            !part ||
+            part === '.' ||
+            part === '..' ||
+            part.startsWith('.')
+        ) ||
+        !/^[a-zA-Z0-9 _./-]+$/.test(path) ||
+        !Object.hasOwn(allowedTypes, extension) ||
+        file.size === 0 ||
+        file.size > 5 * 1024 * 1024 ||
+        seenPaths.has(path)
+      ) {
+        return Response.json(
+          { success: false, message: `Invalid website file: ${path}` },
+          { status: 400 }
+        )
+      }
+
+      seenPaths.add(path)
+      totalSize += file.size
+
+      if (path === 'index.html') {
+        hasIndex = true
+      }
+
+      if (totalSize > 20 * 1024 * 1024) {
+        return Response.json(
+          { success: false, message: 'Website exceeds the 20 MB limit.' },
+          { status: 400 }
+        )
+      }
+
+      uploads.push({
+        file,
+        key: `${portfolio.storage_prefix}${path}`,
+        contentType: allowedTypes[extension],
+      })
+    }
+
+    if (!hasIndex) {
+      return Response.json(
+        { success: false, message: 'Website folder must contain index.html.' },
+        { status: 400 }
+      )
+    }
+
+    for (const upload of uploads) {
+      await env.bitreca_media.put(upload.key, upload.file.stream(), {
+        httpMetadata: { contentType: upload.contentType },
+      })
+    }
+
+    return Response.json({
+      success: true,
+      message: 'Website folder uploaded successfully.',
+      uploadedFiles: uploads.length,
+    })
+  } catch (error) {
+    console.error('Portfolio folder upload failed:', error)
+
+    return Response.json(
+      { success: false, message: 'Could not upload website folder.' },
+      { status: 500 }
+    )
+  }
+}
+// PortfolioForest - List uploaded website files (admin only)
+if (
+  /^\/api\/admin\/portfolios\/[0-9]+\/files-check$/.test(url.pathname) &&
+  request.method === 'GET'
+) {
+  try {
+    const id = Number(url.pathname.split('/')[4])
+
+    const portfolio = await env.bitreca_db
+      .prepare('SELECT storage_prefix FROM portfolios WHERE id = ?')
+      .bind(id)
+      .first()
+
+    if (!portfolio) {
+      return Response.json(
+        { success: false, message: 'Portfolio not found.' },
+        { status: 404 }
+      )
+    }
+
+    const result = await env.bitreca_media.list({
+      prefix: portfolio.storage_prefix,
+      limit: 100,
+    })
+
+    return Response.json({
+      success: true,
+      files: result.objects.map((object) => ({
+        path: object.key.slice(portfolio.storage_prefix.length),
+        size: object.size,
+      })),
+      truncated: result.truncated,
+    })
+  } catch (error) {
+    console.error('Portfolio files check failed:', error)
+
+    return Response.json(
+      { success: false, message: 'Could not check website files.' },
+      { status: 500 }
+    )
+  }
+}
+// PortfolioForest - Verify uploaded HTML (admin only)
+if (
+  /^\/api\/admin\/portfolios\/[0-9]+\/file-check$/.test(url.pathname) &&
+  request.method === 'GET'
+) {
+  try {
+    const id = Number(url.pathname.split('/')[4])
+
+    const portfolio = await env.bitreca_db
+      .prepare('SELECT storage_prefix FROM portfolios WHERE id = ?')
+      .bind(id)
+      .first()
+
+    if (!portfolio) {
+      return Response.json(
+        { success: false, message: 'Portfolio not found.' },
+        { status: 404 }
+      )
+    }
+
+    const key = `${portfolio.storage_prefix}index.html`
+    const object = await env.bitreca_media.head(key)
+
+    return Response.json({
+      success: true,
+      fileExists: object !== null,
+      key,
+      size: object?.size ?? null,
+    })
+  } catch (error) {
+    console.error('Portfolio file check failed:', error)
+
+    return Response.json(
+      { success: false, message: 'Could not check portfolio file.' },
+      { status: 500 }
+    )
+  }
+}
+  // PortfolioForest - Publish or unpublish a portfolio (admin only)
+if (
+  /^\/api\/admin\/portfolios\/[0-9]+\/status$/.test(url.pathname) &&
+  request.method === 'PATCH'
+) {
+  try {
+    const id = Number(url.pathname.split('/')[4])
+    const body = await request.json()
+
+    const status = body.status
+
+    if (!['draft', 'published'].includes(status)) {
+      return Response.json(
+        { success: false, message: 'Invalid portfolio status.' },
+        { status: 400 }
+      )
+    }
+
+    const existing = await env.bitreca_db
+      .prepare('SELECT id FROM portfolios WHERE id = ?')
+      .bind(id)
+      .first()
+
+    if (!existing) {
+      return Response.json(
+        { success: false, message: 'Portfolio not found.' },
+        { status: 404 }
+      )
+    }
+
+    await env.bitreca_db
+      .prepare(`
+        UPDATE portfolios
+        SET status = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `)
+      .bind(status, id)
+      .run()
+
+    return Response.json({
+      success: true,
+      message: `Portfolio ${status === 'published' ? 'published' : 'unpublished'} successfully.`,
+    })
+  } catch (error) {
+    console.error('Could not update portfolio status:', error)
+
+    return Response.json(
+      { success: false, message: 'Could not update portfolio status.' },
       { status: 500 }
     )
   }

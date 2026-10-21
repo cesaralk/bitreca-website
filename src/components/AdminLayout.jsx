@@ -38,13 +38,17 @@ async function handleLogout() {
             Dashboard
           </NavLink>
 
-          <NavLink to="/admin/projects">
-            Projects
-          </NavLink>
+         <NavLink to="/admin/projects">
+  Projects
+</NavLink>
 
-          <NavLink to="/admin/services">
-            Services
-          </NavLink>
+<NavLink to="/admin/portfolios">
+  PortfolioForest 🌲
+</NavLink>
+
+<NavLink to="/admin/services">
+  Services
+</NavLink>
 
           <NavLink to="/admin/products">
             Products
