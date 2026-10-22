@@ -612,7 +612,25 @@ updated_at
           { status: 400 }
         )
       }
+// Prevent portfolios from using reserved subdomains
+const reservedSlugs = new Set([
+  'www',
+  'admin',
+  'api',
+  'mail',
+  'ftp',
+  'portfolioforest',
+])
 
+if (reservedSlugs.has(slug)) {
+  return Response.json(
+    {
+      success: false,
+      message: 'This subdomain is reserved and cannot be used.',
+    },
+    { status: 400 }
+  )
+}
       const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
       if (!slugPattern.test(slug)) {
@@ -750,6 +768,25 @@ updated_at
         )
       }
 
+// Prevent existing portfolios from using reserved subdomains
+const reservedSlugs = new Set([
+  'www',
+  'admin',
+  'api',
+  'mail',
+  'ftp',
+  'portfolioforest',
+])
+
+if (reservedSlugs.has(slug)) {
+  return Response.json(
+    {
+      success: false,
+      message: 'This subdomain is reserved and cannot be used.',
+    },
+    { status: 400 }
+  )
+}
       const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
       if (!slugPattern.test(slug)) {
