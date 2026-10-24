@@ -405,6 +405,60 @@ if (
 }
 
 
+    // Public PortfolioForest API: read-only production portfolio metadata.
+    if (url.pathname === '/api/portfolios' && request.method === 'GET') {
+      const headers = {
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff'
+      }
+
+      try {
+        const columns = await env.bitreca_db
+          .prepare('PRAGMA table_info(portfolios)').all()
+
+        const names = new Set((columns.results || []).map(x => x.name))
+
+        const required = ['name', 'slug', 'profession', 'description',
+          'featured', 'status', 'created_at']
+
+        if (required.some(name => !names.has(name))) {
+          throw new Error('Portfolio schema is not ready')
+        }
+
+        const deletionFilter = names.has('deletion_requested_at')
+          ? ' AND deletion_requested_at IS NULL'
+          : ''
+
+        const { results } = await env.bitreca_db.prepare(`
+          SELECT name, slug, profession, description, featured
+          FROM portfolios
+          WHERE status = 'published' ${deletionFilter}
+          ORDER BY featured DESC, created_at DESC, id DESC
+          LIMIT 100
+        `).all()
+
+        const portfolios = (results || []).map(p => ({
+          name: p.name,
+          slug: p.slug,
+          profession: p.profession || '',
+          description: p.description || '',
+          featured: p.featured === 1,
+          website_url: null
+        }))
+
+        return Response.json(
+          { success: true, portfolios },
+          { headers }
+        )
+      } catch (error) {
+        console.error('Public portfolio directory unavailable')
+        return Response.json(
+          { success: false, message: 'Portfolio directory unavailable.' },
+          { status: 503, headers }
+        )
+      }
+    }
+
     // Get published projects for the public website
     if (
       url.pathname === '/api/projects' &&

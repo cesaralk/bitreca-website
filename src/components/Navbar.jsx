@@ -33,6 +33,7 @@ function Navbar() {
         <Link to="/products" onClick={closeMenu}>Products</Link>
         <Link to="/store" onClick={closeMenu}>Store</Link>
         <Link to="/projects" onClick={closeMenu}>Projects</Link>
+        <Link to="/portfolioforest" onClick={closeMenu}>PortfolioForest</Link>
         <Link to="/about" onClick={closeMenu}>About</Link>
         <Link to="/contact" onClick={closeMenu}>Contact</Link>
       </div>

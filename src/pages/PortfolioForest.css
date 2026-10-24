@@ -1,0 +1,30 @@
+.forest-page { min-height: 100vh; background: var(--bg-primary, #070b14); }
+.forest-container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+.forest-hero { padding: 132px 0 88px; border-bottom: 1px solid var(--border-color, #243044); background: radial-gradient(ellipse at 85% 15%, rgba(59,130,246,.16), transparent 55%); }
+.forest-eyebrow { color: var(--brand-blue-light, #60a5fa); font-size: 12px; font-weight: 800; letter-spacing: .19em; }
+.forest-hero h1 { margin: 20px 0 24px; max-width: 850px; font-size: clamp(45px, 6.7vw, 82px); line-height: 1.04; letter-spacing: -.055em; }
+.forest-hero h1 span { color: var(--brand-blue-light, #60a5fa); }
+.forest-intro { color: var(--text-secondary, #aeb8c8); max-width: 630px; font-size: 18px; line-height: 1.7; }
+.forest-gallery { padding: 75px 0 120px; }
+.forest-gallery-heading { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 34px; }
+.forest-gallery-heading h2 { font-size: clamp(28px, 4vw, 42px); margin: 10px 0 0; letter-spacing: -.035em; }
+.forest-count { font-size: 14px; color: var(--text-secondary, #aeb8c8); }
+.forest-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 24px; }
+.forest-card { display: flex; flex-direction: column; min-width: 0; background: var(--bg-secondary, #0c1220); border: 1px solid var(--border-color, #243044); border-radius: 18px; overflow: hidden; transition: transform .2s ease, border-color .2s ease; }
+.forest-card:hover { transform: translateY(-3px); border-color: rgba(96,165,250,.45); }
+.forest-card-banner { min-height: 176px; display: flex; align-items: center; justify-content: center; position: relative; background: linear-gradient(135deg, #152a51, #101827 55%, #203d54); }
+.forest-card-monogram { display: grid; place-items: center; width: 76px; height: 76px; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; color: #e5efff; font-size: 38px; font-weight: 700; }
+.forest-card-type { position: absolute; bottom: 15px; left: 20px; font-size: 10px; letter-spacing: .16em; color: #b4c5e3; }
+.forest-card-content { padding: 25px; flex: 1; display: flex; flex-direction: column; }
+.forest-card-role { color: var(--brand-blue-light, #60a5fa); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 9px; }
+.forest-card-content h3 { font-size: 24px; line-height: 1.25; margin: 0 0 14px; overflow-wrap: anywhere; }
+.forest-card-description { color: var(--text-secondary, #aeb8c8); font-size: 14px; line-height: 1.7; margin: 0 0 28px; overflow-wrap: anywhere; }
+.forest-card-link { color: var(--brand-blue-light, #60a5fa); font-size: 14px; font-weight: 700; margin-top: auto; display: inline-flex; gap: 8px; align-items: center; width: fit-content; }
+.forest-card-link:hover { text-decoration: underline; }
+.forest-card-link:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.forest-card-unavailable { color: var(--text-secondary, #aeb8c8); font-size: 13px; margin-top: auto; }
+.forest-message, .forest-empty { color: var(--text-secondary, #aeb8c8); padding: 48px 25px; text-align: center; }
+.forest-empty { border: 1px dashed var(--border-color, #243044); border-radius: 16px; }
+.forest-empty h3 { color: var(--text-primary, white); }
+@media (max-width: 1000px) { .forest-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 650px) { .forest-container { width: min(100% - 28px, 1180px); } .forest-hero { padding: 96px 0 60px; } .forest-intro { font-size: 16px; } .forest-gallery { padding: 52px 0 90px; } .forest-grid { grid-template-columns: 1fr; } }
