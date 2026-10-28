@@ -443,7 +443,7 @@ if (
           profession: p.profession || '',
           description: p.description || '',
           featured: p.featured === 1,
-          website_url: null
+          website_url: /^[a-z0-9-]+$/.test(p.slug) ? `https://${p.slug}.bitreca.com/` : null
         }))
 
         return Response.json(
