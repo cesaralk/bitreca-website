@@ -1,0 +1,36 @@
+{
+    "name":  "bitreca-hosting-delete-sandbox-20261025",
+    "main":  "portfolio-hosting/index.js",
+    "compatibility_date":  "2026-09-30",
+    "workers_dev":  false,
+    "preview_urls":  false,
+    "d1_databases":  [
+                         {
+                             "binding":  "PORTFOLIO_DB",
+                             "database_name":  "bitreca-delete-sandbox-db-20261025",
+                             "database_id":  "9c236935-b942-4cd7-9360-fed24db999fa",
+                             "preview_database_id":  "9c236935-b942-4cd7-9360-fed24db999fa",
+                             "migrations_dir":  "./migrations",
+                             "remote":  false
+                         }
+                     ],
+    "r2_buckets":  [
+                       {
+                           "binding":  "PORTFOLIO_FILES",
+                           "bucket_name":  "bitreca-delete-sandbox-r2-20261025",
+                           "preview_bucket_name":  "bitreca-delete-sandbox-r2-20261025",
+                           "remote":  false
+                       }
+                   ],
+    "vars":  {
+                 "PORTFOLIO_EVIDENCE_IMPORT_ENABLED":  "false",
+                 "PORTFOLIO_STAGING_PREVIEW_ENABLED":  "false",
+                 "PORTFOLIO_STAGING_MUTATIONS_FROZEN":  "true",
+                 "PORTFOLIO_BUCKET_NAME":  "bitreca-delete-sandbox-r2-20261025",
+                 "PORTFOLIO_DATABASE_ID":  "9c236935-b942-4cd7-9360-fed24db999fa",
+                 "PORTFOLIO_ENVIRONMENT":  "staging",
+                 "PORTFOLIO_DELETE_REQUESTS_ENABLED":  "false",
+                 "PORTFOLIO_PRODUCTION_CLEANUP_APPROVED":  "false",
+                 "PORTFOLIO_STORAGE_SCOPE":  "portfolioforest/staging/bitreca-delete-sandbox-r2-20261025/9c236935-b942-4cd7-9360-fed24db999fa"
+             }
+}

@@ -35,3 +35,9 @@ dist-ssr
 .dev.vars.*
 bitreca-production-backup.sql
 deployment-check/
+/.build-check-portfolio-admin/
+
+# Private operator material must stay outside the repository even when ignored.
+/.portfolio-operator/
+*.private.pem
+*-signing-key.*

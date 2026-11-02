@@ -1,30 +1,83 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "bitreca-website",
-	"main": "worker/index.js",
-	"compatibility_date": "2026-09-23",
-	"observability": {
-		"enabled": true
-	},
-"assets": {
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bitreca-website",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-23",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
     "not_found_handling": "single-page-application",
     "run_worker_first": [
-        "/api/*"
+      "/api/*"
     ]
-},
-	"d1_databases": [
-		{
-			"binding": "bitreca_db",
-			"database_name": "bitreca-db",
-			"database_id": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a"
-		}
-	],
-
-
-"r2_buckets": [
-  {
-    "binding": "bitreca_media",
-    "bucket_name": "bitreca-media"
-  }
-]
+  },
+  "d1_databases": [
+    {
+      "binding": "bitreca_db",
+      "database_name": "bitreca-db",
+      "database_id": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+      "remote": false
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "bitreca_media",
+      "bucket_name": "bitreca-media",
+      "remote": false,
+      "preview_bucket_name": "bitreca-media-preview-isolated"
+    },
+    {
+      "binding": "PORTFOLIO_STORAGE",
+      "bucket_name": "bitreca-portfolios-prod-20261031",
+      "preview_bucket_name": "bitreca-portfolios-prod-20261031-preview-isolated",
+      "remote": false
+    }
+  ],
+  "vars": {
+    "PORTFOLIO_ENVIRONMENT": "production",
+    "PORTFOLIO_BUCKET_NAME": "bitreca-portfolios-prod-20261031",
+    "PORTFOLIO_DATABASE_ID": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_STORAGE_SCOPE": "portfolioforest/production/bitreca-portfolios-prod-20261031/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_DELETE_REQUESTS_ENABLED": "true",
+    "PORTFOLIO_CLEANUP_ENABLED": "true",
+    "PORTFOLIO_FINALIZATION_ENABLED": "true",
+    "PORTFOLIO_SCHEDULE_ENABLED": "true",
+    "PORTFOLIO_EVIDENCE_IMPORT_ENABLED": "false",
+    "PORTFOLIO_LEGACY_DELETE_ENABLED": "false",
+    "PORTFOLIO_LEGACY_RECONCILIATION_IMPORT_ENABLED": "false",
+    "PORTFOLIO_AUTHORIZATION_POLICY": "solo-operator-v1",
+    "PORTFOLIO_AUTHORIZATION_POLICY_ID": "4580c991-6b1e-4e00-9a26-0b5d1a60c645",
+    "PORTFOLIO_AUTHORIZATION_GENERATION": "2",
+    "PORTFOLIO_OPERATOR_ID": "bitreca-owner",
+    "PORTFOLIO_OPERATOR_KEY_ID": "7e0d344e4de13d5cdd773482346ef7e3d5c57d411555bdf4db7f0ed028214a4e",
+    "PORTFOLIO_DEPLOYMENT_SHA256": "2e8cc4a9a9cee71809be0d00a7170dc3794e3f86d272a2832c2665d7dedeed95",
+    "PORTFOLIO_INVENTORY_PUBLIC_KEY_SPKI": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjK1/qWfJ8rrrJb5Gkw2AHDHrebjEDvs818xaORTykhwdD9Ogx6fvW2XKarDGcG4C3DTO0rZEiJL4AwTeawQfUg==",
+    "PORTFOLIO_CLEAN_STORAGE_ENABLED": "true",
+    "PORTFOLIO_MUTATIONS_FROZEN": "false",
+    "PORTFOLIO_LEGACY_STORAGE_SCOPE": "portfolioforest/production/bitreca-media/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_PRODUCTION_CLEANUP_APPROVED": "true"
+  },
+  "triggers": {
+    "crons": [
+      "* * * * *"
+    ]
+  },
+  "account_id": "4ec868eac2a3b9127531ad39d2501f15",
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "www.bitreca.com/*",
+      "zone_name": "bitreca.com"
+    },
+    {
+      "pattern": "bitreca.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.bitreca.com",
+      "custom_domain": true
+    }
+  ]
 }

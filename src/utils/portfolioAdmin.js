@@ -1,13 +1,16 @@
+import { stagingPortfolioPreview } from '../../shared/portfolio-staging.js'
+
 export function portfolioState(portfolio, job) {
   if (job?.phase === 'finalized') return 'finalized'
   if (portfolio.deletion_requested_at != null) return job?.phase === 'blocked' ? 'blocked' : 'pending'
   return portfolio.status === 'published' ? 'published' : 'draft'
 }
-// This helper is for the production Bitreca admin UI. It intentionally
-// does not depend on the staging-only preview configuration.
-export function portfolioAddress(portfolio) {
-  if (typeof portfolio?.slug !== 'string' || !/^[a-z0-9-]{1,100}$/.test(portfolio.slug)) return null
-  return `https://${portfolio.slug}.bitreca.com`
+export function portfolioAddress(portfolio, deployment) {
+  if (typeof portfolio.slug !== 'string' || !/^[a-z0-9-]{1,100}$/.test(portfolio.slug)) return null
+  if (!deployment || deployment.environment === 'production') return `https://${portfolio.slug}.bitreca.com`
+  const preview = stagingPortfolioPreview({ PORTFOLIO_ENVIRONMENT: deployment.environment, PORTFOLIO_STAGING_PREVIEW_ENABLED: 'true',
+    PORTFOLIO_STAGING_HOSTNAME: deployment.stagingPreview?.hostname, PORTFOLIO_STAGING_PREVIEW_SLUG: deployment.stagingPreview?.slug })
+  return preview?.slug === portfolio.slug ? preview.origin : null
 }
 export function portfolioDisplayAddress(portfolio, deployment) {
   const address = portfolioAddress(portfolio, deployment)

@@ -1,3 +1,6 @@
+import { getPortfolioReadStorage } from '../shared/portfolio-storage.js'
+import { stagingPortfolioPreview } from '../shared/portfolio-staging.js'
+
 export default {
 
  async fetch(request, env) {
@@ -16,7 +19,10 @@ const hostname = url.hostname.toLowerCase()
 const portfolioDomain = '.bitreca.com'
 let portfolioSlug = null
 
-if (hostname.endsWith(portfolioDomain)) {
+if (env.PORTFOLIO_ENVIRONMENT === 'staging') {
+  const preview = stagingPortfolioPreview(env)
+  if (preview && hostname === preview.hostname) portfolioSlug = preview.slug
+} else if (hostname.endsWith(portfolioDomain)) {
   const subdomain = hostname.slice(0, -portfolioDomain.length)
 
   const reservedSubdomains = new Set([
@@ -80,9 +86,9 @@ if (
 
     const portfolio = await env.PORTFOLIO_DB
       .prepare(`
-        SELECT storage_prefix
+        SELECT id, storage_prefix
         FROM portfolios
-        WHERE slug = ? AND status = 'published'
+        WHERE slug = ? AND status = 'published' AND deletion_requested_at IS NULL
       `)
       .bind(slug)
       .first()
@@ -115,12 +121,29 @@ if (
       return new Response('Not found.', { status: 404 })
     }
 
-    const file = await env.PORTFOLIO_FILES.get(
+    const storage = await getPortfolioReadStorage(env, env.PORTFOLIO_DB, portfolio.id, 'hosting')
+    const file = await storage.get(
       `${portfolio.storage_prefix}${relativePath}`
     )
 
     if (!file) {
       return new Response('Website file not found.', { status: 404 })
+    }
+
+    // Recheck after the R2 await: marking must also fence a stalled file read.
+    let visible
+    try {
+      visible = await env.PORTFOLIO_DB.prepare(`
+        SELECT id FROM portfolios
+        WHERE id = ? AND status = 'published' AND deletion_requested_at IS NULL
+      `).bind(portfolio.id).first()
+    } catch (error) {
+      await file.body.cancel()
+      throw error
+    }
+    if (!visible) {
+      await file.body.cancel()
+      return new Response('Portfolio not found.', { status: 404, headers: { 'Cache-Control': 'no-store' } })
     }
 
     return new Response(file.body, {
@@ -131,7 +154,7 @@ if (
         'X-Frame-Options': 'DENY',
 'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
         'Content-Security-Policy':
-          "default-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'",
+          "default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'",
       },
     })
   } catch (error) {

@@ -2,23 +2,62 @@
   "name": "bitreca-portfolio-hosting",
   "main": "portfolio-hosting/index.js",
   "secrets": {
-  "required": []
-},
- "compatibility_date": "2026-09-30",
- "workers_dev": false,
- "d1_databases": [
-  {
-    "binding": "PORTFOLIO_DB",
-    "database_name": "bitreca-db",
-    "database_id": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a"
-  }
-],
-
+    "required": []
+  },
+  "compatibility_date": "2026-09-30",
+  "workers_dev": false,
+  "d1_databases": [
+    {
+      "binding": "PORTFOLIO_DB",
+      "database_name": "bitreca-db",
+      "database_id": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+      "remote": false
+    }
+  ],
   "r2_buckets": [
     {
       "binding": "PORTFOLIO_FILES",
       "bucket_name": "bitreca-media",
-      "preview_bucket_name": "bitreca-media"
+      "preview_bucket_name": "bitreca-media-preview-isolated",
+      "remote": false
+    },
+    {
+      "binding": "PORTFOLIO_STORAGE",
+      "bucket_name": "bitreca-portfolios-prod-20261031",
+      "preview_bucket_name": "bitreca-portfolios-prod-20261031-preview-isolated",
+      "remote": false
+    }
+  ],
+  "account_id": "4ec868eac2a3b9127531ad39d2501f15",
+  "vars": {
+    "PORTFOLIO_ENVIRONMENT": "production",
+    "PORTFOLIO_DATABASE_ID": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_BUCKET_NAME": "bitreca-portfolios-prod-20261031",
+    "PORTFOLIO_STORAGE_SCOPE": "portfolioforest/production/bitreca-portfolios-prod-20261031/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_CLEAN_STORAGE_ENABLED": "true",
+    "PORTFOLIO_MUTATIONS_FROZEN": "true",
+    "PORTFOLIO_LEGACY_STORAGE_SCOPE": "portfolioforest/production/bitreca-media/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",
+    "PORTFOLIO_DELETE_REQUESTS_ENABLED": "false",
+    "PORTFOLIO_CLEANUP_ENABLED": "false",
+    "PORTFOLIO_FINALIZATION_ENABLED": "false",
+    "PORTFOLIO_EVIDENCE_IMPORT_ENABLED": "false",
+    "PORTFOLIO_SCHEDULE_ENABLED": "false",
+    "PORTFOLIO_LEGACY_DELETE_ENABLED": "false",
+    "PORTFOLIO_LEGACY_RECONCILIATION_IMPORT_ENABLED": "false",
+    "PORTFOLIO_PRODUCTION_CLEANUP_APPROVED": "false"
+  },
+  "triggers": {
+    "crons": []
+  },
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "*.bitreca.com/*",
+      "zone_name": "bitreca.com"
+    },
+    {
+      "pattern": "forest-demo.bitreca.com/*",
+      "zone_name": "bitreca.com"
     }
   ]
 }

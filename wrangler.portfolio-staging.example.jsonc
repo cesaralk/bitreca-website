@@ -1,0 +1,24 @@
+{
+  "name": "bitreca-portfolio-staging-REPLACE_REVIEWED_NAME",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-23",
+  "workers_dev": false,
+  "assets": { "directory": "./dist/client", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  "d1_databases": [{ "binding": "bitreca_db", "database_name": "REPLACE_ISOLATED_STAGING_DB", "database_id": "REPLACE_STAGING_UUID", "remote": false }],
+  "r2_buckets": [{ "binding": "bitreca_media", "bucket_name": "REPLACE_ISOLATED_STAGING_BUCKET", "preview_bucket_name": "REPLACE_ISOLATED_STAGING_BUCKET", "remote": false }],
+  "vars": {
+    "ADMIN_AUTH_VERSION": "1",
+    "PORTFOLIO_ENVIRONMENT": "staging",
+    "PORTFOLIO_DATABASE_ID": "REPLACE_STAGING_UUID",
+    "PORTFOLIO_BUCKET_NAME": "REPLACE_ISOLATED_STAGING_BUCKET",
+    "PORTFOLIO_STORAGE_SCOPE": "portfolioforest/staging/REPLACE_ISOLATED_STAGING_BUCKET/REPLACE_STAGING_UUID",
+    "PORTFOLIO_INVENTORY_PUBLIC_KEY_SPKI": "REPLACE_PINNED_PUBLIC_SPKI_BASE64",
+    "PORTFOLIO_DELETE_REQUESTS_ENABLED": "false",
+    "PORTFOLIO_CLEANUP_ENABLED": "false",
+    "PORTFOLIO_FINALIZATION_ENABLED": "false",
+    "PORTFOLIO_SCHEDULE_ENABLED": "false",
+    "PORTFOLIO_EVIDENCE_IMPORT_ENABLED": "false",
+    "PORTFOLIO_PRODUCTION_CLEANUP_APPROVED": "false"
+  },
+  "triggers": { "crons": [] }
+}

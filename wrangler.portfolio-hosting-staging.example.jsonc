@@ -1,0 +1,9 @@
+{
+  "name": "bitreca-hosting-staging-REPLACE_REVIEWED_NAME",
+  "main": "portfolio-hosting/index.js",
+  "compatibility_date": "2026-09-30",
+  "workers_dev": false,
+  "d1_databases": [{ "binding": "PORTFOLIO_DB", "database_name": "REPLACE_ISOLATED_STAGING_DB", "database_id": "REPLACE_STAGING_UUID", "remote": false }],
+  "r2_buckets": [{ "binding": "PORTFOLIO_FILES", "bucket_name": "REPLACE_ISOLATED_STAGING_BUCKET", "preview_bucket_name": "REPLACE_ISOLATED_STAGING_BUCKET", "remote": false }],
+  "triggers": { "crons": [] }
+}

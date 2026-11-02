@@ -1,0 +1,73 @@
+{
+  "name": "bitreca-main-staging",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-23",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist/client",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "bitreca_db",
+      "database_name": "bitreca-portfolio-staging-db",
+      "database_id": "c9f87f2a-12fd-45bf-bf94-02e0f1f24d07",
+      "preview_database_id": "c9f87f2a-12fd-45bf-bf94-02e0f1f24d07",
+      "migrations_dir": "./migrations",
+      "remote": false
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "bitreca_media",
+      "bucket_name": "bitreca-portfolio-staging",
+      "preview_bucket_name": "bitreca-portfolio-staging",
+      "remote": false
+    }
+  ],
+  "vars": {
+    "ADMIN_AUTH_VERSION": "1",
+    "PORTFOLIO_ENVIRONMENT": "staging",
+    "PORTFOLIO_DATABASE_ID": "c9f87f2a-12fd-45bf-bf94-02e0f1f24d07",
+    "PORTFOLIO_BUCKET_NAME": "bitreca-portfolio-staging",
+    "PORTFOLIO_STORAGE_SCOPE": "portfolioforest/staging/bitreca-portfolio-staging/c9f87f2a-12fd-45bf-bf94-02e0f1f24d07",
+    "PORTFOLIO_INVENTORY_PUBLIC_KEY_SPKI": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAExvCOHx51P+HGT0cE1Mvtt++KHIYbDxh1UJGtPZcipyGlOh0SGQEmpsxJXS13CaxvgQ74yw7wGMsmE7+shXdPZw==",
+    "PORTFOLIO_STAGING_PREVIEW_ENABLED": "false",
+    "PORTFOLIO_STAGING_HOSTNAME": "bitreca-portfolio-hosting-staging.ceasar-elkhatib.workers.dev",
+    "PORTFOLIO_STAGING_PREVIEW_SLUG": "demo",
+    "PORTFOLIO_UPLOAD_MAX_FILES": "10",
+    "PORTFOLIO_CLEANUP_R2_OPERATION_LIMIT": "1",
+    "PORTFOLIO_DELETE_REQUESTS_ENABLED": "false",
+    "PORTFOLIO_CLEANUP_ENABLED": "false",
+    "PORTFOLIO_FINALIZATION_ENABLED": "false",
+    "PORTFOLIO_SCHEDULE_ENABLED": "false",
+    "PORTFOLIO_EVIDENCE_IMPORT_ENABLED": "false",
+    "PORTFOLIO_PRODUCTION_CLEANUP_APPROVED": "false",
+    "PORTFOLIO_LOGIN_RATE_LIMIT_ENABLED": "true"
+  },
+  "secrets": {
+    "required": [
+      "ADMIN_USERNAME",
+      "ADMIN_PASSWORD",
+      "SESSION_SECRET"
+    ]
+  },
+  "triggers": {
+    "crons": []
+  },
+  "ratelimits": [
+    {
+      "name": "STAGING_ADMIN_LOGIN_LIMITER",
+      "namespace_id": "26010231",
+      "simple": {
+        "limit": 8,
+        "period": 60
+      }
+    }
+  ]
+}
+

@@ -1,5 +1,5 @@
 export async function adminApi(url, options = {}) {
-  const response = await fetch(url, options)
+  const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options })
 
   const data = await response
     .json()
