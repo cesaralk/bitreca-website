@@ -66,8 +66,8 @@ export async function verifyStagingPackage(directory) {
     target: artifact.target, readiness: 'REQUIRES MANUAL APPROVAL', workers: [resources.mainName, resources.hostingName] }
 }
 export async function prepareStagingPackage({ sandbox = false } = {}) {
-  const main = JSON.parse(await readFile(join(root, sandbox ? 'wrangler.delete-sandbox.jsonc' : 'wrangler.portfolio-staging.jsonc'), 'utf8'))
-  const hosting = JSON.parse(await readFile(join(root, sandbox ? 'wrangler.delete-sandbox-hosting.jsonc' : 'wrangler.portfolio-hosting-staging.jsonc'), 'utf8'))
+  const main = JSON.parse(await readFile(join(root, 'tests', 'fixtures', 'retired-environments', sandbox ? 'wrangler.delete-sandbox.jsonc' : 'wrangler.portfolio-staging.jsonc'), 'utf8'))
+  const hosting = JSON.parse(await readFile(join(root, 'tests', 'fixtures', 'retired-environments', sandbox ? 'wrangler.delete-sandbox-hosting.jsonc' : 'wrangler.portfolio-hosting-staging.jsonc'), 'utf8'))
   if (sandbox) validateSandboxPair(main, hosting)
   else validateStagingPair(main, hosting, { allowPlaceholders: true })
   const temporary = await mkdtemp(join(tmpdir(), 'portfolioforest-staging-build-'))

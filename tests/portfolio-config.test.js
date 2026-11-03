@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { generateKeyPairSync } from 'node:crypto'
 import { validateStaging, validateStagingPair } from '../scripts/check-portfolio-config.mjs'
 
-const template = () => JSON.parse(readFileSync(new URL('../wrangler.portfolio-staging.example.jsonc', import.meta.url), 'utf8'))
+const template = () => JSON.parse(readFileSync(new URL('./fixtures/retired-environments/wrangler.portfolio-staging.example.jsonc', import.meta.url), 'utf8'))
 function isolated() {
   const config = template(), id = '22222222-2222-4222-8222-222222222222', bucket = 'portfolioforest-isolated-fixture'
   config.name = 'portfolioforest-isolated-fixture'
@@ -39,8 +39,8 @@ test('static staging guard rejects production aliases, mismatched scopes, enable
 })
 
 test('prepared named staging pair has exact approved resources, disabled preview and unapplied authentication trust placeholders', () => {
-  const main = JSON.parse(readFileSync(new URL('../wrangler.portfolio-staging.jsonc', import.meta.url), 'utf8'))
-  const hosting = JSON.parse(readFileSync(new URL('../wrangler.portfolio-hosting-staging.jsonc', import.meta.url), 'utf8'))
+  const main = JSON.parse(readFileSync(new URL('./fixtures/retired-environments/wrangler.portfolio-staging.jsonc', import.meta.url), 'utf8'))
+  const hosting = JSON.parse(readFileSync(new URL('./fixtures/retired-environments/wrangler.portfolio-hosting-staging.jsonc', import.meta.url), 'utf8'))
   assert.doesNotThrow(() => validateStagingPair(main, hosting, { allowPlaceholders: true }))
   assert.doesNotThrow(() => validateStagingPair(main, hosting))
   for (const extra of [{ build: { command: 'npm run deploy' } }, { services: [{ binding: 'unreviewed', service: 'production' }] }]) {

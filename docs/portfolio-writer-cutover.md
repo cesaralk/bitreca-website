@@ -1,6 +1,6 @@
 # Writer cutover and recovery checklist
 
-## Solo owner policy: `solo-operator-v1` (local implementation, not activated)
+## Solo owner policy: `solo-operator-v1` (production generation 2)
 
 This explicit policy provides owner accountability, **not independent second-person
 oversight**. It preserves writer-drain requirements, P-256 verification, immutable
@@ -75,93 +75,11 @@ restoring a snapshot. Restrict deploy/D1/R2 credentials, remove legacy writer ac
 forbid untracked rollback, and retain provider audit records. Code cannot enforce
 these Cloudflare account controls or remove the owner's ultimate account authority.
 
-### Existing protected sandbox: exact approval stages
+### Historical environment procedures
 
-Use only account `4ec868eac2a3b9127531ad39d2501f15`, main
-`bitreca-main-delete-sandbox-20261025`, hosting
-`bitreca-hosting-delete-sandbox-20261025`, database
-`bitreca-delete-sandbox-db-20261025` / `9c236935-b942-4cd7-9360-fed24db999fa`,
-and bucket `bitreca-delete-sandbox-r2-20261025`. Scope is
-`portfolioforest/staging/bitreca-delete-sandbox-r2-20261025/9c236935-b942-4cd7-9360-fed24db999fa`.
-No additional environment or harness is needed.
-
-1. **Local review:** owner supplies only public key and owner identity; prepare
-   a new candidate with migration 0014 and reviewed solo public pins in a separate
-   package. Do not edit the existing frozen configs or either historical pinned
-   package. Verify all digests. The old `deploy-sandbox-reviewed.ps1` remains pinned
-   to the previous 13-migration independent candidate: **do not use it for this
-   upgrade**. Prepare a newly reviewed command plan with fresh active-version guards.
-2. **Migration/enrollment/deployment approval:** confirm exact account, D1 UUID,
-   bucket and current migration history first. Apply only pending 0014 from the
-   newly reviewed migration directory, then execute its owner-reviewed enrollment
-   proposal with controls disabled. Deploy the reviewed pair frozen/private with
-   schedules, evidence import, requests, cleanup and finalization OFF. Verify active
-   versions, public pins, bindings, JS hashes and recorded enrollment; stop on drift.
-   Do not blindly reuse historical version guards. Each remote mutation needs approval.
-3. **Writer settlement and protocol approval:** preserve real credential inventory,
-   ingress/old deployment fencing and definitive in-flight settlement records.
-   Uncertain or untracked writers block the stage. The owner signs a truthful v2
-   report only after this evidence exists. Separately approve the monotonic
-   protocol-1 change; no cutover occurs during migration/enrollment.
-4. **Evidence-import approval:** verify the signed envelope offline, then separately
-   enable the existing authenticated evidence-import gate and import using its
-   existing endpoint with the v2 payload/signature envelope. Confirm the exact
-   immutable epoch and disable the import gate again. Cleanup remains OFF.
-5. **Disposable application test approval:** follow
-   [sandbox-deletion-e2e.md](sandbox-deletion-e2e.md) using new post-epoch fixtures A/B
-   in this existing sandbox. Approve unfreezing/creation and both upload paths, then
-   exact-ID marking and bounded cleanup of A only. Verify B and unrelated keys are
-   unchanged, and preserve manifests, exact delete batches and empty-prefix receipts.
-6. **Separate finalization approval:** inspect A's receipts before enabling both
-   environment and D1 finalization controls. Finalize A only; verify tombstone,
-   immutable ownership/receipt history and B. Disable controls/refreeze afterwards
-   under the same specifically approved test scope. Do not remove B or resources.
-
-The existing `check-portfolio-sandbox.mjs --cutover-plan` emits an **independent-v1**
-plan with runtime revision zero. Do not reuse it after solo enrollment, which advances
-that revision. For the separately reviewed solo protocol stage, substitute actual
-enrolled pins and the freshly read runtime revision into this guarded SQL file;
-the owner must already have retained genuine settlement evidence:
-
-```sql
-UPDATE portfolio_storage_writer_policy SET minimum_protocol_version=1
-WHERE id=1 AND minimum_protocol_version=0
- AND NOT EXISTS(SELECT 1 FROM portfolios)
- AND NOT EXISTS(SELECT 1 FROM portfolio_storage_allocations)
- AND NOT EXISTS(SELECT 1 FROM portfolio_storage_origins)
- AND NOT EXISTS(SELECT 1 FROM portfolio_storage_birth_seals)
- AND NOT EXISTS(SELECT 1 FROM portfolio_storage_allocation_events)
- AND NOT EXISTS(SELECT 1 FROM portfolio_deletion_jobs)
- AND NOT EXISTS(SELECT 1 FROM portfolio_storage_protocol_verifications)
- AND NOT EXISTS(SELECT 1 FROM portfolio_deletion_finalizations)
- AND EXISTS(SELECT 1 FROM portfolio_deletion_runtime_policy WHERE id=1
-     AND revision=<fresh-reviewed-revision> AND cleanup_enabled=0 AND finalization_enabled=0)
- AND EXISTS(SELECT 1 FROM portfolio_storage_current_solo_policy
-     WHERE id='<enrolled-policy-UUID>' AND generation=<enrolled-generation>
-     AND operator_id='<reviewed-owner-ID>' AND operator_key_id='<reviewed-SPKI-SHA256>'
-     AND deployment_sha256='<reviewed-code-manifest-SHA256>'
-     AND storage_scope='portfolioforest/staging/bitreca-delete-sandbox-r2-20261025/9c236935-b942-4cd7-9360-fed24db999fa');
-```
-
-After explicit approval, the exact-target execution template is:
-
-```powershell
-node node_modules/wrangler/bin/wrangler.js d1 execute bitreca-delete-sandbox-db-20261025 --remote --json --config <new-reviewed-package-main.wrangler.jsonc> --file <reviewed-solo-protocol-cutover.sql>
-```
-
-Require success and **exactly one** changed row, then read back protocol 1 and all
-public pins. Zero rows, an ambiguous response or identity drift means stop and read
-state; never strip conditions or blindly retry. Empty-database clauses limit this
-procedure to the disposable sandbox baseline; they do not prove writer settlement.
-
-For recovery, first stop ingress and disable/increment runtime authorization;
-already-issued operations may still settle. Preserve checkpoints and leases, and
-resume exact recorded manifests only when authorized. After restore, keep the
-highest externally archived generation/key revocation pins: an older D1 snapshot
-must fail against them. Never roll back pins with the database. Lost/compromised key
-requires permanent revocation and a separately enrolled next generation; old origins
-remain blocked pending a separately designed evidence-preserving recovery, not a
-retroactive owner attestation. No automatic recovery or legacy adoption is provided.
+The old sandbox upgrade/deployment stages are complete and their operational
+utilities are retired. Their records remain in [release history](https://github.com/cesaralk/bitreca-website/blob/14dabbdbd3468c88e6919b1bb954b90d17234526/docs/portfolio-writer-cutover.md).
+Do not rerun them for production or use disabled test fixtures as live configs.
 
 ## Existing independent-policy procedure
 
@@ -181,7 +99,7 @@ configuration keeps requests, execution, finalization, evidence import, and Cron
    separately. Do not assume production matches local.
    A newly created empty STAGING database instead needs all 0001–0013. Review the
    0006 short-pattern D1 correction and the exact-target commands in
-   [portfolio-staging-release-checklist.md](portfolio-staging-release-checklist.md).
+   [historical staging checklist](https://github.com/cesaralk/bitreca-website/blob/14dabbdbd3468c88e6919b1bb954b90d17234526/docs/portfolio-staging-release-checklist.md).
 5. Deploy the reviewed tracking-capable code with ALL deletion flags off. Both
    folder and HTML handlers register ownership/writer identity before each PUT,
    await every issued write, stop local issuance before closure, and fence activation.

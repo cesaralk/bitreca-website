@@ -1,21 +1,16 @@
 # PortfolioForest deletion operations — review before authorization
 
-No procedure in this document was executed against Cloudflare. Every SQL example
+Production rollout is complete. Historical SQL examples below must not be replayed. Every SQL example
 below changes state and therefore needs separate authorization for its EXACT
 database. Do not paste it into an existing local or production database as a test.
 The safe automated commands at the end use only disposable fixtures.
 
 ## Resource and trust configuration
 
-Use the prepared `wrangler.portfolio-staging.jsonc` and
-`wrangler.portfolio-hosting-staging.jsonc` for the supplied dedicated resources.
-The generic `.example.jsonc` files remain reference templates. Review the exact
-targets and approval order in [portfolio-staging-release-checklist.md](portfolio-staging-release-checklist.md).
-Verify the user-created staging D1/R2 resources and restricted credentials; do not
-provision additional resources or purchase a subscription as a workaround.
-Use the SAME staging database and bucket for both Workers. Never copy a production
-database ID, bucket binding, credentials, signed report, or identity object into
-staging. Production's shared media bucket must never be a staging or preview target.
+Use the two production Wrangler configurations and the approved identity in
+[production handover](deletion-live-activation.md). Historical environment configs
+are disabled fixtures under tests/fixtures/retired-environments, not live targets.
+Keep production resources and credentials separate from every test fixture.
 
 These source files are templates, not proof that staging exists. `remote:false`
 selects local simulation for development; it does not make deployment safe or
@@ -193,22 +188,9 @@ set writers closed, falsify evidence, change prefix ownership or delete bookkeep
 to make progress. Unresolved legacy objects may continue incurring storage costs.
 This Phase A implementation deliberately provides no automatic legacy adoption.
 
-## Offline checks available now
+## Local maintenance
 
-```powershell
-npm run test:portfolio
-npm run lint
-npm run check:portfolio-config
-npm run check:portfolio-build
-npm run check:portfolio-ui
-git diff --check
-```
-
-These commands do not provision Cloudflare resources or load `.dev.vars`/`.env`.
-The build command bypasses the Cloudflare Vite plugin and emits no project build
-artifacts. The UI command uses an installed Chromium browser and loopback mock API;
-browser profiles/screenshots remain in a new OS temporary directory. The standard
-`build`, `preview`, and `deploy` commands were preserved, not run in this task.
-Validate a completed staging source file with
-`node scripts/check-portfolio-config.mjs <reviewed-staging.jsonc>`; this is a static
-contract check, not verification of the provider resources or cryptographic key.
+Keep reusable tests, source checks and owner-key recovery tools. Retired staging
+preparation commands are no longer npm scripts. See the project README for current
+development commands. Historical operational examples remain in
+[release history](https://github.com/cesaralk/bitreca-website/blob/14dabbdbd3468c88e6919b1bb954b90d17234526/docs/portfolio-deletion-operations.md).

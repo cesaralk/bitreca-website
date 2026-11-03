@@ -35,8 +35,8 @@ test('leaves production and local configurations unchanged', async () => {
   assert.equal(await stagingLoginLimitResponse(request, env(undefined, { PORTFOLIO_LOGIN_RATE_LIMIT_ENABLED: undefined })), null)
 })
 test('staging binding requires sealed pair and keeps hosting isolated', async () => {
-  const main = JSON.parse(await readFile(new URL('../wrangler.portfolio-staging.jsonc', import.meta.url)))
-  const hosting = JSON.parse(await readFile(new URL('../wrangler.portfolio-hosting-staging.jsonc', import.meta.url)))
+  const main = JSON.parse(await readFile(new URL('./fixtures/retired-environments/wrangler.portfolio-staging.jsonc', import.meta.url)))
+  const hosting = JSON.parse(await readFile(new URL('./fixtures/retired-environments/wrangler.portfolio-hosting-staging.jsonc', import.meta.url)))
   validateStagingPair(main, hosting, { allowPlaceholders: true })
   assert.equal(main.workers_dev, false)
   assert.equal(hosting.workers_dev, false)

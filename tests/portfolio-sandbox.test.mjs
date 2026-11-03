@@ -12,7 +12,7 @@ import hosting from '../portfolio-hosting/index.js'
 
 async function configs() {
   return Promise.all(['wrangler.delete-sandbox.jsonc', 'wrangler.delete-sandbox-hosting.jsonc']
-    .map(async name => JSON.parse(await readFile(new URL('../' + name, import.meta.url), 'utf8'))))
+    .map(async name => JSON.parse(await readFile(new URL('./fixtures/retired-environments/' + name, import.meta.url), 'utf8'))))
 }
 
 test('offline cutover and import preparation has separate gates and exact sandbox-only commands', async t => {

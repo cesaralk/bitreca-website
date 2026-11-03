@@ -98,9 +98,9 @@ export function validateSandboxSnapshot(raw, migrationNames) {
 }
 
 export async function checkSandbox({ snapshot } = {}) {
-  const mainPath = join(root, 'wrangler.delete-sandbox.jsonc')
+  const mainPath = join(root, 'tests', 'fixtures', 'retired-environments', 'wrangler.delete-sandbox.jsonc')
   const main = JSON.parse(await readFile(mainPath, 'utf8'))
-  const hosting = JSON.parse(await readFile(join(root, 'wrangler.delete-sandbox-hosting.jsonc'), 'utf8'))
+  const hosting = JSON.parse(await readFile(join(root, 'tests', 'fixtures', 'retired-environments', 'wrangler.delete-sandbox-hosting.jsonc'), 'utf8'))
   validateSandboxPair(main, hosting)
   const migrations = (await readdir(join(root, 'migrations'))).filter(name => /^\d{4}_.*\.sql$/.test(name)).sort()
   assert.equal(migrations.length, 14)
