@@ -7,6 +7,7 @@ import { getPortfolioDeletionAdminStatus, handlePortfolioDeletionAdmin } from '.
 import { schedulePortfolioDeletions } from './portfolio-deletion-workflow.js'
 import { loadLegacyReconciliation } from './portfolio-legacy-reconciliation.js'
 import { legacyDeletionEnabled, handleLegacyDelete, retryLegacyDelete } from './portfolio-legacy-deletion.js'
+import { handleContactRequest } from './contact-enquiry.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -316,6 +317,10 @@ export default {
   },
   async fetch(request, env) {
     const url = new URL(request.url)
+
+    if (url.pathname === '/api/enquiries' || url.pathname === '/api/contact/config') {
+      return handleContactRequest(request, env)
+    }
 
     // Reject cross-origin requests that modify admin data.
 if (

@@ -43,9 +43,9 @@
 .hero h1 {
   max-width: 1000px;
   margin: 0;
-  font-size: clamp(52px, 7vw, 100px);
-  line-height: 0.95;
-  letter-spacing: -4px;
+  font-size: clamp(52px, 5.2vw, 76px);
+  line-height: 1.05;
+  letter-spacing: -3px;
 }
 
 .hero h1 span {
@@ -2082,5 +2082,12 @@
   .hero-orbit,
   .hero-node {
     animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero .btn-secondary {
+    border-color: rgba(148, 163, 184, 0.45);
+    background: rgba(255, 255, 255, 0.04);
   }
 }

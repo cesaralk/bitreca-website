@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard'
 import StoreCategory from '../components/StoreCategory'
 import ProjectCard from '../components/ProjectCard'
 import ValueCard from '../components/ValueCard'
-import TestimonialCard from '../components/TestimonialCard'
+
 import Reveal from '../components/Reveal'
 
 function Home() {
@@ -380,52 +380,7 @@ useEffect(() => {
 
 </section>
 
-<section className="testimonials-section">
 
-  <div className="testimonials-container">
-
-    <div className="testimonials-heading">
-
-      <div>
-        <p className="section-label">
-          CLIENT EXPERIENCES
-        </p>
-
-        <h2>
-          Built together.
-          <span> Trusted afterward.</span>
-        </h2>
-      </div>
-
-      <p className="testimonials-intro">
-        Every project is a collaboration. We focus on understanding
-        the need, building the right solution and creating technology
-        our clients can rely on.
-      </p>
-
-    </div>
-
-    <div className="testimonials-grid">
-
-      <TestimonialCard
-        quote="Customer testimonial will be added here."
-        name="Client"
-        role="Business Owner"
-        company=""
-      />
-
-      <TestimonialCard
-        quote="Customer testimonial will be added here."
-        name="Client"
-        role="Business Owner"
-        company=""
-      />
-
-    </div>
-
-  </div>
-
-</section>
 
 <section className="final-cta">
 

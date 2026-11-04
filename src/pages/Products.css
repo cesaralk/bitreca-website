@@ -1,0 +1,103 @@
+.software-products-page {
+  --software-products-line: rgba(174, 184, 200, 0.2);
+  line-height: 1.7;
+}
+
+.software-products-page .software-products-container {
+  width: 86%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.software-products-page :is(h1, h2, h3, h4, p) { margin-top: 0; }
+.software-products-page :is(h1, h2, h3, h4) { line-height: 1.15; }
+.software-products-page p, .software-products-page li { color: var(--text-secondary); }
+.software-products-page a:focus-visible { outline: 3px solid #93c5fd; outline-offset: 5px; border-radius: 4px; }
+.software-products-page .software-products-eyebrow { color: var(--brand-blue-light); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+.software-products-hero { padding-block: 90px 80px; background: radial-gradient(ellipse at 85% 25%, rgba(59, 130, 246, 0.15), transparent 60%); }
+.software-products-hero-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 64px; }
+.software-products-page h1 { margin-bottom: 28px; font-size: clamp(38px, 4.4vw, 64px); letter-spacing: -2.3px; }
+.software-products-page h1 span { color: var(--brand-blue-light); }
+.software-products-lead { max-width: 600px; margin-bottom: 32px; font-size: 18px; }
+.software-products-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.software-products-page .software-products-button { display: inline-flex; align-items: center; justify-content: center; gap: 18px; min-height: 48px; padding: 14px 22px; border: 1px solid transparent; border-radius: 8px; font-size: 14px; font-weight: 700; text-align: center; }
+.software-products-page .software-products-primary { color: #fff; background: #2563eb; }
+.software-products-page .software-products-primary:hover { background: #1d4ed8; }
+.software-products-page .software-products-secondary { border-color: #526179; background: rgba(255, 255, 255, 0.025); }
+.software-products-page .software-products-secondary:hover { background: #101e35; border-color: var(--brand-blue-light); }
+.software-products-overview { min-width: 0; padding: 32px; border: 1px solid #284b7f; border-radius: 18px; background: linear-gradient(145deg, #122747, var(--bg-secondary) 80%); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18); }
+.software-products-overview-top { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.software-products-page .software-products-overview-top p { margin-bottom: 0; }
+.software-products-monogram { display: grid; place-items: center; flex-shrink: 0; width: 48px; height: 48px; background: #2563eb; color: #fff; border-radius: 12px; font-size: 28px; font-weight: 700; }
+.software-products-page .software-products-overview h2 { font-size: 36px; letter-spacing: -1px; margin-bottom: 10px; }
+.software-products-capability-map { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0; margin: 26px 0; list-style: none; }
+.software-products-page .software-products-capability-map li { padding: 12px; border: 1px solid var(--software-products-line); border-radius: 7px; color: #dbeafe; font-size: 13px; }
+.software-products-page .software-products-overview-footer { border-top: 1px solid var(--software-products-line); padding-top: 18px; margin-bottom: 0; font-size: 13px; }
+.software-products-detail { padding-block: 80px; border-top: 1px solid var(--software-products-line); scroll-margin-top: 28px; }
+.software-products-detail-heading { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 64px; margin-bottom: 52px; }
+.software-products-page .software-products-detail-heading h2 { font-size: clamp(36px, 4vw, 52px); letter-spacing: -1.5px; margin-bottom: 14px; }
+.software-products-page .software-products-audience { display: inline-block; padding: 7px 12px; border: 1px solid var(--software-products-line); border-radius: 6px; font-size: 13px; }
+.software-products-detail-heading h3 { max-width: 500px; font-size: 28px; letter-spacing: -0.5px; margin-bottom: 20px; }
+.software-products-text-link { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; font-size: 15px; font-weight: 700; color: var(--brand-blue-light); }
+.software-products-text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.software-products-page .software-products-section-heading .software-products-eyebrow { margin-bottom: 12px; }
+.software-products-page :is(.software-products-section-heading, .software-products-benefits) > h3 { font-size: clamp(25px, 2.8vw, 34px); letter-spacing: -0.7px; margin-bottom: 28px; }
+.software-products-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.software-products-feature { min-width: 0; padding: 28px; border: 1px solid var(--software-products-line); border-radius: 12px; background: var(--bg-secondary); }
+.software-products-feature-number { display: block; color: var(--brand-blue-light); font-size: 12px; margin-bottom: 24px; }
+.software-products-page h4 { font-size: 19px; margin-bottom: 14px; }
+.software-products-feature p { margin-bottom: 0; font-size: 15px; }
+.software-products-benefits { margin-top: 64px; }
+.software-products-benefit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.software-products-benefit-grid > div { border-top: 1px solid #315b91; padding-top: 24px; }
+.software-products-benefit-grid p { margin-bottom: 0; font-size: 15px; }
+.software-products-fit { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; padding-block: 64px; border-top: 1px solid var(--software-products-line); }
+.software-products-page .software-products-fit h2 { font-size: clamp(28px, 3vw, 38px); letter-spacing: -1px; margin-bottom: 22px; }
+.software-products-fit p:last-child { margin-bottom: 0; }
+.software-products-fit ul { padding-left: 22px; margin: 0; align-self: center; }
+.software-products-fit li { padding-left: 8px; margin-block: 14px; }
+.software-products-fit li::marker { color: var(--brand-blue-light); }
+.software-products-contact { display: flex; justify-content: space-between; align-items: center; gap: 40px; padding: 44px; margin-bottom: 80px; border: 1px solid #284b7f; border-radius: 16px; background: linear-gradient(120deg, #10223f, #0c1526); }
+.software-products-page .software-products-contact h2 { max-width: 560px; font-size: clamp(28px, 3vw, 38px); letter-spacing: -1px; margin-bottom: 20px; }
+.software-products-contact p:last-child { max-width: 620px; margin-bottom: 0; }
+.software-products-contact > a { flex-shrink: 0; }
+
+/* Keep the shared header's tablet adjustment local to Products. */
+@media (min-width: 769px) and (max-width: 1100px) {
+  body:has(.software-products-page) .navbar { height: auto; min-height: 80px; flex-wrap: wrap; gap: 18px; padding-block: 20px; }
+  body:has(.software-products-page) .navbar-links { flex-wrap: wrap; gap: 16px 24px; }
+}
+
+@media (max-width: 1000px) {
+  .software-products-hero-grid { gap: 32px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .software-products-overview { padding: 26px; }
+  .software-products-detail-heading, .software-products-fit { gap: 32px; }
+  .software-products-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .software-products-benefit-grid { gap: 24px; }
+  .software-products-contact { align-items: flex-start; flex-direction: column; gap: 24px; }
+}
+
+@media (max-width: 700px) {
+  .software-products-page .software-products-container { width: 88%; }
+  .software-products-hero { padding-block: 56px 44px; }
+  .software-products-hero-grid, .software-products-detail-heading, .software-products-fit { grid-template-columns: 1fr; gap: 28px; }
+  .software-products-page h1 { letter-spacing: -1.4px; }
+  .software-products-lead { font-size: 16px; }
+  .software-products-overview-top { margin-bottom: 22px; }
+  .software-products-detail { padding-block: 52px; }
+  .software-products-detail-heading { margin-bottom: 36px; }
+  .software-products-benefit-grid { grid-template-columns: 1fr; }
+  .software-products-benefits { margin-top: 44px; }
+  .software-products-fit { padding-block: 44px; }
+  .software-products-feature { padding: 24px; }
+  .software-products-contact { padding: 28px; margin-bottom: 56px; }
+}
+
+@media (max-width: 480px) {
+  .software-products-feature-grid { grid-template-columns: 1fr; }
+  .software-products-actions a, .software-products-contact > a { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.software-products-page) { scroll-behavior: auto; }
+}
