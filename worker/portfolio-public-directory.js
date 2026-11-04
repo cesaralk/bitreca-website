@@ -18,11 +18,21 @@ export function publicPortfolioUrl(env, slug) {
 
   // Published customer websites run on the isolated portfolio-hosting Worker.
   // Advertise their URLs only for the reviewed production R2/D1 identity.
-  if (
+   if (
     env?.PORTFOLIO_ENVIRONMENT === 'production' &&
-    env.PORTFOLIO_BUCKET_NAME === 'bitreca-media' &&
     env.PORTFOLIO_DATABASE_ID === '8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a' &&
-    env.PORTFOLIO_STORAGE_SCOPE === 'portfolioforest/production/bitreca-media/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a' &&
+    (
+      (
+        env.PORTFOLIO_BUCKET_NAME === 'bitreca-media' &&
+        env.PORTFOLIO_STORAGE_SCOPE ===
+          'portfolioforest/production/bitreca-media/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a'
+      ) ||
+      (
+        env.PORTFOLIO_BUCKET_NAME === 'bitreca-portfolios-prod-20261031' &&
+        env.PORTFOLIO_STORAGE_SCOPE ===
+          'portfolioforest/production/bitreca-portfolios-prod-20261031/8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a'
+      )
+    ) &&
     !['www', 'admin', 'api', 'mail', 'ftp', 'portfolioforest'].includes(slug)
   ) {
     return `https://${slug}.bitreca.com`

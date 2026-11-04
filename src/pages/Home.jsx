@@ -59,7 +59,11 @@ useEffect(() => {
   <Link to="/contact" className="btn btn-secondary">
     Start a Project
   </Link>
-</div>
+
+ 
+</div>  {/* hero-buttons */}
+
+</div>  {/* hero-content */}
 <div className="hero-visual" aria-hidden="true">
 
   <div className="hero-orbit hero-orbit-one">
@@ -83,9 +87,7 @@ useEffect(() => {
   <div className="hero-node hero-node-three"></div>
 
 </div>
-        </div>
-
-      </section>
+           </section>
 <section className="intro">
 
 <Reveal>
