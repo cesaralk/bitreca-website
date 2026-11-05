@@ -1,92 +1,80 @@
-.projects-page {
-  min-height: 100vh;
+﻿.projects-page {
+  --projects-line: rgba(174, 184, 200, 0.2);
+  min-height: 70vh;
   background: var(--bg-primary);
-}
-
-.projects-page-container {
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto;
-}
-
-/* Hero */
-
-.projects-page-hero {
-  padding: 150px 0 80px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.projects-page-hero h1 {
-  max-width: 850px;
-  margin: 16px 0 0;
-
-  color: var(--text-primary);
-
-  font-size: clamp(48px, 7vw, 88px);
-  line-height: 0.98;
-  letter-spacing: -4px;
-}
-
-.projects-page-hero h1 span {
-  color: var(--brand-blue);
-}
-
-.projects-page-intro {
-  max-width: 650px;
-  margin-top: 28px;
-
-  color: var(--text-secondary);
-
-  font-size: 18px;
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
-/* Projects */
+.projects-page .projects-page-container { width: 86%; max-width: 1200px; margin-inline: auto; }
+.projects-page :is(h1, h2, h3, p) { margin-top: 0; }
+.projects-page :is(h1, h2, h3) { line-height: 1.15; }
+.projects-page p { color: var(--text-secondary); }
+.projects-page :is(a, button):focus-visible { outline: 3px solid #93c5fd; outline-offset: 5px; border-radius: 4px; }
+.projects-page .projects-eyebrow { margin-bottom: 20px; color: var(--brand-blue-light); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.projects-page-hero { padding-block: 90px 70px; border-bottom: 1px solid var(--projects-line); background: radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, 0.14), transparent 65%); }
+.projects-page h1 { max-width: 1000px; margin-bottom: 28px; font-size: clamp(40px, 4.7vw, 68px); letter-spacing: -2.3px; }
+.projects-page-hero h1 span { color: var(--brand-blue-light); }
+.projects-page-intro { max-width: 650px; margin-bottom: 0; font-size: 18px; }
+.projects-page-content { padding-block: 64px 80px; }
+.projects-list-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 32px; }
+.projects-page .projects-list-heading h2 { margin-bottom: 0; font-size: clamp(28px, 3vw, 38px); letter-spacing: -1px; }
+.projects-list-heading > p { flex-shrink: 0; margin-bottom: 0; font-size: 14px; }
+.projects-page .projects-list-heading .projects-eyebrow { margin-bottom: 12px; }
+.public-project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.projects-page .public-project-card { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--projects-line); border-radius: 14px; background: var(--bg-secondary); }
+.public-project-image { aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; border-radius: 13px 13px 0 0; padding: 16px; background: linear-gradient(135deg, #10223f, #080f1c); }
+.public-project-image img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.public-project-image-fallback { text-align: center; padding: 24px; }
+.public-project-image-fallback > span { font-size: 44px; color: var(--brand-blue-light); }
+.projects-page .public-project-image-fallback p { margin: 12px 0 0; font-size: 14px; }
+.public-project-card-content { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; min-width: 0; padding: 30px; }
+.projects-page .public-project-card-category { color: var(--brand-blue-light); font-size: 12px; font-weight: 700; letter-spacing: 1.2px; margin-bottom: 14px; }
+.projects-page .public-project-card h3 { margin-bottom: 16px; font-size: 27px; letter-spacing: -0.5px; }
+.projects-page .public-project-card-description { margin-bottom: 24px; font-size: 15px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.public-project-card-link { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; margin-top: auto; color: var(--brand-blue-light); font-size: 15px; font-weight: 700; }
+.public-project-card-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.public-projects-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.projects-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.projects-page .projects-button { display: inline-flex; align-items: center; justify-content: center; gap: 16px; min-height: 48px; padding: 14px 22px; border: 1px solid transparent; border-radius: 8px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
+.projects-page .projects-primary { color: #fff; background: #2563eb; }
+.projects-page .projects-primary:hover { background: #1d4ed8; }
+.projects-page .projects-secondary { border-color: #526179; color: var(--text-primary); background: transparent; }
+.projects-page .projects-secondary:hover { background: #101e35; border-color: var(--brand-blue-light); }
+.projects-page .projects-state { padding: 44px 28px; border: 1px solid var(--projects-line); border-radius: 14px; background: var(--bg-secondary); text-align: center; }
+.projects-state > p { max-width: 600px; margin: 0 auto 24px; }
+.projects-state > p:last-child { margin-bottom: 0; }
+.projects-page .projects-state h3 { margin-bottom: 18px; font-size: 25px; }
+.projects-state-mark { display: block; color: var(--brand-blue-light); font-size: 32px; margin-bottom: 12px; }
+.projects-contact { display: flex; align-items: center; justify-content: space-between; gap: 40px; padding: 40px; margin-bottom: 80px; border: 1px solid #284b7f; border-radius: 16px; background: linear-gradient(120deg, #10223f, #0c1526); }
+.projects-page .projects-contact h2 { margin-bottom: 20px; font-size: clamp(28px, 3vw, 38px); letter-spacing: -1px; }
+.projects-contact p:last-child { max-width: 620px; margin-bottom: 0; }
+.projects-contact > a { flex-shrink: 0; }
+.projects-back-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--brand-blue-light); font-size: 14px; font-weight: 700; }
+.projects-back-link:hover { text-decoration: underline; text-underline-offset: 5px; }
 
-.projects-page-content {
-  padding: 80px 0 120px;
+/* Both public Projects routes opt in without changing shared navigation files. */
+@media (min-width: 769px) and (max-width: 1100px) {
+  body:has(.projects-page) .navbar { height: auto; min-height: 80px; flex-wrap: wrap; gap: 18px; padding-block: 20px; }
+  body:has(.projects-page) .navbar-links { flex-wrap: wrap; gap: 16px 24px; }
 }
-
-.projects-page-content .projects-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 32px;
+@media (max-width: 1000px) {
+  .public-project-grid { gap: 22px; }
+  .projects-contact { flex-direction: column; align-items: flex-start; gap: 24px; }
 }
-
-.projects-page-message {
-  padding: 50px 0;
-
-  color: var(--text-secondary);
-
-  font-size: 18px;
-  text-align: center;
+@media (max-width: 700px) {
+  .projects-page .projects-page-container { width: 88%; }
+  .projects-page-hero { padding-block: 56px 44px; }
+  .projects-page h1 { letter-spacing: -1.4px; }
+  .projects-page-intro { font-size: 16px; }
+  .projects-page-content { padding-block: 44px 56px; }
+  .public-project-grid { grid-template-columns: 1fr; }
+  .public-project-card-content { padding: 24px; }
+  .projects-page .public-project-card h3 { font-size: 25px; }
+  .projects-list-heading { flex-wrap: wrap; align-items: start; gap: 12px; }
+  .projects-contact { padding: 28px; margin-bottom: 56px; }
+  .projects-state { padding: 32px 22px; }
 }
-
-/* Mobile */
-
-@media (max-width: 768px) {
-  .projects-page-container {
-    width: min(100% - 28px, 1180px);
-  }
-
-  .projects-page-hero {
-    padding: 120px 0 60px;
-  }
-
-  .projects-page-hero h1 {
-    font-size: clamp(42px, 13vw, 64px);
-    letter-spacing: -2px;
-  }
-
-  .projects-page-intro {
-    font-size: 16px;
-  }
-
-  .projects-page-content {
-    padding: 60px 0 90px;
-  }
-
-  .projects-page-content .projects-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
+@media (prefers-reduced-motion: reduce) {
+  html:has(.projects-page) { scroll-behavior: auto; }
 }

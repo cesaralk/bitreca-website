@@ -1,21 +1,22 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-04. Batch #1 deployment authorized; push/live status is recorded
+Updated: 2026-11-05. Projects Batch #2 deployment is authorized. Batch #1 remains
+pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
 Estimates are implementation/review effort, not delivery promises. Later
 milestones need inspection and user agreement before work starts.
 
 | Milestone | Status | Local / deployed | Estimated remaining effort |
 | --- | --- | --- | --- |
-| Homepage Hero typography/mobile CTA changes and testimonial removal | Approved for Batch #1 | Pending Batch #1 push/live verification | No new page work in this batch |
-| Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED locally; approved for Batch #1 | Pending Batch #1 push/live verification | No new page work in this batch |
-| Contact: WhatsApp, mailto and copy fallback; optional email integration | Fallback approved for Batch #1; production email DEFERRED | Pending Batch #1 push/live verification; sending stays disabled | Resend/Turnstile setup and live email test deferred |
+| Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
+| Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
+| Contact: WhatsApp, mailto and copy fallback; optional email integration | Fallback Live; production email DEFERRED | Verified Live at 8775054; email sending confirmed disabled | Resend/Turnstile setup and live email test deferred |
 | About: factual company introduction | Pending review | Deployment unverified | 30–60 min; needs approved information |
-| Software Products: Stockly POS and repeatable product layout | Task 4 complete; approved for Batch #1 | Pending Batch #1 push/live verification | No new page work in this batch |
+| Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
-| Projects: content and project navigation | Pending review | Deployment unverified | 30–60 min; needs verified project material |
+| Projects: public listing and slug details | Approved for Deploy Batch #2; scoped QA reused | Batch #2 build/push/live checks pending | Targeted deployment smoke only |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
-| V1 release Batch #1 | Owner authorized one reviewed commit and main push | Pre-push review complete; final build/push pending | Targeted deployment smoke checks only |
+| V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
 
 ## Services scope and validation
 
@@ -334,7 +335,7 @@ screen-reader/comprehensive accessibility audit. No total task duration is claim
 Task 4 changed only `src/pages/Products.jsx`, `src/pages/Products.css` and this
 roadmap. **READY FOR REVIEW**, local only; no commit, push or deployment.
 
-## Deploy Batch #1 — pre-push record
+## Deploy Batch #1 — pushed and verified Live
 
 Owner authorized deployment of Homepage Hero/testimonial cleanup, Services,
 Contact with WhatsApp/mailto/copy fallback, and software Products. Email delivery
@@ -357,14 +358,188 @@ flags, secrets, subscriptions, DNS or rate-limit bindings will be configured.
   configuration, routes/resources, package files and migrations have no diff.
 - Existing Services, Contact and Products browser/lint/focused-test evidence is
   reused. No repeat visual review or historical test suite is part of deployment.
-- Single final `npm.cmd run build`: passed for Worker and client. Whitespace
-  check is performed on the exact staged manifest before committing.
-- Commit/push: not performed at this snapshot. Cloudflare/live: unverified.
+- Single final `npm.cmd run build`: passed for Worker and client. Exact staged
+  15-file manifest passed `git diff --cached --check`; no private-key or Resend/
+  GitHub token markers were found in the selected files. Generated dist output,
+  local secret files and temporary QA runners were not staged.
+- Commit: **`877505452a784205353ff6357e94a9f0a80c88b1`**, title
+  `Complete Bitreca V1 pages with safe contact fallbacks`.
+- `git push origin main`: succeeded, fast-forward from `45fd26d` to `8775054`.
+  One commit created; no force push or direct Wrangler deployment.
+- Cloudflare GitHub check **Workers Builds: bitreca-website** completed with
+  **success** for that exact commit. [Build details](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/02f9f0d4-7caf-43bb-948e-4f169e77ecfc).
+- Read-only Worker deployment history showed the latest deployment at 100% on
+  version **`8e8af1d9-457f-4db0-ac06-0a041bd7857b`**, created
+  `2026-11-04T21:19:41.760Z` (23:19:41 Beirut). No deployment/configuration action
+  was issued through Wrangler; this was the existing Git-triggered pipeline.
+- First HTTP smoke caught the previous bundle before rollout completed; those
+  responses were not treated as proof of the new release. The final rendered
+  checks below loaded **`/assets/index-Nuf4Q4M5.js`**, matching the final build.
 
-One feature commit is planned. Its actual SHA and post-push/live evidence will
-be recorded in this local roadmap after the commit exists. That final record is
-kept local unless a separate documentation commit is later requested; the
+### Targeted production smoke — verified 2026-11-04
+
+| Public destination | Result |
+| --- | --- |
+| `https://bitreca.com/` | HTTP 200, Homepage hero rendered; testimonial section absent |
+| `https://bitreca.com/services` | HTTP 200, completed Services content rendered |
+| `https://bitreca.com/contact` | HTTP 200, completed Contact form and fallback actions rendered |
+| `https://bitreca.com/products` | HTTP 200, Stockly POS product content rendered |
+| `https://bitreca.com/portfolioforest` | HTTP 200, existing directory rendered |
+| `https://bitreca.com/api/portfolios` | HTTP 200, success true, six entries with public links |
+| Existing directory link `https://cezar.bitreca.com/` | HTTP 200, title `Cesar Al Khatib \| Developer Portfolio`, actual portfolio body rendered |
+
+Contact config returned HTTP 200 with `{ "enabled": false, "siteKey": null }`.
+Send is disabled and the page explicitly says online sending is unavailable.
+Verified official `https://wa.me/96170864221` prefilled action, `mailto:info@bitreca.com`
+and copy control are present. No Turnstile script loads. Prior copy/clipboard QA
+was reused; no live messages/submissions were sent. No uncaught page exceptions
+were observed in the final rendered smoke. Two temporary runner comparison/
+selector issues were corrected locally; no application fixes were needed.
+
+No production D1/R2 data, DNS, secrets, subscriptions, migrations, admin sessions
+or deletion operations were changed/tested. Existing admin/deletion logic is
+unchanged by source audit; production smoke was limited to the requested public
+pages/directory/portfolio. No full visual or historical test cycle was repeated.
+
+**Batch #1 is verified Live, not merely pushed.** Production email remains
+intentionally deferred, not a release blocker for the usable fallback channels.
+Projects and Store remain pending. Temporary smoke runner is outside the repo:
+`bitreca-batch1-production-smoke.mjs` in the user's temporary directory.
+
+This final SHA/live record is a **local, uncommitted documentation update** after
+the single authorized feature commit. The pushed roadmap snapshot records the
+pre-push audit/build state. No second documentation commit/push was made; the
 committed snapshot cannot contain its own final SHA without changing that SHA.
+
+## Task 5: Public Projects — READY FOR REVIEW locally (2026-11-05)
+
+Completed only `/projects` and `/projects/:slug` presentation and client-side
+loading/safety behavior. Existing Worker endpoints and the D1 published-project
+model remain the authority; no alternate data store, API, admin change or seed
+data was introduced. Batch #1 deployment evidence and its actual commit SHA above
+are preserved, including the previously uncommitted post-deployment record.
+
+### Implementation
+
+- Listing uses the existing `/api/projects` response and preserves server order.
+  Dynamic cards link to the existing slug route; no project/example is embedded
+  in production page data. Detail uses `/api/projects/:slug` and renders only
+  supplied title/category/description and optional image, overview, comma-separated
+  technologies, website URL and content. Optional sections are omitted if absent.
+- Updated navy/blue layouts, typography, contained responsive imagery, card
+  descriptions, project metadata and top/bottom back navigation. The listing
+  adds an explicit public-work heading; Contact CTAs use the existing route.
+- Loading, true empty, request failure/retry and detail not-found states are
+  distinct. JSON shape/record checks prevent an HTML fallback or malformed
+  response from becoming an empty/successful project view.
+- Abort cleanup, a 15-second fetch timeout and request-keyed state prevent stale
+  results on retry/slug changes. Route changes focus the heading near page top;
+  keyboard links/buttons have visible focus. Reduced motion is respected.
+- Project text is rendered through ordinary React text nodes, never injected
+  HTML. URL checks reject executable/data schemes, protocol-relative URLs,
+  embedded credentials, backslashes and URL control characters. Images may use
+  safe HTTP(S) or same-origin root paths, including the existing `/api/media/`
+  route. Missing/broken images have honest fallbacks. Safe external websites
+  open in a new tab with `noopener noreferrer` and an accessible new-tab label.
+- The shared ProjectCard adds an **opt-in public appearance**. Its default
+  Homepage return markup remains unchanged. The legacy global `.project-category`
+  declarations are retained exactly so replacing detail styles does not restyle
+  approved Homepage cards. All new page/card styles are separate or scoped.
+
+### Verification performed
+
+- Read-only local `/api/projects` returned `{ "success": true, "projects": [] }`.
+  The actual empty-page state was browser-verified before fixtures were installed.
+- Populated QA used four explicitly labelled synthetic records and generated
+  image responses **only in temporary browser memory/interception**. No fixtures
+  are imported by production code; no D1/R2 data was inserted or changed.
+- Headless Chrome at **1440, 768 and 390px** wide / 1000px viewport height:
+  captured and reviewed listing/detail screenshots. No horizontal overflow or
+  visible clipping found. Each view had one H1 and resolved labelled-by targets.
+- At each width, card Enter navigation, direct slug navigation, top/bottom back
+  links, project-specific accessible link text and visible keyboard focus passed.
+  Returning to the listing focused its visible heading near page top. Tablet/
+  mobile shared menu opened/closed using keyboard without editing Navbar.
+- Landscape and portrait images, broken-image and absent-image fallbacks passed.
+  Supplied website href/target/rel were verified; no external fixture site was
+  represented as a real Bitreca project or visited as a demo.
+- Browser state checks passed for loading/recovery, empty, HTTP failure,
+  network failure, HTML fallback, malformed data/JSON, duplicate records,
+  retry, 404 (including non-JSON response), invalid slug and minimal optional
+  metadata. A delayed older slug response could not overwrite the current one.
+- HTML/script-like fixture content remained literal text; no injected script ran.
+  Unsafe website URLs were suppressed. Long unbroken titles/technology text did
+  not overflow. Technology values were trimmed, empty entries removed and
+  duplicates removed. Reduced-motion computed scroll behavior was `auto`.
+- No non-GET/HEAD network requests or uncaught browser exceptions were observed.
+  Approved Homepage, Services, Contact, Products and PortfolioForest visual QA
+  was not repeated. No production reads or writes were needed for fixture QA.
+- `node --test tests/public-projects.test.js`: **3 passed** (URL safety,
+  malformed record rejection, optional metadata and literal text preservation).
+- Scoped ESLint passed for Projects.jsx, ProjectDetails.jsx, ProjectCard.jsx,
+  PublicProjectImage.jsx, usePublicProjects.js, publicProjects.js and the test.
+- `npm.cmd run build`: passed for the client and unchanged Worker bundle.
+  `git diff --check`: passed. No unrelated historical test suites were run.
+- Preservation checks: **91 protected source/config files** match the Task 5
+  start hashes. Legacy Homepage card return markup and global category property
+  declarations match HEAD. The full local Batch #1 evidence block is preserved.
+- QA artifacts are outside the repo in the user's temporary directory:
+  `bitreca-projects-qa.mjs` and `bitreca-projects-qa-20261104/` (the directory
+  name is an artifact label; these Task 5 results were completed on 2026-11-05).
+
+### Status, files and limitations
+
+**READY FOR REVIEW**, local only. No Projects-specific implementation blocker
+remains in the tested scope. There were no published local records, so populated
+layouts used isolated fixtures rather than a real published-project catalogue.
+Actual project completeness and external-site availability depend on owner-managed
+published content. No fabricated projects, outcomes, testimonials or demo URLs
+are shipped. Chrome viewport emulation is not physical-device, cross-browser or
+screen-reader certification. No total effort/time-spent figure is claimed.
+
+Changed files: `src/pages/Projects.jsx`, `src/pages/Projects.css`,
+`src/pages/ProjectDetails.jsx`, `src/pages/ProjectDetails.css`,
+`src/components/ProjectCard.jsx`, `src/components/PublicProjectImage.jsx`,
+`src/hooks/usePublicProjects.js`, `src/utils/publicProjects.js`,
+`tests/public-projects.test.js` and this roadmap. No dependencies, Worker APIs,
+admin management, auth, migrations, D1/R2 configuration, hosting, secrets or
+unrelated pages changed. No commit, push or deployment; stop after Projects.
+
+## Deploy Batch #2: Projects — pre-push review (2026-11-05)
+
+Owner authorized a single ten-file Projects/roadmap commit and ordinary push to
+main. Baseline is Batch #1 commit `877505452a784205353ff6357e94a9f0a80c88b1`;
+refreshed origin/main equals local HEAD. All tracked/untracked changes match the
+exact approved manifest, with no unrelated files staged or source edits needed.
+
+- Reviewed listing/detail JSX/CSS, shared card opt-in, new image/hook/URL helper,
+  focused test file and roadmap. No implementation blocker found.
+- All 91 protected source/config hashes match the Task 5 baseline. Homepage
+  ProjectCard default markup and legacy category presentation match HEAD.
+  Homepage, Services, Contact, Products, PortfolioForest, Store, Worker APIs,
+  deletion, auth, resources, secrets and Cloudflare configuration have no changes.
+- The complete **Batch #1 post-deployment SHA/build/version/live evidence block
+  is preserved and included in the Batch #2 roadmap commit**. Its earlier
+  statements about being uncommitted describe the Batch #1 handoff, not its
+  inclusion in Batch #2. No Batch #1 evidence was removed or rewritten.
+- Existing Task 5 browser QA, three safety tests and scoped lint are reused.
+  No repeat visual, isolated-fixture or historical testing in this deploy task.
+- Single final `npm.cmd run build`: passed for client and unchanged Worker.
+  Exact staged whitespace check is performed before the commit. Client output:
+  `/assets/index-DN3ADZNY.js`, `/assets/index-oqcfpEgI.css`.
+- Commit/push and Cloudflare/live verification: pending at this snapshot.
+
+Approved manifest: `src/pages/Projects.jsx`, `src/pages/Projects.css`,
+`src/pages/ProjectDetails.jsx`, `src/pages/ProjectDetails.css`,
+`src/components/ProjectCard.jsx`, `src/components/PublicProjectImage.jsx`,
+`src/hooks/usePublicProjects.js`, `src/utils/publicProjects.js`,
+`tests/public-projects.test.js`, `docs/BITRECA_V1_ROADMAP.md`.
+
+After the single commit exists, the actual SHA and targeted production evidence
+will be recorded locally without a second commit unless separately requested.
+Production checks are limited to Projects and an existing published slug if
+available, plus Homepage and PortfolioForest continuity. Never seed/change data.
+No About or Store work is authorized in this batch.
 
 ## Boundaries
 
