@@ -1,6 +1,7 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-05. Projects Batch #2 deployment is authorized. Batch #1 remains
+Updated: 2026-11-05. Task #6 Contact Inbox/Admin is implemented locally; production
+activation is BLOCKED pending owner review/setup. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
 Estimates are implementation/review effort, not delivery promises. Later
@@ -10,11 +11,11 @@ milestones need inspection and user agreement before work starts.
 | --- | --- | --- | --- |
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Contact: WhatsApp, mailto and copy fallback; optional email integration | Fallback Live; production email DEFERRED | Verified Live at 8775054; email sending confirmed disabled | Resend/Turnstile setup and live email test deferred |
+| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Existing fallback Live; Task #6 Inbox/Admin implemented and tested locally | Production unchanged at 3ed49f4; D1 inbox not migrated/deployed | Owner review, free Turnstile/secrets, one additive migration and live test required; no automatic outbound messaging |
 | About: factual company introduction | Pending review | Deployment unverified | 30–60 min; needs approved information |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
-| Projects: public listing and slug details | Approved for Deploy Batch #2; scoped QA reused | Batch #2 build/push/live checks pending | Targeted deployment smoke only |
+| Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
 
@@ -413,6 +414,8 @@ committed snapshot cannot contain its own final SHA without changing that SHA.
 
 ## Task 5: Public Projects — READY FOR REVIEW locally (2026-11-05)
 
+Historical local QA record. Deployment completion is recorded in Batch #2 below.
+
 Completed only `/projects` and `/projects/:slug` presentation and client-side
 loading/safety behavior. Existing Worker endpoints and the D1 published-project
 model remain the authority; no alternate data store, API, admin change or seed
@@ -505,7 +508,7 @@ Changed files: `src/pages/Projects.jsx`, `src/pages/Projects.css`,
 admin management, auth, migrations, D1/R2 configuration, hosting, secrets or
 unrelated pages changed. No commit, push or deployment; stop after Projects.
 
-## Deploy Batch #2: Projects — pre-push review (2026-11-05)
+## Deploy Batch #2: Projects — pushed and verified Live (2026-11-05)
 
 Owner authorized a single ten-file Projects/roadmap commit and ordinary push to
 main. Baseline is Batch #1 commit `877505452a784205353ff6357e94a9f0a80c88b1`;
@@ -527,7 +530,17 @@ exact approved manifest, with no unrelated files staged or source edits needed.
 - Single final `npm.cmd run build`: passed for client and unchanged Worker.
   Exact staged whitespace check is performed before the commit. Client output:
   `/assets/index-DN3ADZNY.js`, `/assets/index-oqcfpEgI.css`.
-- Commit/push and Cloudflare/live verification: pending at this snapshot.
+- Exact ten-file staged manifest passed `git diff --cached --check`. No
+  unrelated files, secrets or generated build output were staged.
+- Commit: **`3ed49f470ae25f4a7a4900a8c5a188299f2473cf`**, title
+  `Complete public Projects listing and detail experience`.
+- `git push origin main`: succeeded, fast-forward from `8775054` to `3ed49f4`.
+  One commit, no force push and no direct Wrangler deployment.
+- Cloudflare GitHub check **Workers Builds: bitreca-website** completed with
+  **success** for this exact SHA. [Build details](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/43b30b33-7d5d-4bba-b006-4db61d5d22cd).
+- Read-only deployment history showed the new version
+  **`db06bceb-d8b2-4942-be34-a0241f3552d2`** at **100%**, deployed
+  `2026-11-05T05:13:08.677Z`. No configuration/resource mutations were issued.
 
 Approved manifest: `src/pages/Projects.jsx`, `src/pages/Projects.css`,
 `src/pages/ProjectDetails.jsx`, `src/pages/ProjectDetails.css`,
@@ -535,11 +548,197 @@ Approved manifest: `src/pages/Projects.jsx`, `src/pages/Projects.css`,
 `src/hooks/usePublicProjects.js`, `src/utils/publicProjects.js`,
 `tests/public-projects.test.js`, `docs/BITRECA_V1_ROADMAP.md`.
 
-After the single commit exists, the actual SHA and targeted production evidence
-will be recorded locally without a second commit unless separately requested.
-Production checks are limited to Projects and an existing published slug if
-available, plus Homepage and PortfolioForest continuity. Never seed/change data.
-No About or Store work is authorized in this batch.
+### Targeted read-only production checks
+
+All checked documents returned HTTP 200 and rendered the final-build bundle
+**`/assets/index-DN3ADZNY.js`** (no screenshots or visual/fixture tests repeated).
+
+| Route/API | Actual result |
+| --- | --- |
+| `https://bitreca.com/projects` | New listing rendered both existing published records: Portfolios and Stockly POS; both project detail hrefs present; no listing error |
+| `/api/projects` | HTTP 200, success true, 2 published records |
+| `https://bitreca.com/projects/stockly-pos` | Direct published detail rendered Stockly POS, existing image loaded, back link targets `/projects` |
+| `/api/projects/stockly-pos` | HTTP 200, success true, slug `stockly-pos` |
+| `https://bitreca.com/` | Existing Homepage rendered successfully |
+| `https://bitreca.com/portfolioforest` | Existing PortfolioForest rendered successfully |
+| `/api/portfolios` | HTTP 200, success true, 6 entries |
+
+No application POST/PUT/PATCH/DELETE requests or uncaught page exceptions were
+observed. Production data was read only; no seed, update or deletion occurred.
+One temporary runner helper-name collision was corrected before it made any
+requests; no application change was required. Temporary smoke runner is outside
+the repository: `bitreca-batch2-production-smoke.mjs` in the user's temp directory.
+
+**Batch #2 is verified Live, not merely pushed.** No deployment/implementation
+blocker remains for this batch. Batch #1's complete formerly local deployment
+record is now included in commit `3ed49f4`, as authorized. Its historical wording
+about remaining uncommitted at the Batch #1 handoff is retained as evidence.
+
+This final Batch #2 SHA/live evidence update remains **local and uncommitted**;
+the single pushed commit contains its pre-push audit/build record. No second
+commit or push was made. No About or Store work was started. Stop after Batch #2.
+
+## Task #6: Contact Inbox + Admin — implementation complete, activation BLOCKED
+
+Production baseline remains **`3ed49f470ae25f4a7a4900a8c5a188299f2473cf`**.
+This local task supersedes the earlier optional Resend architecture. No paid
+service, automatic email/WhatsApp delivery, new login system or parallel database
+was added. The complete previously uncommitted Batch #2 SHA/build/version/live
+record above is preserved; no release action has been authorized/performed here.
+
+### Implemented
+
+- Contact submits to the existing Worker `/api/enquiries` route and acknowledges
+  success only after D1 confirms storage. The response is 201 (new) or 200 (exact
+  receipt retry), status `stored`, with a UUID reference. No provider-acceptance
+  message or Resend endpoint/key remains in the implementation.
+- Approved Contact layout, company WhatsApp and direct email actions remain.
+  Copy/manual fallback remains available when inbox submission is unavailable.
+  Optional international phone field plus explicit WhatsApp checkbox control
+  whether an owner WhatsApp reply action is allowed. No number is auto-filled.
+- One additive migration **0018_add_contact_enquiries.sql** creates only
+  `contact_enquiries`, `contact_enquiry_limits` and their indexes in existing
+  `bitreca_db`. IDs, unique request IDs, receipt HMAC, timestamps, status and
+  optimistic row version are stored. No existing schema/data is altered/deleted.
+- Public validation/body limits, same-origin/allowed-origin checks, honeypot,
+  required free Turnstile hostname/action verification and atomic primary-D1
+  attempt counters fail closed. Limits: 5/IP per ten minutes, 20 shared/minute,
+  200 shared/day (fixed UTC windows). IPs are daily-scoped HMACs, not stored raw.
+  Counter expiry cleanup is bounded and touches only its own ephemeral table.
+- Unique insert/conflict resolution covers concurrent duplicates and lost write
+  acknowledgements. Same request ID with changed content returns 409. D1 errors
+  never claim success or definite non-storage. Raw content/tokens/keys are not
+  logged or exposed by the public API.
+- `/admin/enquiries` reuses ProtectedAdminRoute/AdminLayout/useAdminApi. Dashboard
+  quick action and sidebar link expose the inbox. Worker dispatch occurs after
+  the unchanged existing admin session and mutation-origin guards.
+- Owner can page through twenty-row keyset lists, filter four statuses, read
+  details and save New/In Progress/Replied/Archived with version conflict checks.
+  List payload omits bodies, phone, request IDs and hashes. All private responses
+  are no-store; there is no public list/read or new delete/export endpoint.
+- Manual mailto reply is validated/encoded; manual WhatsApp reply requires a
+  valid stored phone and consent. Links open the external app for owner review;
+  they neither send nor mark Replied. Status changes are separate explicit saves.
+- Stored content is escaped React text. A 401 redirects to existing login and
+  removes the inbox UI. Existing authentication/session logic is unchanged.
+
+### Verified checks (2026-11-05)
+
+- **17 focused tests passed**: 16 against real in-memory SQLite (full existing
+  0004 auth migration and additive 0018), plus one isolated workerd/Miniflare D1
+  runtime test. No remote database or real credentials were used.
+- Tests cover additive constraints/preserved existing rows; method/origin/body/
+  field/phone-consent rejection; CAPTCHA hostname/action/failure; actual stored
+  acknowledgement; replay/conflict/concurrent duplicate handling; uncertain
+  write recovery; persistent atomic limits; bounded counter cleanup; private
+  no-store list/detail; cursor/status filtering; concurrent status edits; no
+  public reads; anonymous/forged/expired/revoked/rotated session denial; reply URLs
+  and absence of outbound provider code. No historical unrelated suites run.
+- Scoped ESLint passed for all changed JS/JSX and the two focused tests/helper.
+  `npm.cmd run build` passed for Worker/client; `git diff --check` passed.
+- Chrome new-workflow browser checks at **1440/768/390px** used a loopback-only
+  server serving the built UI, real Worker handlers, actual existing session
+  login and an in-memory synthetic SQLite database. Only the Turnstile widget/
+  Siteverify responses were test doubles; the storage/auth/admin API were real
+  implementation code. No production resources or messages were accessed.
+- Public submission -> exactly one saved row -> owner session -> protected
+  inbox/details passed. Required fields, optional phone consent, disabled/loading
+  controls, duplicate-action suppression, honest saved reference, status changes,
+  all-status filtering, 20+5 pagination, version conflict/reload and manual link
+  behavior passed. No phone means no WhatsApp reply link.
+- Script-like message content stayed literal. HTML/legacy accepted responses did
+  not produce saved success. Lost receipt retry kept one row; rate feedback and
+  disabled-submission fallback passed. Revoked owner session redirected to login
+  without retaining an inbox view. No external browser request or uncaught page
+  exception was observed in the workflow run.
+- Reviewed Contact/new Inbox screenshots at all three sizes; no document or
+  form/detail overflow found. Keyboard focus and owner selection worked. Other
+  approved public-page visual/fixture suites were not repeated.
+- Browser artifacts are temporary and outside the repo:
+  `bitreca-inbox-test-server.mjs`, `bitreca-inbox-browser-qa.mjs` and
+  `bitreca-inbox-qa-20261105/` in the user's temporary directory. The temporary
+  server has no real D1 bindings/credentials and no outbound-send capability.
+
+### Release blockers and stop gate
+
+**BLOCKED for production activation; ready for owner implementation review.**
+
+1. Owner must review/authorize this exact implementation, additive migration,
+   privacy/retention procedure and attempt thresholds. Archives retain PII;
+   there is no automatic purge. No total task-time/effort figure is claimed.
+2. Free Managed Turnstile hostname-scoped widget/public key/private secret and a
+   separate high-entropy CONTACT_RATE_LIMIT_SECRET must be supplied/configured
+   for the approved environment. They were not installed or externally verified.
+   CONTACT_INBOX_ENABLED remains false/absent until authorized activation.
+3. Release preflight must verify the existing D1 migration ledger, with 0018 the
+   sole pending change; never replay historical portfolio/auth/deletion SQL.
+4. After approval: additive migration, reviewed code commit/push, existing
+   Cloudflare deployment, enablement and **one authorized live public-to-private
+   inbox enquiry test**. No live test was run at this gate.
+
+The single release sequence, exact future commands/settings, free-widget setup,
+privacy/retention guidance and fail-safe disable/rollback are in
+[CONTACT_ENQUIRY_INTEGRATION.md](CONTACT_ENQUIRY_INTEGRATION.md). No production
+migration, subscription, config/secret/DNS/resource change, commit, push or deploy
+was performed. Production email sending remains unused, not a dependency.
+
+Exact Task #6 files:
+
+- `migrations/0018_add_contact_enquiries.sql`
+- `shared/contact-enquiry.js`
+- `worker/contact-enquiry.js`, `worker/contact-http.js`, `worker/admin-enquiries.js`,
+  `worker/index.js` (new protected dispatch/import only)
+- `src/pages/Contact.jsx`, `src/pages/Contact.css`
+- `src/pages/AdminEnquiries.jsx`, `src/pages/AdminEnquiries.css`
+- `src/App.jsx`, `src/components/AdminLayout.jsx`, `src/pages/AdminDashboard.jsx`
+  (route/navigation/quick action only)
+- `tests/contact-enquiry.test.js`, `tests/contact-d1-runtime.test.js`,
+  `tests/helpers/contact-d1.js`
+- `docs/CONTACT_ENQUIRY_INTEGRATION.md`, `docs/BITRECA_V1_ROADMAP.md`
+
+Protected source/config hash baseline and complete Batch #2 evidence are checked
+before handoff. Homepage, Services, Products, Projects, PortfolioForest, old
+migrations, deletion, hosting and existing auth implementations are preserved.
+Stop at this owner review/release gate; do not start other V1 milestones.
+
+## Contact activation attempt — 2026-11-06
+
+Owner authorized migration 0018, the reviewed eighteen-file commit/push,
+activation and one real Turnstile enquiry. Read-only release checks found:
+
+- Production `bitreca-website` runtime contains all five Contact settings.
+  CONTACT_TURNSTILE_SECRET, CONTACT_RATE_LIMIT_SECRET and CONTACT_ALLOWED_ORIGINS
+  are secret bindings; CONTACT_TURNSTILE_SITE_KEY and CONTACT_INBOX_ENABLED are
+  plain-text bindings. The enable flag is `false`. No secret values were read.
+- Existing `bitreca_db` still targets database
+  `8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`. Remote migration listing confirms
+  **0018_add_contact_enquiries.sql is the sole pending migration**.
+- **BLOCKED before migration/push:** dashboard-only plain-text Contact settings
+  are absent from wrangler.jsonc, whose keep_vars option is unset. Wrangler's
+  installed configuration schema says ordinary deployment overrides/deletes
+  dashboard variables unless keep_vars is true. Persistence is not established.
+- Proposed minimal fix: add `"keep_vars": true` to wrangler.jsonc. This would be
+  a nineteenth release file and requires owner authorization beyond the explicit
+  eighteen-file manifest. No configuration edit was made at this gate.
+- No production migration, setting change, commit, push, activation or live
+  enquiry was performed. Inbox remains disabled; existing fallback is preserved.
+  Prior Batch #1/#2 deployment evidence is retained. Completed QA was not rerun.
+
+## Authorized Contact release — 2026-11-06
+
+Owner approved adding wrangler.jsonc as the nineteenth release file with only
+`"keep_vars": true`. Focused parsed-config comparison passed: removing that one
+property produces exactly HEAD's configuration. No resource, route, portfolio
+flag, authentication setting or scheduled task was changed.
+
+Remote preflight reconfirmed only 0018 pending, then the authorized
+`wrangler d1 migrations apply bitreca-db --remote` succeeded for
+**0018_add_contact_enquiries.sql only** on database
+`8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`. Existing QA is reused; no broad tests
+were repeated. Runtime Contact settings were present, inbox disabled before
+rollout. Commit/push, deployment, enablement and real test evidence follow after
+they occur; none is claimed by this pre-commit record. Preserve new tables on
+fallback; disable the inbox flag rather than dropping data.
 
 ## Boundaries
 

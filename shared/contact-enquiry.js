@@ -1,5 +1,12 @@
 export const contactInterests = ['Website development', 'Applications', 'Custom software', 'Game development', 'Not sure yet']
 export const contactRecipient = 'info@bitreca.com'
+export const enquiryStatuses = { new: 'New', in_progress: 'In Progress', replied: 'Replied', archived: 'Archived' }
+
+export function normalizeContactPhone(value) {
+  if (typeof value !== 'string' || value.length > 40 || !/^[+0-9 ()-]*$/.test(value)) return ''
+  const normalized = value.replace(/[ ()-]/g, '')
+  return /^\+[1-9][0-9]{7,14}$/.test(normalized) ? normalized : ''
+}
 
 export function validateContact(fields) {
   const errors = {}
@@ -18,6 +25,10 @@ export function validateContact(fields) {
     errors.email = 'Enter a valid email address, such as name@example.com.'
   }
   if (!contactInterests.includes(fields.service)) errors.service = 'Choose a service, or select “Not sure yet”.'
+  if (fields.phone != null && (typeof fields.phone !== 'string' || (fields.phone.trim() && !normalizeContactPhone(fields.phone)))) errors.phone = 'Use an international number, such as +961 70 123 456.'
+  if (fields.whatsappConsent != null && typeof fields.whatsappConsent !== 'boolean') errors.phone = 'Choose whether to allow a manual WhatsApp reply.'
+  if (typeof fields.phone === 'string' && fields.phone.trim() && fields.whatsappConsent !== true) errors.phone = 'Allow a WhatsApp reply, or leave the optional number blank.'
+  if (fields.whatsappConsent === true && !normalizeContactPhone(fields.phone)) errors.phone = 'Provide a valid international number, or clear WhatsApp permission.'
   if (typeof fields.message !== 'string' || fields.message.trim().length < 20 || fields.message.length > 5000 || controlCharacters(fields.message, true)) {
     errors.message = 'Describe your project in 20–5,000 characters without control characters.'
   }
@@ -25,7 +36,17 @@ export function validateContact(fields) {
 }
 
 export function formatContactBrief(fields) {
-  return ['Bitreca project enquiry', `Name: ${fields.name.trim()}`, `Email: ${fields.email.trim()}`, `Service interest: ${fields.service}`, '', fields.message.trim()].join('\n')
+  return ['Bitreca project enquiry', `Name: ${fields.name.trim()}`, `Email: ${fields.email.trim()}`, `Service interest: ${fields.service}`, ...(fields.whatsappConsent === true && normalizeContactPhone(fields.phone) ? [`WhatsApp reply number: ${normalizeContactPhone(fields.phone)}`] : []), '', fields.message.trim()].join('\n')
+}
+
+export function enquiryReplyLinks(enquiry) {
+  const emailErrors = validateContact({ name: 'Reply', email: enquiry.email, service: contactInterests[0], message: 'Reply address validation only.' })
+  const email = emailErrors.email ? '' : enquiry.email.trim()
+  const phone = enquiry.whatsapp_consent === 1 ? normalizeContactPhone(enquiry.phone) : ''
+  return {
+    email: email ? `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Re: Bitreca project enquiry')}` : '',
+    whatsapp: phone ? `https://wa.me/${phone.slice(1)}?text=${encodeURIComponent('Hello, I am following up on your Bitreca project enquiry.')}` : '',
+  }
 }
 
 export function contactWhatsAppUrl(fields) {

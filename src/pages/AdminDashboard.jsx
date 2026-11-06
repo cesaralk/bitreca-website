@@ -89,6 +89,7 @@ function AdminDashboard() {
   </div>
 
   <div className="dashboard-actions">
+    <Link to="/admin/enquiries" className="dashboard-action"><strong>Enquiry Inbox</strong><span>Read project enquiries and reply manually.</span></Link>
     <Link
   to="/admin/projects"
   className="dashboard-action"

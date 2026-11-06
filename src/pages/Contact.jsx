@@ -4,7 +4,7 @@ import ContactTurnstile from '../components/ContactTurnstile'
 import { contactInterests as interests, contactRecipient, contactWhatsAppUrl, formatContactBrief, validateContact as validate } from '../../shared/contact-enquiry'
 import './Contact.css'
 
-const emptyFields = { name: '', email: '', service: '', message: '' }
+const emptyFields = { name: '', email: '', service: '', message: '', phone: '', whatsappConsent: false, website: '' }
 
 function Contact() {
   const [fields, setFields] = useState(emptyFields)
@@ -16,7 +16,7 @@ function Contact() {
   const [delivery, setDelivery] = useState({ enabled: false, loading: true })
   const [turnstileToken, setTurnstileToken] = useState('')
   const [resetKey, setResetKey] = useState(0)
-  const [accepted, setAccepted] = useState(false)
+  const [stored, setStored] = useState(false)
   const requestId = useRef(null)
   const busy = status.kind === 'copying' || status.kind === 'sending'
 
@@ -27,19 +27,20 @@ function Contact() {
     fetch('/api/contact/config', { signal: controller.signal, cache: 'no-store' })
       .then(async (response) => {
         const config = response.ok && response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null
-        if (active) setDelivery({ loading: false, enabled: config?.enabled === true && typeof config.siteKey === 'string' && Boolean(config.siteKey), siteKey: config?.siteKey })
+        if (active) setDelivery({ loading: false, enabled: config?.mode === 'inbox' && config.enabled === true && typeof config.siteKey === 'string' && Boolean(config.siteKey), siteKey: config?.siteKey })
       }).catch(() => { if (active) setDelivery({ loading: false, enabled: false }) })
       .finally(() => window.clearTimeout(timer))
     return () => { active = false; controller.abort(); window.clearTimeout(timer) }
   }, [])
 
   function updateField(event) {
-    const { name, value } = event.target
+    const { name, type, checked } = event.target
+    const value = type === 'checkbox' ? checked : event.target.value
     setFields((current) => ({ ...current, [name]: value }))
-    setErrors((current) => ({ ...current, [name]: undefined }))
+    setErrors((current) => ({ ...current, [name]: undefined, ...(name === 'whatsappConsent' ? { phone: undefined } : {}) }))
     setStatus({ kind: 'idle', text: '' })
     setManualBrief('')
-    setAccepted(false)
+    setStored(false)
     requestId.current = null
   }
 
@@ -83,7 +84,7 @@ function Contact() {
 
   async function sendEnquiry(event) {
     event.preventDefault()
-    if (copying.current || accepted) return
+    if (copying.current || stored) return
     const nextErrors = validate(fields)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length) {
@@ -92,36 +93,38 @@ function Contact() {
       return
     }
     if (!delivery.enabled || !turnstileToken) {
-      setStatus({ kind: 'error', text: delivery.enabled ? 'Complete the security check before sending.' : 'Online sending is unavailable. Use WhatsApp, email or copy your brief below.' })
+      setStatus({ kind: 'error', text: delivery.enabled ? 'Complete the security check before submitting.' : 'Inbox submission is temporarily unavailable. Use WhatsApp, direct email or copy your brief below.' })
       return
     }
     copying.current = true
-    requestId.current ||= crypto.randomUUID()
-    setStatus({ kind: 'sending', text: 'Sending your enquiry for acceptance…' })
+    setStatus({ kind: 'sending', text: 'Saving your enquiry to Bitreca’s private inbox…' })
     try {
+      requestId.current ||= crypto.randomUUID()
       const response = await fetch('/api/enquiries', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...fields, turnstileToken, requestId: requestId.current }),
         signal: AbortSignal.timeout(25000),
       })
       const result = response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null
-      if (response.status === 202 && result?.status === 'accepted' && typeof result.reference === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(result.reference)) {
-        setAccepted(true)
-        setStatus({ kind: 'accepted', text: `Your enquiry was accepted for email delivery to ${contactRecipient}. Inbox receipt is not yet confirmed. Reference: ${result.reference}` })
+      if ([200, 201].includes(response.status) && result?.status === 'stored' && typeof result.reference === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(result.reference)) {
+        setStored(true)
+        setStatus({ kind: 'stored', text: `Your enquiry has been saved to Bitreca’s private inbox. Reference: ${result.reference}. The owner can review it and reply manually. No email or WhatsApp message was sent automatically.` })
       } else if (response.status === 422 && result?.status === 'invalid' && result.errors) {
         const safeErrors = Object.fromEntries(Object.entries(result.errors).filter(([key, value]) => Object.hasOwn(emptyFields, key) && typeof value === 'string'))
         setErrors(safeErrors)
         setStatus({ kind: 'invalid', text: 'Please check your details and try again.' })
         if (Object.keys(safeErrors).length) window.requestAnimationFrame(() => formRef.current?.elements.namedItem(Object.keys(safeErrors)[0])?.focus())
       } else {
-        const message = response.status === 429 ? 'Too many attempts. Please wait at least a minute before trying again.'
+        const wait = Number(response.headers.get('Retry-After'))
+        const message = response.status === 429 ? `Too many attempts. Please wait ${Number.isFinite(wait) && wait > 0 && wait <= 86400 ? Math.ceil(wait / 60) : 10} minute(s) before trying again, or contact us directly.`
           : result?.status === 'invalid_challenge' ? 'The security check expired or was not valid. Complete a fresh check and try again.'
-            : response.status === 503 ? 'Online sending is unavailable. Please use WhatsApp, direct email or copy your brief.'
-              : 'Email acceptance could not be confirmed. Your entries are preserved. Retry with a fresh security check or use the contact options below.'
+            : result?.status === 'request_conflict' ? 'This submission reference was already used with different details. Edit your enquiry to start a new submission.'
+              : result?.status === 'unavailable' ? 'Inbox submission is temporarily unavailable. Please use WhatsApp, direct email or copy your brief.'
+                : 'We could not confirm whether your enquiry was saved. Your entries are preserved. Retry unchanged with a fresh security check, or use the direct contact options below.'
         setStatus({ kind: 'error', text: message })
       }
     } catch {
-      setStatus({ kind: 'error', text: 'Email acceptance could not be confirmed. Your entries are preserved. Retry with a fresh security check or use WhatsApp or email. A timed-out request may still have been accepted.' })
+      setStatus({ kind: 'error', text: 'We could not confirm whether your enquiry was saved. Your entries are preserved. Retry unchanged with a fresh security check, or use WhatsApp or direct email. A timed-out request may still have been saved.' })
     } finally {
       copying.current = false
       setTurnstileToken('')
@@ -158,15 +161,16 @@ function Contact() {
 
           <section className="contact-form-panel" aria-labelledby="contact-form-title">
             <h2 id="contact-form-title">Your project enquiry</h2>
-            <p className="contact-form-intro">All fields are required. Choose “Not sure yet” if you need help finding a starting point.</p>
+            <p className="contact-form-intro">Name, email, service and message are required. A WhatsApp reply number is optional. Choose “Not sure yet” if you need help finding a starting point.</p>
             <div className="contact-availability" id="contact-availability">
-              <strong>{delivery.loading ? 'Checking email availability…' : delivery.enabled ? 'Send your enquiry to info@bitreca.com.' : 'Online sending is currently unavailable.'}</strong>
-              <p>{delivery.enabled ? 'Complete the security check, then send. You can also contact us directly or copy your brief.' : 'Use WhatsApp or info@bitreca.com, or prepare and copy your project brief below. Copying does not send a message.'}</p>
+              <strong>{delivery.loading ? 'Checking inbox availability…' : delivery.enabled ? 'Submit to Bitreca’s private enquiry inbox.' : 'Inbox submission is temporarily unavailable.'}</strong>
+              <p>{delivery.enabled ? 'Complete the security check, then submit. The owner reviews enquiries in the admin inbox and replies manually.' : 'You can still use WhatsApp or info@bitreca.com, or prepare and copy your project brief below. Copying does not submit a message.'}</p>
             </div>
 
             <form ref={formRef} onSubmit={sendEnquiry} noValidate aria-describedby="contact-availability contact-privacy">
               <fieldset disabled={busy}>
                 <legend className="contact-sr-only">Your details and project</legend>
+                <div hidden aria-hidden="true"><label htmlFor="contact-website">Leave this field empty</label><input id="contact-website" name="website" tabIndex={-1} autoComplete="off" value={fields.website} onChange={updateField} /></div>
                 <div className="contact-field-row">
                   <div className="contact-field">
                     <label htmlFor="contact-name">Name <span>(required)</span></label>
@@ -188,16 +192,23 @@ function Contact() {
                   {errors.service && <p className="contact-field-error" id="contact-service-error">{errors.service}</p>}
                 </div>
                 <div className="contact-field">
+                  <label htmlFor="contact-phone">WhatsApp reply number <span>(optional)</span></label>
+                  <p className="contact-field-hint" id="contact-phone-hint">Use an international number with country code. Leave blank unless you want a manual WhatsApp reply.</p>
+                  <input id="contact-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" maxLength={40} value={fields.phone} onChange={updateField} onBlur={checkField} aria-invalid={Boolean(errors.phone)} aria-describedby={`contact-phone-hint${errors.phone ? ' contact-phone-error' : ''}`} />
+                  <label className="contact-consent" htmlFor="contact-whatsapp-consent"><input id="contact-whatsapp-consent" name="whatsappConsent" type="checkbox" checked={fields.whatsappConsent} onChange={updateField} />Allow the owner to reply manually via WhatsApp to this number.</label>
+                  {errors.phone && <p className="contact-field-error" id="contact-phone-error">{errors.phone}</p>}
+                </div>
+                <div className="contact-field">
                   <label htmlFor="contact-message">Project message <span>(required)</span></label>
                   <p className="contact-field-hint" id="contact-message-hint">What would you like to build or improve? Use 20–5,000 characters.</p>
                   <textarea id="contact-message" name="message" rows={7} required minLength={20} maxLength={5000} value={fields.message} onChange={updateField} onBlur={checkField} aria-invalid={Boolean(errors.message)} aria-describedby={`contact-message-hint contact-message-count${errors.message ? ' contact-message-error' : ''}`} />
                   <p className="contact-character-count" id="contact-message-count">{fields.message.length.toLocaleString('en-US')} / 5,000 characters</p>
                   {errors.message && <p className="contact-field-error" id="contact-message-error">{errors.message}</p>}
                 </div>
-                <p className="contact-privacy" id="contact-privacy">Please leave out passwords, payment details and other sensitive information. Sending shares these details with Bitreca through Resend. The security check uses Cloudflare Turnstile. Copying only puts your brief on your clipboard.</p>
+                <p className="contact-privacy" id="contact-privacy">Please leave out passwords, payment details and other sensitive information. Submitting saves these details in Bitreca’s private inbox for owner review and manual reply. No email or WhatsApp message is sent automatically. The security check uses Cloudflare Turnstile. Copying only puts your brief on your clipboard.</p>
                 {delivery.enabled && <ContactTurnstile siteKey={delivery.siteKey} onToken={setTurnstileToken} resetKey={resetKey} />}
                 <div className="contact-actions">
-                  <button className="contact-button" type="submit" disabled={busy || !delivery.enabled || accepted} aria-busy={status.kind === 'sending'}>{status.kind === 'sending' ? 'Sending enquiry…' : accepted ? 'Accepted for delivery' : 'Send enquiry'} <span aria-hidden="true">↗</span></button>
+                  <button className="contact-button" type="submit" disabled={busy || !delivery.enabled || stored} aria-busy={status.kind === 'sending'}>{status.kind === 'sending' ? 'Saving enquiry…' : stored ? 'Enquiry saved' : 'Submit enquiry'} <span aria-hidden="true">↗</span></button>
                   <button className="contact-secondary-link contact-copy-button" type="button" onClick={prepareBrief} disabled={busy} aria-busy={status.kind === 'copying'}>{status.kind === 'copying' ? 'Copying brief…' : 'Copy project brief'}</button>
                 </div>
               </fieldset>

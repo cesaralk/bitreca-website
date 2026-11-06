@@ -58,8 +58,8 @@ async function handleLogout() {
             Store
           </NavLink>
 
-          <NavLink to="/admin/messages">
-            Messages
+          <NavLink to="/admin/enquiries">
+            Enquiries
           </NavLink>
 
           <NavLink to="/admin/settings">

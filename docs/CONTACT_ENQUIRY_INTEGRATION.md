@@ -1,202 +1,218 @@
-﻿# Contact enquiry integration and owner activation guide
+﻿# Contact Inbox + Admin — implementation and release gate
 
-Updated 2026-11-04. Task 3 code is implemented locally, **disabled by default**.
-No secret was installed, external account verified, email sent, WhatsApp message
-sent, DNS changed or Worker deployed during implementation.
+Updated 2026-11-05. Supersedes the previous Resend delivery plan. Implementation
+is local only at production baseline `3ed49f470ae25f4a7a4900a8c5a188299f2473cf`.
+No production migration, secret/configuration change, commit, push or deployment
+has been performed. **No outbound email/WhatsApp service is used or enabled.**
 
-## Official destinations and behavior
+## Authorized release progress — 2026-11-06
 
-- Recipient is fixed in code at `info@bitreca.com`; requests cannot choose it.
-- Sender is fixed at `Bitreca <info@bitreca.com>`. This requires verified
-  **bitreca.com** sending authorization in Resend. The code does not assume that
-  the domain is currently verified. A deployment flag is an owner attestation,
-  not a domain verification API result; Resend must still accept each email.
-- Reply-To is the visitor's validated email. Names/messages are plain-text body
-  data, never interpolated into subject, sender or recipient headers. No HTML,
-  attachments, CC/BCC or automatic email to unverified visitors is generated.
-- WhatsApp is `https://wa.me/96170864221`, phone `+96170864221`. The Contact link
-  adds an encoded, short project introduction with service interest if selected.
-  The visitor reviews and sends in WhatsApp. No private name/email/full message
-  is automatically put in the URL. They can paste the copied brief themselves.
-- Direct email opens the visitor's email application at `info@bitreca.com`.
-  Opening either external action does not imply a message was sent or received.
+Owner approved activation and the nineteenth file, wrangler.jsonc. Its sole
+configuration change is `"keep_vars": true`, verified by parsed comparison
+against HEAD after removing that property. Dashboard variables are preserved
+during deployment; secrets remain private. All five settings were found on the
+production runtime, with inbox false. After reconfirming 0018 was the sole pending
+migration, the authorized remote apply succeeded for 0018 only on bitreca-db
+(`8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`). No historical migration was replayed.
+Code rollout/enablement/real Turnstile and authenticated inbox verification are
+not yet claimed; final SHA/live evidence follows in the roadmap after release.
+Earlier gate statements describe the implementation/preflight handoff.
 
-## Implemented API and controls
+## Behavior and architecture
 
-`GET /api/contact/config` returns only `{ enabled, siteKey }` with no-store.
-It does not reveal secrets. Sending is enabled only when all required flags,
-keys, allowed origin and two rate-limit bindings are present; otherwise the
-UI shows unavailable and retains WhatsApp, direct email and Copy project brief.
+- Existing Contact layout, official WhatsApp action and `mailto:info@bitreca.com`
+  remain. Submit enquiry now means store in Bitreca's private D1 inbox, not send
+  email. Copy remains an honest local fallback.
+- Public `POST /api/enquiries` accepts name/email/service/message, optional phone
+  plus explicit WhatsApp permission, empty honeypot, requestId and Turnstile token.
+  Only HTTP 201/200 with `{ status: "stored", reference: "<UUID>" } confirms storage.
+  The UI never accepts old Resend `202/accepted` or HTML success responses.
+- Existing `bitreca_db` binding stores the new data. One additive migration,
+  `0018_add_contact_enquiries.sql`, creates only `contact_enquiries`,
+  `contact_enquiry_limits` and their indexes. No existing tables/rows/triggers or
+  historical migrations are changed; no parallel database or R2 resource.
+- New enquiry states: New, In Progress, Replied, Archived. Created/updated Unix
+  timestamps and a monotonically incremented row version support ordering and
+  concurrent-edit detection. Unique request_id and payload HMAC prevent retries
+  creating duplicate rows or reusing a receipt for different content.
+- After D1 returns a confirmed inserted ID, response is 201. Exact request/body
+  receipt replay returns 200, with the same reference and no message/status data.
+  Concurrent insert conflict also resolves against the unique request record.
+  Exact receipt replay can recover after a consumed CAPTCHA or lost acknowledgement;
+  it still requires same-origin/configuration, rate checks, valid shape and the
+  caller's matching unguessable request ID plus full original normalized payload.
+- Different payload for the same requestId returns 409. Input errors return 422;
+  invalid JSON/method/origin/size/content type and bot input are rejected. D1 or
+  connection failures return unconfirmed/unavailable, never false storage success.
+  The client preserves fields/request ID on retry. Reload/edit starts a new ID;
+  this is request idempotency, not permanent deduplication by email/content.
+- Raw message content stays literal React text. Email links are validated and
+  encoded. Phone numbers require an international +country-code format and
+  explicit checkbox permission; normalized E.164-style syntax does not prove
+  phone/account ownership. No automatic acknowledgement is sent to visitors.
 
-`POST /api/enquiries` accepts JSON fields `name`, `email`, `service`, `message`,
-`turnstileToken`, `requestId`. Same-origin Origin is required; allowed deployment
-origins must be explicitly configured. There is no permissive CORS response.
+## Security and bounded abuse protection
 
-- Limits: 24 KiB streamed JSON body, 5-second body-read timeout; name 1-100,
-  email at most 254 (local part at most 64), message 20-5,000 characters. Service
-  must match the five UI options. Reject extra keys, single-line control
-  characters, unsafe email syntax and inappropriate message control characters.
-- Dedicated per-IP and shared contact traffic limiters run before external
-  requests. Missing/failed limiters or missing CF-Connecting-IP fail closed.
-- Server verifies Turnstile with Cloudflare Siteverify; requires success, exact
-  request hostname and action `contact_enquiry`. Expired/reused/invalid tokens
-  cannot authorize delivery. Each retry requires a fresh challenge token.
-- Upstream calls have 8-second abort signals and reject redirects. No raw form
-  bodies, secrets or upstream errors are logged by the Contact handler.
-- Resend receives a stable Idempotency-Key made from the enquiry UUID and a
-  SHA-256 digest of the exact email payload. Same-page retries preserve the UUID
-  until fields change. Provider idempotency lasts 24 hours; reload/new edits
-  start a new enquiry. This is not permanent, cross-device deduplication.
-- Only a successful provider response containing a valid email ID produces
-  HTTP 202 `{ status: 'accepted', reference }`. Rejections give 502; uncertain
-  outcomes (timeouts, network errors, malformed success or upstream 5xx) give
-  504 `unconfirmed`. Validation gives 422; challenge failure 400; rate limit
-  429 with Retry-After 60; unavailable configuration/services 503.
-- Frontend accepts only the explicit 202/accepted/valid-reference contract.
-  It says **accepted for email delivery**, explicitly not confirmed inbox
-  receipt. HTML SPA responses and arbitrary success JSON never show acceptance.
-  Entries remain available on errors. A request that times out may still have
-  been accepted: don't claim it was definitely unsent.
-- No D1, R2, session, admin or deletion code changes. Owner reviews the email in
-  the official inbox, not in a new database/admin UI.
+- Public writes require CONTACT_INBOX_ENABLED=true, exact configured origin,
+  migrated schema, D1 availability, a private rate/HMAC key and free Turnstile keys.
+  Public config returns only `{ enabled, mode: "inbox", siteKey }`. Missing schema
+  or configuration disables the form and preserves direct-contact/copy fallback.
+- Turnstile Siteverify requires success, the exact request hostname and action
+  `contact_enquiry`. New writes fail closed if verification fails/unavailable.
+  Tokens are limited to 2048 characters; upstream timeout is eight seconds.
+- Request body is streamed/bounded to 24 KiB with a five-second read deadline.
+  Name 1-100, email at most 254 with strict syntax, service from the fixed list,
+  message 20-5,000. Reject control/header injection, unknown keys and honeypot input.
+- Atomic D1 primary UPSERTs reserve shared **200 attempts/day**, shared
+  **20/minute**, then **5/IP per ten minutes**. These count valid-shaped attempts,
+  including retries and failed challenge attempts, not only saved enquiries.
+  Counter failures reject storage. A shared limit intentionally pauses all
+  submissions until reset; this is cost/storage protection, not a promise of
+  immunity to denial of service. Review thresholds with the owner before release.
+- Rejected global reservations do not create new per-IP rows. Counters expire
+  after their fixed window plus sixty seconds; a bounded cleanup deletes at most
+  100 expired counter rows per allowed attempt. It never deletes enquiry data.
+- No raw IP is stored. Daily-scoped HMAC IP keys use CONTACT_RATE_LIMIT_SECRET;
+  payload receipt hashes use a separate purpose string under that secret.
+  Do not reuse the admin SESSION_SECRET. Rotate via a reviewed change: prior
+  receipt hashes may no longer match after key rotation, while request IDs remain
+  unique. Never wipe receipt rows just to bypass a conflict.
+- No logs of request bodies, tokens, phone/email, SQL errors or private keys are
+  introduced. Responses use private/no-store and nosniff; no permissive CORS.
+- D1/Workers use the existing account plan and usage quotas. This adds no paid
+  service or subscription; free Turnstile is the only external verification.
+  Existing platform quotas can still make the inbox temporarily unavailable.
 
-## Owner setup — not executed by this task
+## Protected owner inbox
 
-### 1. Confirm the receiving inbox
+- Route `/admin/enquiries` uses existing ProtectedAdminRoute and AdminLayout;
+  Dashboard quick action and sidebar link lead to it. No new login/roles/session
+  system. Existing admin authentication/configuration/fingerprint/revocation
+  checks remain unchanged.
+- API dispatch is AFTER existing Worker admin session and write-origin guards.
+  Anonymous/forged/expired/revoked sessions cannot list/read/update messages.
+  Public GET enquiry collection returns 405; there is no public message reader.
+- `GET /api/admin/enquiries?status=all|new|in_progress|replied|archived&cursor=...`
+  uses fixed twenty-row keyset pages, sorted by created_at/id, with status filter.
+  The list omits message bodies, telephone, receipt request IDs and hashes.
+- `GET /api/admin/enquiries/:id` exposes one message only to the authenticated
+  owner. `PATCH` accepts exactly status and expected version; stale updates get
+  409 and require reloading. All SQL values are bound, filters/cursors validated.
+  No message-content edits, exports, bulk actions or delete endpoint added.
+- Reply in email app opens encoded mailto for the validated submitted address.
+  Reply in WhatsApp appears only for a valid supplied number with stored consent.
+  Both require the owner to review/send in the external app. Opening a reply link
+  neither sends anything nor marks Replied. Save Replied only after manual reply.
+- On a 401 the shared admin helper redirects to login and the inbox unmounts.
+  No PII is persisted in frontend localStorage/sessionStorage or URL queries.
 
-Confirm `info@bitreca.com` exists, receives external email and is monitored by
-an identified owner. Sending authorization does not create a receiving inbox.
-Confirm that direct email and WhatsApp reach the intended person/account.
+## Privacy and retention guidance — owner decision
 
-### 2. Resend account and DNS verification
+Messages contain personal information. Limit access to the owner account, keep
+that account protected and log out on shared devices. Do not collect passwords,
+payment details or other unnecessary sensitive content. Use the Contact notice
+and approved company privacy guidance before activation.
 
-1. In Resend, add `bitreca.com` under Domains, select the intended region and
-   enable sending. Use the exact SPF, DKIM and any sending return-path records
-   shown for this domain in the Resend dashboard; do not invent record values.
-2. DNS edits require separate owner authorization. Review existing records first.
-   Do not replace the root mailbox MX records or enable Resend receiving just to
-   send enquiries. Add only the sending records required by Resend, merging SPF
-   deliberately if necessary rather than creating conflicting SPF policies.
-3. Ask Resend to verify the records and wait for the dashboard to show the
-   domain as verified for sending. Verify that `info@bitreca.com` is authorized
-   as From. A local test/mock or enabled flag is not evidence of verification.
-4. Create a Resend sending-only API key restricted to this domain where supported.
-   Keep the key private and install it only as the Worker secret RESEND_API_KEY.
-5. Set appropriate account usage monitoring and delivery/bounce notifications.
-   Owner inbox receipt must be tested separately from provider acceptance.
+Archiving is not deletion. No automatic expiry or purge job is implemented.
+Suggested owner procedure: review monthly, retain only while needed for follow-up,
+and agree a manual purge interval for completed enquiries (for example ninety
+days) before collecting live data. Any future purge must be reviewed, touch only
+contact tables, and account for database backups and request-ID retention. The
+existing portfolio permanent-deletion workflow is unrelated and must not be used.
+No claim of legal compliance or instant erasure from backups is made.
 
-### 3. Cloudflare Turnstile
+## Required owner configuration — not applied
 
-1. Create a Managed Turnstile widget in the intended Cloudflare account.
-2. Allow only the intended hostnames (production `bitreca.com` and
-   `www.bitreca.com`; use a separate widget for approved staging hosts).
-   Do not enable Any Hostname. The application sends action `contact_enquiry`.
-3. Put the public site key into CONTACT_TURNSTILE_SITE_KEY. The site key is
-   deliberately public; its paired secret belongs only in the Worker secret
-   CONTACT_TURNSTILE_SECRET. Never use test keys for production.
-4. The UI loads Cloudflare's explicit-render script only when sending is enabled.
-   If a CSP is introduced later, allow the documented Turnstile script/frame
-   sources. The compact widget fits the existing mobile form without redesign.
-5. Test challenge success, expiry, blocking and server-side token validation on
-   the actual approved hostname. Synthetic QA does not verify the real widget.
+1. Create/reuse a **Free** Managed Turnstile widget with only `bitreca.com` and
+   `www.bitreca.com` allowed. Use a separate widget for any approved test hostname.
+   Do not enable arbitrary hostnames or use test keys in production. No DNS
+   change or paid Email Sending subscription is needed.
+2. Install the paired **CONTACT_TURNSTILE_SECRET** as a Cloudflare Worker secret.
+   Generate a separate high-entropy random rate/HMAC secret (at least 32 bytes
+   before encoding) in the owner's secret manager, and install it only as
+   **CONTACT_RATE_LIMIT_SECRET**. Do not paste values into source, chat, logs,
+   build variables or committed files. No secret value is supplied by this guide.
+3. Public runtime settings (future authorized configuration):
 
-### 4. Dedicated rate-limit bindings and activation flags
+   | Variable | Required value |
+   | --- | --- |
+   | CONTACT_TURNSTILE_SITE_KEY | Public key paired with the private widget secret |
+   | CONTACT_ALLOWED_ORIGINS | `https://bitreca.com,https://www.bitreca.com` |
+   | CONTACT_INBOX_ENABLED | Keep `false` until schema/code/setup verification; then `true` for authorized test/activation |
 
-No changes to `wrangler.jsonc` were made. Before a separately authorized staging
-or production activation, provision these **contact-only** bindings on that
-environment. Select unique positive-integer namespace IDs in the owner account;
-do not reuse admin/portfolio namespaces or copy example IDs blindly:
+4. No Resend key/domain flag, email subscription, custom rate binding, new D1/R2
+   resource or admin credential change is required. Obsolete CONTACT_EMAIL_*
+   settings and RESEND_API_KEY are ignored by the replacement implementation;
+   do not enable them. Current wrangler.jsonc remains untouched.
 
-```jsonc
-"ratelimits": [
-  {
-    "name": "CONTACT_RATE_LIMITER",
-    "namespace_id": "<UNUSED_POSITIVE_INTEGER_A>",
-    "simple": { "limit": 3, "period": 60 }
-  },
-  {
-    "name": "CONTACT_GLOBAL_RATE_LIMITER",
-    "namespace_id": "<UNUSED_POSITIVE_INTEGER_B>",
-    "simple": { "limit": 30, "period": 60 }
-  }
-]
-```
+## Single minimal deployment plan — STOP until owner authorizes
 
-The proposed thresholds are 3 attempts per IP/minute and 30 shared attempts per
-minute **per Cloudflare location**, with approximate counters. Despite its
-binding name, CONTACT_GLOBAL_RATE_LIMITER is not an exact worldwide spending
-cap. Use Resend usage alerts/limits as appropriate. A strict worldwide budget
-would need a separately scoped coordinated limiter; it is not implemented here.
+**Gate:** owner reviews code, additive schema, privacy/retention and thresholds;
+confirms free Turnstile setup and separate private rate key; then explicitly
+approves production migration, one code commit/push and one live enquiry test.
+No release action below was performed during implementation.
 
-Configure non-secret Worker variables on the selected environment:
+1. Confirm target repository main/baseline and existing `bitreca_db` maps to the
+   intended `bitreca-db` production database. Reconfirm configuration/old source
+   preservation and the current recovery/backup procedure. Keep inbox flag false.
+   Check migration ledger read-only:
+   `npx.cmd wrangler d1 migrations list bitreca-db --remote`.
+   Proceed only if previous migrations are already reconciled and **0018 is the
+   sole pending migration**. If historical entries are pending or schema/ledger
+   disagree, STOP; never replay portfolio/auth/deletion migrations to release this.
+2. Apply that one approved additive migration:
+   `npx.cmd wrangler d1 migrations apply bitreca-db --remote`.
+   Confirm only the two new tables and indexes were added, with no changes to
+   existing records. Leave new tables in place on rollback; do not drop live data.
+3. With explicit authorization, install the two secrets using interactive prompts
+   against the intended account/Worker (never values in command arguments):
+   `npx.cmd wrangler secret put CONTACT_TURNSTILE_SECRET --name bitreca-website`
+   and `npx.cmd wrangler secret put CONTACT_RATE_LIMIT_SECRET --name bitreca-website`.
+   Set the public widget/origin values while CONTACT_INBOX_ENABLED remains false.
+   These commands/settings write cloud resources and may create Worker versions;
+   they are future owner-authorized actions, not commands to run during review.
+4. Stage only this reviewed workflow/migration/docs/tests, preserve the complete
+   local Batch #2 evidence in the roadmap, create one commit and ordinary push
+   to main. Let existing Cloudflare Builds deploy; no separate Wrangler deploy.
+   Confirm check success and the new deployed version before enabling the flag.
+5. Verify `/api/contact/config` reports mode=inbox; verify protected inbox access
+   and anonymous API denial. Then enable CONTACT_INBOX_ENABLED for the authorized
+   test. Config must be enabled with only public site key, no private key output.
+6. **One authorized live test:** owner/tester enters a clearly labelled release
+   enquiry and owner-controlled email in the public form, completes real
+   Turnstile and submits once. Phone is optional; use a real owner-approved number
+   and explicit permission only if testing WhatsApp reply availability. Record the
+   stored UUID, log into the existing Admin Dashboard, open Enquiries and confirm
+   the exact saved message. Verify one row/reference, status changes and manual
+   reply href. Do not send a reply automatically or test with fabricated third-
+   party addresses. Mark the test Archived after review if authorized.
+7. Record commit/deployment/live evidence in the roadmap and stop. If any stage
+   fails, disable CONTACT_INBOX_ENABLED to restore WhatsApp/mailto/copy fallback;
+   owner can still review saved messages while authenticated. Preserve tables and
+   records. Do not roll back by replaying or reversing unrelated migrations.
 
-| Name | Value / prerequisite |
-| --- | --- |
-| CONTACT_ALLOWED_ORIGINS | `https://bitreca.com,https://www.bitreca.com` for production; exact staging origin(s) for staging |
-| CONTACT_TURNSTILE_SITE_KEY | Public key for the correct hostname/widget |
-| CONTACT_RESEND_DOMAIN_VERIFIED | `true` only after owner verifies sending authorization in Resend |
-| CONTACT_EMAIL_ENABLED | Start `false`; enable `true` only for an authorized staged test/activation |
+## Checks completed locally
 
-Install secrets with Wrangler's interactive prompts, never command-line values,
-VITE_* variables, source code or committed files. **The commands below write
-cloud resources and require later authorization; they were not run here.**
-For a staging Worker, first select its verified isolated name/config instead of
-the production name. After production activation is explicitly authorized:
+- 16 focused endpoint/schema/auth/idempotency/abuse/manual-link tests against real
+  in-memory SQLite, with the unchanged 0004 auth schema and additive 0018 schema.
+- One isolated workerd/Miniflare D1 runtime test (installed toolchain dependency):
+  storage, duplicate retry and owner authenticated read/update; no remote binding.
+- New-workflow Chrome checks at 1440/768/390 against a loopback-only server serving
+  the built app, real Worker handlers/auth and an in-memory synthetic database.
+  Only Turnstile verification/widget responses were isolated test doubles.
+- Browser public submit -> stored row -> actual session login -> private inbox;
+  pagination/filtering, status/version conflict, permission-dependent reply links,
+  validation, safe text, lost receipt recovery, rate feedback and 401 redirect.
+  No outbound messages, production data, old-page visual suites or live test.
+- Build, scoped ESLint and whitespace evidence is recorded in the roadmap.
 
-```powershell
-npx.cmd wrangler secret put RESEND_API_KEY --name bitreca-website
-npx.cmd wrangler secret put CONTACT_TURNSTILE_SECRET --name bitreca-website
-```
-
-Use the intended Cloudflare account and check the exact target before each
-command. Do not echo values or paste them into this guide. Secrets must exist on
-both environments independently if both are used. No real secrets are needed
-for the repository's mocked unit/browser checks.
-
-### 5. Staged test and real inbox acceptance gate
-
-1. Arrange an explicitly authorized isolated staging Worker and origin without
-   production D1/R2 bindings, auth changes or deletion cron activation. Do not
-   clone production bindings/schedules merely to test Contact. Stage the two
-   Contact routes/handler with the approved flags, secrets, widget and limiters.
-   Provisioning/deployment is a separate owner action, not part of this task.
-2. Confirm config returns enabled with only the public site key and no secrets.
-   Missing configuration must disable sending. Verify no secrets in browser
-   source, network payloads, bundle or logs. Confirm the privacy/retention copy
-   matches provider and owner inbox practices before collecting real data.
-3. Submit a real, clearly labelled test enquiry from an owner-controlled email.
-   Complete Turnstile on the allowed hostname. Record the returned reference and
-   Resend's event status. HTTP 202 means provider acceptance, not inbox receipt.
-4. Owner must open **info@bitreca.com**, check inbox/spam, identify the test by
-   reference/content, confirm sender and body, and click Reply to verify it
-   targets the test visitor email. Receiving-domain MX/authentication, spam
-   filtering or a Resend Delivered event alone are not a substitute for this.
-5. Exercise bad fields, invalid/expired challenge, wrong Origin, rate limits,
-   provider rejection and network timeout. Verify entries remain and no false
-   acceptance is shown. Retry unchanged data with a fresh token and the same
-   request ID; confirm no duplicate during Resend's idempotency window.
-6. Obtain explicit production activation authorization. If not approved, leave
-   CONTACT_EMAIL_ENABLED false. Roll back sending by disabling that flag while
-   leaving WhatsApp, direct email and copy fallback available.
-
-## Verification performed locally
-
-Focused automated tests cover handler validation, fail-closed configuration,
-Worker routing isolation, provider/challenge errors, fixed From/To, Reply-To,
-plain-text formatting and idempotency. Browser functional tests use mocked
-Turnstile/provider outcomes; they do not prove real domain verification or inbox
-receipt. Approved visual QA was not repeated. See BITRECA_V1_ROADMAP.md for actual
-run results and current blockers.
+Production activation is **BLOCKED** until owner review/authorization, required
+free widget/secrets/settings, migration-ledger check and approved live test gate.
+The implementation is prepared; missing security setup is not bypassed.
 
 ## Primary references consulted
 
-- [Resend Send Email API](https://resend.com/docs/api-reference/emails/send-email)
-- [Resend verified domains](https://resend.com/docs/dashboard/domains/introduction)
-- [Resend idempotency keys](https://resend.com/docs/dashboard/emails/idempotency-keys)
+- [D1 prepared/batched operations and transaction behavior](https://developers.cloudflare.com/d1/worker-api/d1-database/)
+- [D1 primary/session read consistency](https://developers.cloudflare.com/d1/best-practices/read-replication/)
 - [Turnstile server-side verification](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
-- [Turnstile client rendering](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/)
-- [Workers rate-limit bindings and locality](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
-
-**Current blocker:** Resend account/domain/key, real Turnstile credentials,
-contact limiter bindings and inbox receipt have not been verified/configured by
-this task. Code completion is not production delivery readiness.
+- [Turnstile Free plan](https://developers.cloudflare.com/turnstile/plans/)

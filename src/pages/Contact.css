@@ -54,7 +54,9 @@
 .contact-status { padding: 16px; margin-top: 20px; border: 1px solid var(--contact-line); border-radius: 8px; color: #dbeafe; font-size: 14px; overflow-wrap: anywhere; }
 .contact-status-invalid, .contact-status-error { border-color: #a55265; color: #fecdd3; }
 .contact-status-copied { border-color: #315b91; background: #10223d; }
-.contact-status-accepted { border-color: #315b91; background: #10223d; }
+.contact-status-stored { border-color: #315b91; background: #10223d; }
+.contact-page .contact-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; font-size: 13px; line-height: 1.6; }
+.contact-page .contact-consent input { flex-shrink: 0; width: 18px; height: 18px; min-height: 18px; margin: 2px 0 0; padding: 0; accent-color: #60a5fa; }
 .contact-direct { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--contact-line); }
 .contact-direct p { font-size: 13px; margin: 8px 0; }
 .contact-actions { display: flex; flex-wrap: wrap; gap: 12px; }

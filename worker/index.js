@@ -8,6 +8,7 @@ import { schedulePortfolioDeletions } from './portfolio-deletion-workflow.js'
 import { loadLegacyReconciliation } from './portfolio-legacy-reconciliation.js'
 import { legacyDeletionEnabled, handleLegacyDelete, retryLegacyDelete } from './portfolio-legacy-deletion.js'
 import { handleContactRequest } from './contact-enquiry.js'
+import { handleAdminEnquiries } from './admin-enquiries.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -473,6 +474,12 @@ if (url.pathname.startsWith('/api/admin/') && url.pathname !== '/api/admin/login
     console.error('Admin session validation failed.')
     return authenticationUnavailable()
   }
+}
+
+// Inbox routes inherit the existing origin/session gate above, without a new
+// authentication system or any change to other admin/portfolio routes.
+if (url.pathname === '/api/admin/enquiries' || url.pathname.startsWith('/api/admin/enquiries/')) {
+  return handleAdminEnquiries(request, env)
 }
 
 // Upload media to R2
