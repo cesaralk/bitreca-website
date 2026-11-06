@@ -87,6 +87,13 @@ test('Turnstile success, exact hostname/action and non-reused tokens are require
     const result=await handleContactRequest(publicRequest(enquiry()),f.env,async()=>Response.json(value));assert.equal(result.status,400)
   }
   assert.equal((await handleContactRequest(publicRequest(enquiry()),f.env,async()=>{throw new DOMException('timeout','TimeoutError')})).status,503)
+  for (const status of [302, 307, 500]) {
+    const isolated = fixture(t)
+    const result = await handleContactRequest(publicRequest(enquiry()), isolated.env, async () =>
+      Response.json({ success: true, hostname: 'bitreca.test', action: 'contact_enquiry' }, { status }))
+    assert.equal(result.status, 400)
+    assert.equal(count(isolated), 0)
+  }
   assert.equal(count(f),0)
 })
 

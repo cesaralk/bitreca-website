@@ -1,7 +1,7 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-05. Task #6 Contact Inbox/Admin is implemented locally; production
-activation is BLOCKED pending owner review/setup. Projects Batch #2 remains Live. Batch #1 remains
+Updated: 2026-11-06. Task #6 Contact Inbox/Admin is **Deployed — live verification blocked**;
+the reported live submission failed and diagnosis is pending. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
 Estimates are implementation/review effort, not delivery promises. Later
@@ -11,7 +11,7 @@ milestones need inspection and user agreement before work starts.
 | --- | --- | --- | --- |
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Existing fallback Live; Task #6 Inbox/Admin implemented and tested locally | Production unchanged at 3ed49f4; D1 inbox not migrated/deployed | Owner review, free Turnstile/secrets, one additive migration and live test required; no automatic outbound messaging |
+| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Deployed — live verification blocked | 0018 applied; commit 3e05fdb deployed; failed live attempt under diagnosis | Capture HTTP/JSON status in a supervised retry; no automatic outbound messaging |
 | About: factual company introduction | Pending review | Deployment unverified | 30–60 min; needs approved information |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
@@ -739,6 +739,98 @@ were repeated. Runtime Contact settings were present, inbox disabled before
 rollout. Commit/push, deployment, enablement and real test evidence follow after
 they occur; none is claimed by this pre-commit record. Preserve new tables on
 fallback; disable the inbox flag rather than dropping data.
+
+### Contact deployment and enablement evidence — 2026-11-06
+
+- Exact nineteen-file commit:
+  **`3e05fdb5438e4e5488e3ab76b5cf956b1a8c86b5`**, title
+  `Add secure D1 contact enquiries and protected admin inbox`.
+  Exact staged manifest/whitespace checks and Batch #2 evidence preservation
+  passed. Ordinary push to origin/main succeeded from 3ed49f4 to 3e05fdb.
+- [Cloudflare GitHub build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/b59cf001-e688-46d2-acb6-3e48509ba6bc)
+  completed with success. Git deployment version
+  `11a8b04c-498a-4ca1-a690-a09b129f2ff6` served 100% at
+  `2026-11-06T04:58:03.168325Z`.
+- All five runtime Contact settings survived Git deployment. Allowed origins,
+  Turnstile secret and independent rate secret are secret bindings; public widget
+  key and enable flag are plain-text bindings. No secret values were exposed.
+- Authorized settings PATCH changed only CONTACT_INBOX_ENABLED to `true` and
+  inherited every other runtime binding. Before/after binding comparison passed.
+  Activation deployed version `9ffb04ed-8772-462c-acbd-7fa36b44d573` at 100%,
+  `2026-11-06T05:01:05.869067Z`. No code/resource/auth/portfolio setting changed
+  during enablement.
+- Both `https://bitreca.com/api/contact/config` and the www equivalent returned
+  HTTP 200, enabled=true, mode=inbox and a present public site key.
+  Anonymous `GET /api/admin/enquiries` returned **401**.
+- Read-only post-migration checks confirmed the 0018 ledger record and both new
+  contact tables/indexes. Protected file hashes match except the explicitly
+  approved, separately verified keep_vars edit. Existing QA was reused.
+- **Real Turnstile submission and authenticated inbox verification remain
+  pending human interaction.** Owner was asked to submit exactly one labelled
+  release enquiry using their own email, then confirm the saved UUID/message in
+  `/admin/enquiries`. No CAPTCHA bypass, fabricated session, automatic message or
+  additional enquiry is used. Deployment/enabling is verified; the full live
+  submission workflow is not yet claimed.
+- This post-commit evidence update is local/uncommitted; no second commit/push.
+  Batch #1/#2 evidence is retained. If live validation fails, disable the flag;
+  preserve all contact tables/submissions and existing direct-contact fallback.
+  No About work started.
+
+### Failed live submission diagnosis — 2026-11-06
+
+Owner reported the generic unconfirmed-submission response, no saved UUID and
+no message in authenticated Admin Inbox. HTTP/JSON response status and completion
+of real Turnstile were not captured; root cause is not established.
+
+The agent executed the authorized migration, not the owner manually. Existing
+execution output identified production bitreca-db
+(`8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`), executed six commands and marked
+0018_add_contact_enquiries.sql successful. Fresh read-only SELECTs confirm:
+
+- Ledger entry applied_at `2026-11-06 04:56:20` (UTC).
+- Both contact_enquiries and contact_enquiry_limits exist.
+- Enquiry count is zero. No visitor content or identifiers were read.
+- Read-only query metadata reports zero writes and changed_db=false.
+- Before fallback, both hostname config endpoints returned enabled=true,
+  mode=inbox and public site key present. Runtime binding metadata still matches
+  the configured database. Missing migration is ruled out; CAPTCHA validity,
+  request parsing, response routing and post-validation storage path are not.
+- Aggregate counters show a shared daily max_hits=2 and expired minute/IP
+  buckets with max_hits=1; this does not demonstrate exhausted rate limits or
+  identify the failing request/stage.
+
+Fallback verified: CONTACT_INBOX_ENABLED=false on both production hostnames;
+all other runtime bindings compare unchanged. Anonymous inbox API still returns
+401. Tables and direct-contact options are preserved.
+
+Status remains **Deployed — live verification blocked**. No migration reapply,
+new enquiry, code change, commit or push was performed during diagnosis. Use the
+agreed disabled-inbox fallback while preparing a supervised diagnostic retry;
+preserve both contact tables and WhatsApp/email/copy options. Before retry,
+capture only HTTP response status and JSON `status` for POST /api/enquiries.
+Never share request payloads, CAPTCHA tokens, cookies or credentials.
+
+### Siteverify exception fix — 2026-11-06
+
+Owner captured HTTP 503, JSON status challenge_unavailable. Actual workerd probe
+at the production compatibility date reproduced a TypeError constructing a
+request with redirect='error': workerd accepts only follow/manual. This occurs
+before provider I/O. With redirect='manual', the same eight-second timeout and
+synthetic invalid credentials reached Siteverify and returned HTTP 400 JSON.
+No real credentials/tokens or enquiry endpoint were used by this probe.
+
+Changed only the Siteverify redirect policy to manual: no redirect following,
+no trust of non-2xx, and unchanged secret/token/hostname/action verification.
+Strengthened runtime regression to construct the handler's actual request options
+inside workerd, plus redirect/non-2xx rejection with no stored rows. All 17 focused
+tests, scoped lint and build passed. Additional rejection cases were isolated
+after the existing attempt budget correctly limited a shared test fixture.
+
+Inbox was disabled during diagnosis; keys, migration 0018 and existing data were
+not changed. Root cause is request-mode compatibility, not evidence of a bad
+secret or provider outage. Status stays **Deployed — live verification blocked**
+until the fixed deployment passes a fresh real challenge and protected-inbox
+confirmation. No new broad/visual/historical QA cycle was run.
 
 ## Boundaries
 

@@ -86,7 +86,9 @@ export async function handleContactRequest(request, env, fetcher = fetch) {
       const response = await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ secret: env.CONTACT_TURNSTILE_SECRET, response: input.turnstileToken, remoteip: ip }),
-        signal: AbortSignal.timeout(8000), redirect: 'error',
+        // workerd accepts only follow/manual. Do not follow provider redirects;
+        // non-2xx responses remain untrusted and cannot authorize storage.
+        signal: AbortSignal.timeout(8000), redirect: 'manual',
       })
       verified = response.ok && response.headers.get('Content-Type')?.includes('application/json') ? await response.json() : null
     } catch { return reply(503, { status: 'challenge_unavailable' }) }

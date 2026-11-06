@@ -6,7 +6,13 @@ import { handleContactRequest } from '../worker/contact-enquiry.js'
 import worker from '../worker/index.js'
 
 test('isolated workerd D1 stores once and the existing owner session can read/update it', async t => {
-  const mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default { fetch() { return new Response("isolated") } }', compatibilityDate: '2026-09-23', d1Databases: ['bitreca_db'], d1Persist: false }))
+  const mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: `export default { async fetch(input) {
+    const { url, init } = await input.json()
+    // Exercise real workerd request construction; the handler itself runs in
+    // Node in this test. No external request or actual challenge is used here.
+    const request = new Request(url, { ...init, signal: AbortSignal.timeout(8000) })
+    return Response.json({ redirect: request.redirect, method: request.method })
+  } }`, compatibilityDate: '2026-09-23', d1Databases: ['bitreca_db'], d1Persist: false }))
   t.after(() => mf.dispose())
   const db = await mf.getD1Database('bitreca_db')
   const sql = readFileSync(new URL('../migrations/0018_add_contact_enquiries.sql', import.meta.url), 'utf8').replace(/--[^\n]*/g, '')
@@ -20,7 +26,13 @@ test('isolated workerd D1 stores once and the existing owner session can read/up
   const env = { bitreca_db: db, CONTACT_INBOX_ENABLED: 'true', CONTACT_ALLOWED_ORIGINS: origin, CONTACT_RATE_LIMIT_SECRET: 'synthetic-runtime-rate-key-more-than-32-characters', CONTACT_TURNSTILE_SECRET: 'synthetic-runtime-secret', CONTACT_TURNSTILE_SITE_KEY: 'synthetic-runtime-key', ADMIN_USERNAME: 'synthetic-owner', ADMIN_PASSWORD: 'synthetic-password', SESSION_SECRET: 'synthetic-session-secret', ADMIN_AUTH_VERSION: '1' }
   const input = { name: 'Runtime fixture', email: 'qa@example.com', service: 'Applications', message: 'An isolated workerd D1 integration fixture.', requestId: crypto.randomUUID(), turnstileToken: 'synthetic-token' }
   const request = () => new Request(origin + '/api/enquiries', { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.1' }, body: JSON.stringify(input) })
-  const verify = async () => Response.json({ success: true, hostname: 'bitreca.runtime.test', action: 'contact_enquiry' })
+  const verify = async (url, init) => {
+    const constructed = await mf.dispatchFetch('http://localhost', {
+      method: 'POST', body: JSON.stringify({ url, init: { ...init, signal: undefined } }),
+    })
+    assert.deepEqual(await constructed.json(), { redirect: 'manual', method: 'POST' })
+    return Response.json({ success: true, hostname: 'bitreca.runtime.test', action: 'contact_enquiry' })
+  }
   const first = await handleContactRequest(request(), env, verify)
   assert.equal(first.status, 201)
   const receipt = await first.json()
