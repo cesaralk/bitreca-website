@@ -13,6 +13,7 @@ import Services from './pages/Services'
 import Products from './pages/Products'
 import Store from './pages/Store'
 import StoreProduct from './pages/StoreProduct'
+import StoreRequest from './pages/StoreRequest'
 import Projects from './pages/Projects'
 import PortfolioForest from './pages/PortfolioForest'
 import ProjectDetails from './pages/ProjectDetails'
@@ -28,6 +29,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminEnquiries from './pages/AdminEnquiries'
 import AdminStore from './pages/AdminStore'
+import AdminStoreRequests from './pages/AdminStoreRequests'
 import PortfolioTemplate from './pages/PortfolioTemplate'
 
 function AppContent() {
@@ -46,6 +48,7 @@ function AppContent() {
         <Route path="/products" element={<Products />} />
         <Route path="/store" element={<Store />} />
         <Route path="/store/:slug" element={<StoreProduct />} />
+        <Route path="/store/request/review" element={<StoreRequest />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/portfolioforest" element={<PortfolioForest />} />
         <Route path="/portfolio/demo" element={<PortfolioTemplate />} />
@@ -57,6 +60,7 @@ function AppContent() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin/enquiries" element={<ProtectedAdminRoute><AdminLayout><AdminEnquiries /></AdminLayout></ProtectedAdminRoute>} />
         <Route path="/admin/store" element={<ProtectedAdminRoute><AdminLayout><AdminStore /></AdminLayout></ProtectedAdminRoute>} />
+        <Route path="/admin/store/requests" element={<ProtectedAdminRoute><AdminLayout><AdminStoreRequests /></AdminLayout></ProtectedAdminRoute>} />
 
 <Route
   path="/admin/login"

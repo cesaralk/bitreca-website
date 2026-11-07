@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import usePublicStore from '../hooks/usePublicStore'
 import PublicStoreImage from '../components/PublicStoreImage'
+import { StoreRequestLink } from '../components/StoreRequestControls'
 import { storeAvailabilityText, storePrice, validStoreSlug } from '../utils/publicStore'
 import './Store.css'
+import './StoreRequest.css'
 
 export default function Store() {
   const [search, setSearch] = useSearchParams(), location = useLocation()
@@ -34,6 +36,7 @@ export default function Store() {
       <div className="hardware-store-heading"><div><p className="hardware-store-eyebrow">THE CATALOGUE</p><h2 id="store-catalogue-title" ref={heading} tabIndex={-1}>{categoryName || 'Published products'}</h2></div><p>Only published products in published categories appear here. No published items means there is nothing available to browse yet.</p></div>
       <nav className="catalogue-categories" aria-label="Browse published categories"><Link to="/store" aria-current={!category && valid ? 'page' : undefined} onClick={() => { setHistory({ category: null, previous: [] }); focusAfterLoad.current = true }}>All products</Link>{categories.status === 'ready' && categories.data.rows.map(row => <Link key={row.slug} to={`/store?category=${row.slug}`} aria-current={category === row.slug ? 'page' : undefined} onClick={() => { setHistory({ category: row.slug, previous: [] }); focusAfterLoad.current = true }}>{row.title}</Link>)}</nav>
       <div className="catalogue-category-state">{categories.status === 'loading' && <p role="status">Loading categories…</p>}{categories.status === 'error' && <div role="alert"><p>Categories could not be loaded.</p><button type="button" onClick={categories.retry}>Retry categories</button></div>}{categories.status === 'ready' && !categories.data.rows.length && <p>No published categories yet.</p>}{categories.status === 'ready' && (categoryPage.cursor || categories.data.nextCursor) && <nav className="catalogue-pagination" aria-label="Category pages"><button type="button" disabled={!categoryPage.previous.length} onClick={() => setCategoryPage(current => ({ cursor: current.previous.at(-1), previous: current.previous.slice(0, -1) }))}>Previous categories</button><button type="button" disabled={!categories.data.nextCursor} onClick={() => setCategoryPage(current => ({ cursor: categories.data.nextCursor, previous: [...current.previous, current.cursor] }))}>Next categories</button></nav>}</div>
+      <StoreRequestLink />
       <div aria-busy={products.status === 'loading'} className="catalogue-results">
         {products.status === 'loading' && <div className="catalogue-state" role="status"><h3>Loading products…</h3><p>Checking the published catalogue.</p></div>}
         {products.status === 'error' && <div className="catalogue-state" role="alert"><h3>Catalogue temporarily unavailable.</h3><p>We could not load this view. Please retry.</p><button type="button" onClick={products.retry}>Retry products</button></div>}

@@ -1,0 +1,30 @@
+.request-page { padding-block: 48px 80px; }
+.request-page > .hardware-store-eyebrow { margin-top: 30px; }
+.request-intro { max-width: 850px; font-size: 18px; }
+.request-disabled, .request-receipt, .request-selection, .request-form { margin-block: 30px; padding: 30px; border: 1px solid #284b7f; border-radius: 14px; background: var(--bg-secondary); }
+.request-receipt { border-color: #4d8e95; }
+.request-page .request-receipt strong { overflow-wrap: anywhere; }
+.request-toolbar, .store-request-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; justify-content: space-between; }
+.request-items { list-style: none; padding: 0; }
+.request-items > li { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 28px; padding-block: 26px; border-bottom: 1px solid #284b7f; }
+.request-items h3, .request-items p { overflow-wrap: anywhere; }
+.request-items h3 { font-size: 23px; }
+.request-page :is(input, textarea, select), .store-request-entry select { width: 100%; min-height: 44px; padding: 12px; border: 1px solid #365582; border-radius: 8px; background: #070f1d; color: #e2e8f0; font: inherit; }
+.request-page label, .store-request-entry label { display: block; font-size: 14px; }
+.request-field { margin-bottom: 24px; }
+.request-field > label { font-weight: 700; margin-bottom: 8px; }
+.request-page textarea { resize: vertical; }
+.request-form { max-width: 850px; }
+.request-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.request-page .request-check { display: flex; gap: 12px; align-items: start; margin-block: 22px; line-height: 1.6; }
+.request-check input { width: 20px; min-height: 20px; flex: 0 0 20px; margin-top: 3px; }
+.request-page .request-error { color: #fca5a5; }
+.request-page [aria-invalid="true"] { border-color: #fca5a5; }
+.request-page :is(input, textarea, select):focus-visible, .store-request-entry select:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+.request-trap { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+.request-form .contact-verification { margin-block: 24px; }
+.store-request-entry { margin-block: 28px; padding-top: 24px; border-top: 1px solid #284b7f; }
+.hardware-store-page .store-request-entry h2 { font-size: 25px; }
+.store-request-actions { justify-content: flex-start; margin-block: 18px; }
+.store-request-actions label { min-width: 100px; }
+@media (max-width: 700px) { .request-page { padding-block: 32px 60px; } .request-disabled, .request-receipt, .request-selection, .request-form { padding: 22px; } .request-items > li { grid-template-columns: 1fr; gap: 18px; } .request-items .catalogue-image { max-width: 260px; } }

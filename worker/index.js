@@ -11,6 +11,8 @@ import { handleContactRequest } from './contact-enquiry.js'
 import { handleAdminEnquiries } from './admin-enquiries.js'
 import { handleAdminStore } from './admin-store.js'
 import { handlePublicStore } from './public-store.js'
+import { handleStoreOrderRequest } from './store-order-requests.js'
+import { handleAdminStoreRequests } from './admin-store-requests.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -343,6 +345,7 @@ if (
   }
 }
 
+    if (url.pathname === '/api/store/order-requests' || url.pathname === '/api/store/order-requests/config') return handleStoreOrderRequest(request, env)
     const publicStore = await handlePublicStore(request, env)
     if (publicStore) return publicStore
 
@@ -488,6 +491,7 @@ if (url.pathname === '/api/admin/enquiries' || url.pathname.startsWith('/api/adm
 }
 
 if (url.pathname === '/api/admin/store' || url.pathname.startsWith('/api/admin/store/')) {
+  if (url.pathname === '/api/admin/store/requests' || url.pathname.startsWith('/api/admin/store/requests/')) return handleAdminStoreRequests(request, env)
   return handleAdminStore(request, env)
 }
 

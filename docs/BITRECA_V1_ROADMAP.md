@@ -6,6 +6,8 @@ catalogue is deployed with authenticated Live interface and anonymous protection
 verified. Production catalogue remains empty; Live writes/uploads are unverified.
 S3 enquiry-only public catalogue is deployed, with its intentionally empty Live
 catalogue and access/not-found behavior verified. No populated Live claim.
+S4 manual-review requests are implemented/tested locally, with migration 0020
+applied. Release pending; production intake must remain disabled. S5 is unstarted.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -20,7 +22,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S3 deployed; empty catalogue/access behavior Verified Live; populated QA local-only | Release 2af36af; zero production categories/products; S1/S2 evidence preserved | Populated Live/media/enquiry not verified; S2 production writes/uploads still unverified; S4 unstarted |
+| Hardware / Dropshipping Store | S4 implemented/tested; migration applied, release pending | S3 empty Live catalogue preserved; S4 ships with intake disabled | S2 writes/uploads and populated Live behavior remain unverified; S5 decisions/launch pending |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1535,6 +1537,137 @@ S2 production writes/uploads remain explicitly unverified.
   bitreca-store-s3-live.mjs and bitreca-store-s3-live-20261107 in user temp directory.
   No migration applied, production setting changed, message submitted or S4 work
   begun. Stop after S3.
+
+## Store S4 — gated requests for manual review (2026-11-07)
+
+Owner authorized this model and scoped migration/release: visitors select products
+and quantities and request manual review. Owner confirms availability, final price,
+delivery and payment manually. Submission is not an accepted order or payment.
+This supersedes the original planning assumption of priced checkout/delivery-fee
+totals in S4. No fee, currency, payment method, delivery area or operational policy
+is invented; remaining commercial/launch decisions stay with S5.
+
+### Implemented scope and security
+
+- /store/request/review and product selection controls: up to 10 distinct products,
+  1–10 units each, max 50 units total. Session storage holds only slugs/quantities;
+  no customer contact data. Current published metadata is fetched for review;
+  unavailable/withdrawn items must be removed. Customer name/email required,
+  note optional, international phone optional with explicit WhatsApp permission.
+  Mandatory acknowledgement says manual review is not order acceptance/payment.
+- Server payload allows only selected slugs/quantities and bounded contact/ack/
+  honeypot/challenge/request-ID fields. Browser prices/totals are rejected. Body
+  max 16 KiB/five seconds; server revalidates product/category publication and
+  excludes owner-marked unavailable items. Unknown availability requires manual
+  confirmation; no stock reservation or catalogue mutation is performed.
+- New header plus immutable item snapshots commit in one primary-D1 batch.
+  INSERT...SELECT captures current title/SKU/category/listed-price/currency/context/
+  availability directly from eligible catalogue rows. Final SQL trigger checks
+  every selected line and quantity; missing/changed eligibility aborts the entire
+  transaction. No partial requests. Snapshots are reference facts, not a quote;
+  there is no financial total, delivery fee, payment method or fulfilment action.
+- Unique client request UUID + purpose-separated HMAC protects retries. Exact
+  stored receipt replay returns only reference/status and can recover a consumed
+  CAPTCHA/lost acknowledgement without another write. Changed payload conflicts.
+  Gate/origin/shape/rate checks still apply to replays. Success is only 201/200
+  stored_for_review after committed persistence; uncertain outcomes remain errors.
+- Turnstile Siteverify uses real server fetch, exact hostname and distinct action
+  store_order_request, eight-second timeout, manual redirect policy, success check.
+  Reuses existing CONTACT_TURNSTILE_SITE_KEY/SECRET and CONTACT_ALLOWED_ORIGINS.
+  Existing CONTACT_RATE_LIMIT_SECRET is reused under separate order-request/IP
+  HMAC purposes, never SESSION_SECRET. No new credentials or paid service.
+- Separate atomic attempt counters: 200 shared/day, 20/minute, 5/IP/ten minutes,
+  fixed UTC windows; bounded expiry cleanup affects only new temporary counters.
+  Daily-scoped hashed IP identifiers; no raw IP storage. Limits include failed
+  challenge attempts/retries and are not immunity to denial of service.
+- Explicit runtime gate **STORE_ORDER_REQUESTS_ENABLED="false"** added to the
+  existing wrangler vars; missing/false/anything except exact string true disables
+  intake. POST /api/store/order-requests rejects before body reading, DB/counters
+  or provider calls when disabled, including direct API attempts. Config GET
+  returns enabled=false/siteKey=null. Enabled configuration also requires valid
+  origins/keys/schema. Frontend fails closed and hides the customer form when
+  disabled/unavailable. Product enquiries remain separate and available.
+- Protected /admin/store/requests reuses current auth/origin guards, layout and
+  sidebar. Private twenty-row list/filter/pagination, detail/contact/note/snapshots,
+  versioned controlled status transitions New/Reviewing/Awaiting customer/Closed/
+  Archived. These track review only; no accepted/paid/shipped state. Manual mailto
+  and permissioned WhatsApp links send nothing automatically and change no status.
+- Safe literal text, no-store private responses, no public request GET/list/detail,
+  no raw body/token/SQL/secret logging and no delete/edit-snapshot endpoints. SQL
+  guards prevent changes/deletion of submitted customer identity and snapshots;
+  any future retention purge requires separately reviewed procedures. Existing
+  project/portfolio/auth/contact/catalogue rows and deletion workflows unchanged.
+- Shared ContactTurnstile gains optional action prop; default remains
+  contact_enquiry. Contact workflow itself is unchanged. Store public/admin routes
+  and links are integrated without changing S2/S3 data models or public allowlists.
+
+### Focused verification and migration
+
+- **15 S4 tests passed**, including actual bundled workerd/D1 and a synthetic
+  Siteverify service. Covers additive empty schema/preserved sentinel rows; absent/
+  false gate before any DB/body/provider work; validation/quantity/price tampering;
+  origin/config/Turnstile hostname/action/redirect/exception failures; atomic
+  snapshots and rollback on publication/category/availability changes; current
+  server price capture; immutable snapshot guards; gate closure during verification;
+  canonical/concurrent retries, lost commit acknowledgement recovery, persistent
+  purpose-separated rate budgets, private admin access, controlled status/version
+  conflicts, manual reply consent and pagination. No S1–S3/Contact suites repeated.
+- Scoped lint passed; required final build passed for Worker/client, release
+  assets index-Bf0_H2Qb.js and index-BsVmwd5n.css. Parsed config comparison confirms
+  ONLY the new false gate variable changes configuration; all existing flags,
+  keep_vars, routes, resources, schedules and settings match the baseline.
+- Built UI + real handlers/SQLite/auth, memory-only catalogue and provider double:
+  Chrome **1440/768/390px** passed selection, quantity/customer validation, visible
+  keyboard focus, responsive request/admin layouts, single saved request/two
+  snapshots despite duplicate action, no false accepted-order receipt, private
+  literal notes, manual reply consent, review transitions and version conflict/
+  reload. Screenshots reviewed; no overflow or uncaught exceptions.
+- Also passed browser publication-change rollback, HTML/legacy false-response
+  rejection, lost acknowledgement retry yielding one request, disabled gate UI and
+  direct POST rejection, config/selection retry, admin 20+5 pagination/retry and
+  revoked-session redirect. External reply launches were prevented in QA; no
+  customer/supplier messages sent. Provider/widget were synthetic ONLY locally;
+  this does not claim a real production S4 Turnstile submission.
+- Temporary helpers/artifacts outside repo: bitreca-store-s4-server.mjs,
+  bitreca-store-s4-qa.mjs, bitreca-store-s4-qa-20261107 in user temp directory.
+  Local server stopped after QA. No total task-time or cross-browser certification.
+- Verified target: existing bitreca_db -> bitreca-db,
+  **8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a**; active runtime identity matches.
+  Read-only ledger showed 0019 latest, new request tables absent, 0 categories /
+  0 products. Remote pending list showed **0020 as sole pending**.
+- Inspected additive 0020: three new tables, four explicit indexes, six triggers
+  scoped to new requests/snapshots; no seeds, old-table updates or destructive SQL.
+  Authorized remote apply succeeded for **0020_add_store_order_requests.sql only**,
+  fourteen commands including ledger bookkeeping. No older migration replay.
+  No production catalogue records, order requests, uploads or enquiries created.
+- Follow-up remote read-only object/count SELECT did not execute: execution prompt
+  returned "rejected by user". It was not retried through another mechanism.
+  Migration success above is from the existing apply result, not a claimed fresh
+  ledger/count query. No post-migration SQL count/inventory result is claimed.
+
+### S5 decisions and stop boundary
+
+S4 must be reported **Deployed — order intake disabled** after release, not
+operationally launched. No authorization to set the flag true in production.
+Live enabled submissions, real S4 Turnstile action, request persistence/status
+writes and all populated-production behavior remain unverified. S2 production
+writes/uploads stay explicitly unverified. No production data will be fabricated
+to remove those limitations. Rollback: keep intake false, restore reviewed code
+if needed, retain all tables/records; never drop history or reverse old migrations.
+
+Before S5, owner must decide/approve: real catalogue and supplier/availability
+review; who monitors requests and replies; manual final-price/currency/tax and
+acceptance process; fulfilment/delivery areas, fees, timing and exceptions;
+available payment/reconciliation method (none assumed); cancellation/returns/
+warranty wording; privacy/retention and separately reviewed purge procedure;
+technical quantity/rate thresholds and monitoring. Do not capture payment details
+or promise delivery before these are agreed. Manual-review intake does not itself
+settle any commercial term or enable automated acceptance, charging or suppliers.
+Only after separate S5 approval: reviewed launch setting, actual real Turnstile
+action test and one owner-authorized controlled Live request/operational check.
+
+Code deployment/Live disabled-check SHA/evidence follows after it occurs. Preserve
+all earlier deployment evidence. Stop after S4; do not configure payments or start S5.
 
 ## Boundaries
 

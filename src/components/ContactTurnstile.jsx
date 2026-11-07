@@ -26,7 +26,7 @@ function loadTurnstile() {
   return loading
 }
 
-export default function ContactTurnstile({ siteKey, onToken, resetKey }) {
+export default function ContactTurnstile({ siteKey, onToken, resetKey, action = 'contact_enquiry' }) {
   const container = useRef(null)
   const [failure, setFailure] = useState('')
   const [retry, setRetry] = useState(0)
@@ -37,14 +37,14 @@ export default function ContactTurnstile({ siteKey, onToken, resetKey }) {
     loadTurnstile().then((api) => {
       if (!active) return
       widget = api.render(container.current, {
-        sitekey: siteKey, action: 'contact_enquiry', theme: 'dark', size: 'compact',
+        sitekey: siteKey, action, theme: 'dark', size: 'compact',
         callback: (token) => { if (active) { onToken(token); setFailure('') } },
         'expired-callback': () => { if (active) { onToken(''); setFailure('Verification expired. Please verify again.') } },
         'error-callback': () => { if (active) { onToken(''); setFailure('Verification is unavailable. Retry, or use WhatsApp or email below.') } },
       })
     }).catch(() => { if (active) setFailure('Verification could not load. Retry, or use WhatsApp or email below.') })
     return () => { active = false; if (widget !== undefined) window.turnstile?.remove(widget) }
-  }, [siteKey, onToken, resetKey, retry])
+  }, [siteKey, onToken, resetKey, retry, action])
   return (
     <div className="contact-verification">
       <p className="contact-field-hint">Complete the security check before sending.</p>

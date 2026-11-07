@@ -62,6 +62,10 @@ async function handleLogout() {
             Enquiries
           </NavLink>
 
+          <NavLink to="/admin/store/requests">
+            Store requests
+          </NavLink>
+
           <NavLink to="/admin/settings">
             Settings
           </NavLink>
