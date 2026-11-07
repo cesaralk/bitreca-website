@@ -2,7 +2,8 @@
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
-catalogue is implemented; authorized migration applied, code release pending.
+catalogue is deployed; anonymous Live protections verified, authenticated Live
+interface confirmation pending. Production catalogue remains empty for owner entry.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -17,7 +18,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1 Verified Live; S2 implementation tested, release pending | Introduction at f1c2c04 remains public; additive 0019 applied, no production records | Deploy S2 private admin; S3/public catalogue and ordering unstarted |
+| Hardware / Dropshipping Store | S1 Verified Live; S2 deployed with focused local QA and Live access protection verified | 0019 applied; release b6814c7; zero categories/products; authenticated Live UI confirmation pending | Owner checks private empty UI without saving; Live writes unverified; S3/public catalogue and ordering unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1332,6 +1333,52 @@ owner-entry requirement; report that limitation rather than create fake listings
 Authenticated Live UI verification may need the owner to log in; do not retrieve
 credentials, forge a session or claim an authenticated Live result without it.
 Stop after S2; S3 remains unstarted.
+
+## Store S2 — deployment evidence and Live limitations (2026-11-07)
+
+- Release **`b6814c7ebdb650789de5076670362ec48c965c9e`**, title
+  `Add private Store catalogue schema and protected admin management`. Exact
+  ten-file staged manifest and whitespace passed; ordinary push to main succeeded
+  from 547ccd0. All earlier release/planning evidence retained.
+- [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/907a3812-ed1a-497f-980c-42e5012af8ac)
+  completed successfully. Active version
+  **`1edd7458-527a-4e32-8f48-1c19d69230c2`** served 100% at
+  `2026-11-07T10:31:18.991619Z`.
+- Post-migration read-only ledger: 0019 applied at **2026-11-07 10:25:19 UTC**.
+  Schema inventory verified both Store tables, five explicit indexes and three
+  lifecycle triggers. Post-migration and post-deployment counts both confirmed
+  **0 categories / 0 products**; query metadata reported zero writes.
+- Live /admin/store document returned HTTP 200 with expected index-DFVrRiCS.js;
+  Chrome direct anonymous navigation redirected to /admin/login and showed no
+  private Store UI. No uncaught page exceptions in this protection check.
+- Anonymous GET category/product collections, product detail and private Store
+  image returned **401**. Public /api/store/categories, /api/store/products,
+  /api/products and legacy /api/media/store-catalogue/... returned **404**.
+  No production POST/PUT/upload or synthetic listing was created for these checks.
+- Read-only runtime metadata confirmed the existing D1 binding and Contact
+  settings remain present, inbox enabled. No changes to wrangler/configuration,
+  secrets, DNS, bindings, auth logic, portfolio/deletion workflows, S1 or other
+  completed pages. No completed S1/Contact Inbox QA rerun.
+- **Authenticated Live interface confirmation pending:** owner was asked to log
+  in normally and confirm empty Categories/Products lists and New editors, without
+  saving or uploading. Agent has no owner session and did not retrieve credentials
+  or manufacture one. Local authenticated UI/API checks passed; this does not
+  claim an authenticated production list/detail render.
+- **Live write workflow deliberately unverified:** create/edit, private R2 upload,
+  publish/unpublish/archive and conflict handling passed locally, including real
+  isolated workerd D1/R2, but not against production. The latest instruction to
+  leave production empty supersedes the planning-stage draft Live-write test.
+  Owner enters real approved records later under an appropriate authorization;
+  never create fake records just to claim a full Live write pass.
+- No unresolved business decision blocked empty private management. No actual
+  supplier, currency, price, stock, delivery or payment choice was invented.
+  Published admin records remain inaccessible publicly during S2; S1's static
+  category directory does not change when admin records are published. S3 is not
+  started and requires separate authorization/content inputs.
+- Final roadmap-only update committed/pushed as authorized; previous pending
+  release wording is historical. Live protection report/helper outside repo:
+  bitreca-store-s2-live.mjs and bitreca-store-s2-live-20261107. Temporary local
+  server stopped after QA. No total task-time claim. Stop after S2.
 
 ## Boundaries
 
