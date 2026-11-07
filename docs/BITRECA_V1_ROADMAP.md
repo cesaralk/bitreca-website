@@ -1,6 +1,7 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
+Store planning is documented below; implementation has not started.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -15,7 +16,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
+| Hardware / Dropshipping Store | Planning complete; no Store implementation authorized by this planning task | Existing /store is a placeholder, not an operational catalogue or checkout | Recommended S1: honest Store introduction/category directory, 4–8 hours; phased plan below |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -939,6 +940,220 @@ is claimed yet. Stop after About; no Store work was started.
   evidence remains intact. No blocker in the checked scope. Physical-device,
   screen-reader and cross-browser certification were not performed. No new Store
   work; stop after About.
+
+## Store planning — 2026-11-07 (documentation only)
+
+This plan supersedes the earlier unspecified Store milestone, not the completed
+software Products page. Source baseline: 1ce6f51c98396c17135c46609d409dd09ebcb47d.
+Planning does not authorize implementing these milestones, production migrations,
+supplier/payment configuration or real orders. Each implementation milestone
+requires a separately agreed scope and release. Existing deployment evidence
+above remains historical and intact; no completed page QA was repeated.
+
+### Existing capability audit
+
+Inspected Store.jsx, StoreCategory.jsx, ProductCard.jsx, Homepage Store section,
+Products.jsx, App.jsx, AdminLayout.jsx, AdminDashboard.jsx, AdminProjects.jsx,
+ProtectedAdminRoute/admin request helpers, Worker routes/media handling, package
+manifest and migrations 0001–0018. Reused existing roadmap and Contact integration
+evidence. This is source/schema inspection, not new functional Store QA.
+
+| Area | Already present / reusable | Partial or missing |
+| --- | --- | --- |
+| Public Store | /store route; Navbar/Footer/Homepage entry links | Store.jsx renders only an H1; no catalogue, details, loading/error/empty states or Store stylesheet |
+| Category presentation | Homepage lists Storage, Memory, Graphics, Displays, Peripherals via StoreCategory | Every card points to /store; no category data/filtering or verified saleable items. Labels are not supplier/availability evidence |
+| Software Products | Approved static Stockly POS showcase; ProductCard links to /products | Separate from hardware Store. No retail SKU/price/inventory model; do not repurpose the page or silently change Homepage's ProductCard behavior |
+| Admin | Existing owner login/session authorization, layout, request helper; Projects/Portfolios/Enquiries management | /admin/store and /admin/products sidebar links have no matching React route. No Store CRUD, category management, order management or sales statistics; sidebar labels do not establish working features |
+| API / storage | Existing Worker, D1 binding, image-upload/media handling, published-project pattern | No Store/product/order/cart/checkout/payment endpoints in Worker sources. Repository migrations contain no commerce tables. Project records and Contact enquiries are not products/orders |
+| Checkout / orders | No implementation found | No cart persistence, address capture, authoritative pricing, shipping calculation, checkout, order IDs/idempotency, order statuses, cancellation or payment reconciliation |
+| Operations | Manual contact options and verified private project-enquiry inbox exist | No verified suppliers, feed, stock/pricing process, fulfilment owner, delivery contract/areas, currency, payment method, returns/warranty rules or order-confirmation workflow. Contact is not an order system |
+
+No commerce SDK/payment package is installed. Existing auth, D1 and media patterns
+can be reused after Store-specific review; this does not certify a ready-made
+commerce backend or permit changes to PortfolioForest/deletion. Do not add paid
+integrations or subscriptions, automate suppliers, or assume dropshipping is the
+confirmed fulfilment model just because it appears in the old roadmap label.
+
+One read-only production schema inventory on configured bitreca-db
+(`8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`) confirmed no commerce tables:
+`SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE
+'sqlite_%' ORDER BY name`. Metadata reported rows_written=0, changes=0,
+changed_db=false. Only table names were read; no customer/project/portfolio/order
+content or credentials were accessed. No new public/admin Live QA was performed.
+
+### Release meanings and operating gates
+
+- **Store introduction:** truthful category/direction page; no actual item
+  catalogue or checkout. S1 can ship without settled commercial operations.
+- **Live catalogue:** S2+S3 have owner-approved published real items and accurate
+  availability/price wording. Browsing/enquiring is possible; ordering/payment
+  is explicitly unavailable. An empty catalogue is not advertised as stocked.
+- **Ready to accept real orders:** only after S5, with approved currency, supply,
+  delivery, total-price rules, payment method and an owner-operated fulfilment/
+  cancellation process. A cart or saved request alone is not an accepted order.
+  No “paid”, “confirmed”, stock or delivery promise without its supporting event.
+
+Every milestone below ends with its own focused QA, reviewed commit/push through
+the established Cloudflare Git workflow, successful build/deployment check and
+targeted Live verification. Store writes/migrations/live test records require
+specific approval. Keep existing runtime settings/keep_vars and protected data
+unchanged. Estimate ranges include implementation, scoped QA, release review
+and one targeted verification cycle, not waiting on owners/suppliers/accounts.
+
+### Sequential milestones
+
+#### S1 — Honest Store introduction and category directory (4–8 hours)
+
+**Recommended first implementable milestone.** Replace only the Store placeholder
+with the approved dark navy/blue layout, the five existing category descriptions,
+clear catalogue-in-preparation wording and working Contact/WhatsApp enquiries.
+No fictional SKUs, pricing, stock, purchasing, checkout, delivery or supplier
+claims. Existing Contact remains a general enquiry, never an order receipt.
+Use Store-local styles/components; preserve Homepage and software Products.
+
+Dependencies: existing brand/copy/category facts and official contact links are
+available. Owner only needs to approve this limited informational scope; no
+payment, currency, delivery-area or supplier choice blocks S1. Do not publish
+unapproved launch dates. No database/API/admin changes.
+
+Acceptance/release: direct /store load, readable 1440/768/390px layouts, keyboard
+focus/menu/link checks, correct enquiry wording and no dead/fake buy buttons;
+scoped lint/build/whitespace, then approved Git deployment and read-only Live
+Store/navigation verification. Report **introduction Live, commerce unavailable**.
+
+#### S2 — Minimal catalogue data and protected owner management (12–20 hours)
+
+Add only Store-specific tables with an approved additive migration in existing
+D1, protected /admin/store route and bounded owner CRUD for simple products:
+SKU/slug, title/category, plain specifications, approved image, source reference,
+draft/published visibility, availability/last-checked fields and optional approved
+display price plus explicit currency. Store money in currency minor units when
+prices are used; never infer currency. Prefer unpublish/archive over deletion.
+Owner manually maintains initial data; no supplier feed/automation in this scope.
+
+Dependencies: owner-approved initial product list/specifications/image rights,
+supplier/availability evidence and data-maintenance responsibility. Decide
+priced catalogue versus “enquire for price”; only the priced branch needs an
+approved currency/price/tax display policy here. Simple products only: variants,
+bundles or feed synchronization require revised scope/estimates, not silent work.
+Use existing owner authentication/helpers, not a parallel login. Review media
+reuse and an isolated Store namespace without touching portfolio storage/deletion.
+
+Acceptance/release: draft records are private; anonymous/invalid-session reads
+and writes denied, mutation origin checks enforced; validated bounded inputs,
+unique SKUs/slugs, safe text/images, paginated admin states and edit conflicts.
+Focused schema/auth/CRUD tests on isolated fixtures plus admin browser checks,
+lint/build; review ledger before the separately approved additive migration,
+deploy, then one owner-authorized draft create/edit/unpublish Live check.
+No public buying, order records or changes to existing data. Live catalogue
+content is still gated on S3; the admin tool alone is not a public Store.
+
+#### S3 — Published public catalogue and item details (10–18 hours)
+
+Read published Store records dynamically on /store and /store/:slug, with simple
+category filtering, bounded pagination, responsive images/specifications and
+product-specific enquiry links. Include loading, empty, error and not-found
+states. Show only approved price/currency and dated/manual availability wording;
+unknown supply must not become “in stock”. No cart, buy/download or payment action.
+
+Dependencies: S2 and at least one owner-approved real published item for a
+populated catalogue release, plus agreed enquiry-only disclaimer. Supplier prices
+and availability must have an owner-defined review cadence; stale items can be
+unpublished rather than promised. Empty-state release alone is not a populated
+live catalogue. No changes to /products or approved Homepage required.
+
+Acceptance/release: published-only API/detail access, no draft/source-sensitive
+fields exposed, safe rendering, direct slug/back/filter behavior, responsive
+1440/768/390px and keyboard checks. Scoped fixture/API checks, lint/build,
+deploy and read-only Live catalogue/detail/enquiry-link verification against an
+approved item. Do not submit another Contact enquiry as catalogue link QA.
+Report **catalogue Live; orders not accepted**.
+
+#### S4 — Order-request workflow behind a disabled launch gate (24–40 hours)
+
+Build only after the operating decisions below are approved. Add a small cart
+for simple SKUs, server-validated order-request creation, immutable item/price/
+currency/delivery-fee snapshots, request-ID duplicate protection and a protected
+paginated Admin Orders view. Capture only necessary contact/delivery fields;
+reuse reviewed Turnstile and bounded abuse patterns without changing project
+enquiries or existing auth. Revalidate catalogue/quantity/availability and compute
+totals server-side; never trust browser prices. Unsupported areas/items are
+rejected; no speculative reservations or guaranteed supplier stock.
+
+Dependencies: S2+S3; owner approves suppliers and who buys/dispatches; delivery
+areas, rates, timing and address format; one currency/tax/rounding policy; one
+payment method; cancellation/returns/warranty and privacy/retention rules; owner
+monitoring/reply process. Define request versus acceptance and fulfilment statuses.
+No automatic messages, external fulfilment, card capture or paid integration.
+An online-only payment decision without a verified provider is a blocker, not a
+reason to silently substitute cash on delivery or bank transfer.
+
+Acceptance/release: input/quantity/price tampering, idempotency/concurrent retry,
+auth/no public order enumeration, status conflicts, failed storage and unavailable
+product/area handling tested on isolated data. Cart/request/admin focused browser
+QA, lint/build and reviewed additive migration/code release. Production ordering
+stays disabled; verify launch gate/fallback and approved protected admin surface
+Live without a real customer order. Report **workflow deployed, not order-ready**.
+
+#### S5 — Controlled manual-order launch and operational handover (8–16 hours)
+
+Publish approved delivery, payment, cancellation/returns/warranty and privacy
+information in the Store flow; enable the approved method only after owner
+acceptance. Order request receipt must say pending review, not paid/accepted.
+Owner explicitly confirms supplier availability, price and delivery and records
+acceptance/payment/fulfilment events separately. No payment method is preselected
+by this plan; no automatic supplier purchase or messaging. The owner must have
+an actual way to monitor and fulfil every accepted order.
+
+Dependencies: S4, all operating decisions and a verified practical payment/
+reconciliation process for the chosen method. Card/provider integration, if
+chosen, needs a separate scoped milestone after account/currency/fee verification;
+its build/approval/costs are not included in these estimates. Do not launch an
+online-payment promise with an unverified provider.
+
+Acceptance/release: focused end-to-end request/owner review/status/privacy and
+failure/fallback QA; owner-approved production launch settings and Git deployment;
+then one explicitly authorized controlled Live order with owner-controlled data
+through the agreed acceptance/payment/fulfilment process. Any real charge,
+supplier purchase, dispatch, refund or cleanup requires explicit authorization;
+record actual events rather than simulating paid/delivered states. If validation
+fails, disable new requests and preserve existing orders/admin access. Only mark
+**ready to accept real orders** after successful technical and operational checks.
+
+Baseline total S1–S5: **58–102 hours** of implementation/review/release effort,
+not a schedule commitment. This excludes supplier onboarding, waiting for owner
+decisions, catalogue population beyond the agreed pilot set, online payment
+integration, automation, advanced variants, stock synchronization and logistics
+contracts. Re-estimate each stage after its inputs are approved; no work starts
+automatically just because a prior stage ships.
+
+### Essential owner decisions (unanswered, not assumptions)
+
+1. **Supply and fulfilment:** which initial products/categories and approved
+   suppliers? Stock held by Bitreca, supplier dispatch or purchase-on-request?
+   Who verifies availability, pays the supplier, handles dispatch and exceptions?
+2. **Delivery:** which countries/areas, courier or collection option, fees, timing,
+   failed-delivery responsibility and who bears duties/taxes? No Lebanon-only,
+   worldwide, free-shipping or delivery-time assumption is made.
+3. **Currency and pricing:** which displayed/settled currency, fixed prices versus
+   quotes, exchange-rate ownership if relevant, tax inclusion and price validity?
+4. **Payment:** which method is actually available to the business? Who confirms
+   receipt/reconciles it, and when is an order accepted? No COD, bank transfer or
+   card processor is assumed; paid integrations require separate approval.
+5. **Customer obligations and operations:** who monitors orders, expected manual
+   response hours, cancellation/refund/returns/warranty rules, authorised product
+   imagery and personal-data retention/deletion process?
+
+S1 is the recommended next action and is not blocked by these commercial
+decisions. S2/S3 require verified merchandise/content; S4/S5 are blocked by the
+unanswered operating/payment decisions. Keep a catalogue-only launch distinct
+from permission or readiness to transact.
+
+Planning validation: documentation-only diff/whitespace and exact staged-file
+check before commit/push. No build or browser/feature QA needed or claimed for
+this plan; no completed page or Contact Inbox tests rerun. No Store feature,
+production data, payment configuration, secret or infrastructure change. Stop
+after this roadmap plan; preserve all previous release evidence.
 
 ## Boundaries
 
