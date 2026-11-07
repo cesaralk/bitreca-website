@@ -1,7 +1,7 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
-Store planning is documented below; implementation has not started.
+Store S1 introduction/category directory is implemented; release verification is pending.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -16,7 +16,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | Planning complete; no Store implementation authorized by this planning task | Existing /store is a placeholder, not an operational catalogue or checkout | Recommended S1: honest Store introduction/category directory, 4–8 hours; phased plan below |
+| Hardware / Dropshipping Store | S1 implemented; focused local QA passed | Introduction/category directory release pending; no catalogue, checkout or order acceptance | Deploy and verify S1 only; S2 remains unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1154,6 +1154,49 @@ check before commit/push. No build or browser/feature QA needed or claimed for
 this plan; no completed page or Contact Inbox tests rerun. No Store feature,
 production data, payment configuration, secret or infrastructure change. Stop
 after this roadmap plan; preserve all previous release evidence.
+
+## Store S1 — implementation and local QA (2026-11-07)
+
+Owner authorized only the introduction/category directory and its Git release.
+The earlier planning audit is a historical baseline, not current page behavior.
+Scope: Store.jsx, new Store.css and this roadmap. Reused the existing Store route,
+shared header/footer, brand variables and the five established categories; no
+architecture re-review, Homepage/shared component edits, assets or dependencies.
+
+The page states catalogue in preparation, products/prices/stock not listed,
+checkout unavailable and no orders accepted through the page. All five directory
+links jump to meaningful category guides with compatibility/use-case questions.
+Each guide has a category-specific WhatsApp enquiry; the final section links to
+existing Contact and the separate software Products page. WhatsApp uses the
+official number, opens a reviewable message in a new tab and sends nothing
+automatically. Enquiries are expressly not orders/reservations or supply promises.
+No fictitious products, pricing, suppliers, delivery dates or purchase actions.
+
+Verified locally against the final production build:
+
+- Scoped ESLint for Store.jsx passed. Required npm.cmd run build passed for
+  client and unchanged Worker; bundles index-hxX8CCHl.js / index-DMY04gwX.css.
+- Chrome at **1440/768/390px**: screenshots reviewed, one H1, five labelled
+  category guides, five navigation entries, no horizontal overflow, no Store
+  input/form/checkout controls. Availability notice present at every size.
+- All six anchor links (hero plus five categories) activated by Enter and
+  verified to scroll the intended visible target into view. A confirmed conflict
+  with global smooth scrolling was fixed with immediate scrolling scoped only
+  to the Store page; final checks passed. Visible Tab focus and keyboard
+  mobile/tablet menu opening/closing passed.
+- Contact and Products internal navigation passed. All six WhatsApp links have
+  the official destination, appropriate prepared text, safe new-tab attributes
+  and accessible new-tab notice. Links inspected without opening/sending any
+  external message. No Contact enquiry submitted or Contact Inbox QA repeated.
+- Reduced-motion transition/scroll settings passed; no uncaught browser errors
+  or application mutations. Local runner/screenshots/report are outside repo:
+  bitreca-store-s1-qa.mjs and bitreca-store-s1-qa-20261107 in user temp directory.
+- Whitespace and exact three-file staged manifest checked before release.
+  Existing evidence retained; no schema/API/admin/production configuration change.
+
+Live verification is pending this pre-commit record. This is an introduction,
+not a populated catalogue and not an operational shop. S2 tables/admin management
+and all later milestones remain unstarted. No measured task-time claim.
 
 ## Boundaries
 
