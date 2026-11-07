@@ -12,7 +12,7 @@ milestones need inspection and user agreement before work starts.
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
-| About: factual company introduction | Pending review | Deployment unverified | 30–60 min; needs approved information |
+| About: factual company introduction | Implemented; focused local QA passed | Local release prepared; Live verification pending | Authorized Git deployment and targeted Live check |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
@@ -870,6 +870,44 @@ the previously local Siteverify rollout evidence above. Earlier local/uncommitte
 wording describes the original handoff; that evidence is included in this final
 documentation commit. Complete Batch #1/#2 evidence is preserved. Stop after
 Contact Inbox; About has not been started.
+
+## About — implementation and local QA (2026-11-07)
+
+Owner authorized the About page, scoped release and final documentation push.
+Existing page was a one-heading placeholder; `/about` already had a route.
+Replaced it with a responsive introduction, four software disciplines, a
+three-step approach, explicitly aspirational ambition, Stockly POS context and
+project/contact CTAs. Copy draws from existing Homepage, Services and Products:
+no invented team, dates, credentials, clients, testimonials or achievements.
+Only About.jsx, new About.css and this roadmap are release files. No new assets,
+dependencies, shared component changes, API changes or production setting edits.
+
+Verification:
+
+- Scoped ESLint for About.jsx passed; final npm.cmd run build passed for client
+  and unchanged Worker. Final bundles index-Ar5wbe2d.js / index-CaPd-E2O.css.
+- Built UI served by a loopback-only temporary static server. Chrome at
+  1440/768/390px: screenshots reviewed; one H1, four disciplines, three steps,
+  valid labelled-by references and no document/content overflow at each width.
+- Tab showed visible focus; Enter navigated Projects, Services and Contact;
+  all ten page links have meaningful text and valid internal hrefs. Five
+  service/product fragment links navigated to routes with existing target IDs.
+  Existing tablet/mobile menu opened/closed by keyboard in the About context.
+  These are link checks, not repeated destination-page feature QA.
+- A reduced-motion transition-specificity issue was found, fixed in About-only
+  CSS and verified in the final built UI. Temporary keyboard runner corrected
+  Enter character dispatch before testing native buttons; no shared code change.
+- Final run: no uncaught browser exceptions or non-GET/HEAD requests. No Contact
+  Inbox workflow was retested. No production data was touched.
+- Temporary local artifacts outside repository: bitreca-about-qa.mjs and
+  bitreca-about-qa-20261107 in the user's temp directory. Local report and three
+  full-page screenshots retained. Chrome emulation is not physical-device or
+  cross-browser certification. No unmeasured task-time claim.
+- Scoped whitespace/manifest checks run before release commit. Historical
+  Batch #1/#2 and Contact Inbox deployment evidence remains intact.
+
+Live deployment/verification is pending this pre-commit record; no Live result
+is claimed yet. Stop after About; no Store work was started.
 
 ## Boundaries
 
