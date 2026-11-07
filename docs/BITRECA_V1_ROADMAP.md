@@ -4,7 +4,8 @@ Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
 verified. Production catalogue remains empty; Live writes/uploads are unverified.
-S3 enquiry-only public catalogue is implemented/tested locally; release pending.
+S3 enquiry-only public catalogue is deployed, with its intentionally empty Live
+catalogue and access/not-found behavior verified. No populated Live claim.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -19,7 +20,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1/S2 evidence retained; S3 public catalogue implemented and locally verified | Production empty; S3 Git release/Live empty-state verification pending | S2 production writes/uploads remain unverified; no checkout/orders; S4 unstarted |
+| Hardware / Dropshipping Store | S3 deployed; empty catalogue/access behavior Verified Live; populated QA local-only | Release 2af36af; zero production categories/products; S1/S2 evidence preserved | Populated Live/media/enquiry not verified; S2 production writes/uploads still unverified; S4 unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1494,6 +1495,46 @@ S2 production writes/uploads remain explicitly unverified.
   Populated Live catalogue, real product media and product-specific Live enquiry
   remain unavailable/unverified while production is intentionally empty. This is
   not a populated shop and cannot accept orders. Stop after S3; do not begin S4.
+
+## Store S3 — deployed, empty catalogue Verified Live (2026-11-07)
+
+- Release SHA **`2af36af3dcb277536f214443346da11cfbc6a6a8`**, title
+  `Add published enquiry-only Store catalogue and product details`. Exact
+  fifteen-file staged scope/whitespace passed; normal main push succeeded from
+  382e59c. No dependencies, migrations or configuration changes were included.
+- [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/c14b1a3d-9ab1-4913-9456-4a09bc54dbef)
+  completed successfully. Active version
+  **`1fb4be6b-d9c5-4bd9-8b33-7a3acf59887d`** served 100%, deployed
+  `2026-11-07T13:54:25.614585Z`.
+- Live /store HTTP 200 served expected release assets index-BQyFDH-T.js and
+  index-CPeeD1S6.css. Chrome **1440/768/390px** confirmed empty catalogue, no
+  product cards or shopping forms, explicit no-checkout/no-orders notice, one H1,
+  visible keyboard focus and no horizontal overflow. Live mobile screenshot
+  reviewed; no uncaught page exceptions or application mutation requests.
+- Both bitreca.com and www.bitreca.com category/product collection APIs returned
+  **200**, empty arrays, null nextCursor and Cache-Control:no-store.
+- Unknown product detail and media GET/HEAD returned **404**; unknown category
+  filter returned **404**. The corresponding product page showed Product not
+  available, with no product-specific enquiry action; unknown category UI showed
+  its unavailable state. Requesting status=draft returned **400**. Anonymous
+  /api/admin/store/products remained **401**; legacy raw Store media remained
+  **404**. All checks were GET/HEAD only and used no actual catalogue record.
+- Post-deployment D1 count-only SELECTs again confirmed **0 categories / 0
+  products**, metadata rows_written=0/changed_db=false. No production uploads,
+  records or enquiries were created. Existing D1 binding and Contact runtime
+  settings remain present; no Contact Inbox/S1/S2 functional QA repeated.
+- **Limitations remain explicit:** populated product/category/media and
+  product-specific enquiry behavior passed only with isolated local fixtures,
+  not Live. Production is empty by instruction; this is not a populated shop.
+  S2 production create/edit/publish/archive and image uploads remain unverified.
+  Owner-approved data, price/availability review and operational decisions remain
+  necessary before later use; there is no order acceptance or payment flow.
+- Final roadmap-only evidence update committed/pushed as authorized; earlier
+  pending-release wording is historical. Prior Batch #1/#2, Contact, About, S1/S2
+  evidence and write/upload limits preserved. Live helper/report/screenshots:
+  bitreca-store-s3-live.mjs and bitreca-store-s3-live-20261107 in user temp directory.
+  No migration applied, production setting changed, message submitted or S4 work
+  begun. Stop after S3.
 
 ## Boundaries
 
