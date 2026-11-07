@@ -1,7 +1,7 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-06. Task #6 Contact Inbox/Admin is **Deployed — live verification blocked**;
-the reported live submission failed and diagnosis is pending. Projects Batch #2 remains Live. Batch #1 remains
+Updated: 2026-11-07. Task #6 Contact Inbox/Admin is **Verified Live** following
+owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
 Estimates are implementation/review effort, not delivery promises. Later
@@ -11,7 +11,7 @@ milestones need inspection and user agreement before work starts.
 | --- | --- | --- | --- |
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Deployed — live verification blocked | 0018 applied; commit 3e05fdb deployed; failed live attempt under diagnosis | Capture HTTP/JSON status in a supervised retry; no automatic outbound messaging |
+| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Pending review | Deployment unverified | 30–60 min; needs approved information |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
@@ -831,6 +831,45 @@ not changed. Root cause is request-mode compatibility, not evidence of a bad
 secret or provider outage. Status stays **Deployed — live verification blocked**
 until the fixed deployment passes a fresh real challenge and protected-inbox
 confirmation. No new broad/visual/historical QA cycle was run.
+
+### Siteverify fix rollout evidence — 2026-11-06
+
+Fix commit **1259994fff6bb04ce2e8b86c4e4bf795ad736daf** pushed normally to main.
+Four files: Worker Contact handler, two focused test files and this roadmap
+(including previously local release/diagnosis evidence). Staged whitespace passed.
+[Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/0da8c795-97ff-4068-b4d4-7ee08fed5db2)
+completed successfully; Git rollout version
+`32034a54-79b0-4472-a451-8fb1f3296fdc` served 100% at
+`2026-11-06T05:57:34.632901Z`. All five Contact runtime settings survived.
+
+After rollout, inbox re-enabled for one owner-performed fresh real Turnstile test.
+Both production config endpoints returned enabled=true, mode=inbox, public key
+present; anonymous inbox API returned 401. Before/after comparison verified
+only the enable flag changed, with other runtime bindings identical. No key
+rotation, production schema change, migration reapply or data modification.
+Status remains **Deployed — live verification blocked** until owner confirms
+the fresh saved reference in authenticated Admin Inbox. This final rollout
+evidence update remains local/uncommitted. Batch #1/#2 evidence is retained.
+
+## Contact Inbox — Verified Live (2026-11-07)
+
+Owner confirmed the existing successful production enquiry was saved and appears
+in the authenticated Admin Inbox. Saved reference:
+**`f22e5c3e-641c-4514-b102-e000d886e03a`**.
+Confirmed fix commit: **`1259994fff6bb04ce2e8b86c4e4bf795ad736daf`**.
+
+This owner-confirmed live result completes the public submission-to-protected
+inbox verification and supersedes the earlier blocked/pending status records,
+which remain intact as historical evidence. No additional enquiry was submitted,
+and no completed QA, migration or production data operation was repeated.
+Prior successful deployment/runtime-settings and anonymous-access-denial checks
+are reused. No remaining activation blocker is recorded for this workflow.
+
+Owner authorized committing/pushing this final roadmap-only update, including
+the previously local Siteverify rollout evidence above. Earlier local/uncommitted
+wording describes the original handoff; that evidence is included in this final
+documentation commit. Complete Batch #1/#2 evidence is preserved. Stop after
+Contact Inbox; About has not been started.
 
 ## Boundaries
 
