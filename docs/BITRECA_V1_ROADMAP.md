@@ -6,8 +6,9 @@ catalogue is deployed with authenticated Live interface and anonymous protection
 verified. Production catalogue remains empty; Live writes/uploads are unverified.
 S3 enquiry-only public catalogue is deployed, with its intentionally empty Live
 catalogue and access/not-found behavior verified. No populated Live claim.
-S4 manual-review requests are implemented/tested locally, with migration 0020
-applied. Release pending; production intake must remain disabled. S5 is unstarted.
+S4 is **Deployed — order intake disabled**, with migration 0020 applied. Live
+disabled behavior/access protections and owner-confirmed authenticated rendering
+passed; enabled production writes remain unverified. S5 is unstarted.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -22,7 +23,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S4 implemented/tested; migration applied, release pending | S3 empty Live catalogue preserved; S4 ships with intake disabled | S2 writes/uploads and populated Live behavior remain unverified; S5 decisions/launch pending |
+| Hardware / Dropshipping Store | S4 Deployed — order intake disabled | Migration 0020 applied; release 02a40f4; Live false gate/access checks and authenticated rendering passed | Enabled submissions/Turnstile, production writes/uploads and populated Live behavior unverified; S5 not started |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1668,6 +1669,58 @@ action test and one owner-authorized controlled Live request/operational check.
 
 Code deployment/Live disabled-check SHA/evidence follows after it occurs. Preserve
 all earlier deployment evidence. Stop after S4; do not configure payments or start S5.
+
+## Store S4 — Deployed — order intake disabled (2026-11-07)
+
+- Release **`02a40f4b3867d5420a94fd2dc01f70e8f3eeae19`**, title
+  `Add gated Store requests for manual review and protected admin workflow`.
+  Exact twenty-file staged scope/whitespace and prior-evidence preservation
+  passed. Ordinary push to main succeeded from f4559ef.
+- [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/60d6473c-4297-4b8a-962b-1929402bb3ec)
+  completed successfully. Active version
+  **`95526876-6e10-471e-b798-609a0163dc6f`** served 100% at
+  `2026-11-07T15:59:17.701958Z`.
+- Runtime binding metadata verified **STORE_ORDER_REQUESTS_ENABLED=false** as a
+  plain-text binding, existing D1 target unchanged, Contact settings present and
+  Contact Inbox still enabled. No secret values retrieved; no production gate
+  enablement, payment configuration or setting changes beyond the false gate.
+- bitreca.com and www.bitreca.com config GET returned **200, enabled=false,
+  siteKey=null**. Live /store/request/review at **1440/768/390px** rendered the
+  disabled notice and empty selection with **zero customer forms/CAPTCHA iframes**,
+  visible keyboard focus, no overflow and expected index-Bf0_H2Qb.js asset.
+  Mobile screenshot reviewed. No uncaught page exceptions.
+- One deliberately empty Live direct POST `{}` returned **503 intake_disabled**,
+  with no saved reference. No name/email/items/token were supplied. This proves
+  the server gate rather than testing an enabled request. No accepted write,
+  customer message, supplier action, product record, request record or upload.
+- Anonymous list/detail GET at /api/admin/store/requests returned **401**; direct
+  /admin/store/requests navigation redirected to /admin/login with no private UI.
+  Public request collection GET returned **405**, UUID detail GET **404**.
+- Owner confirmed after normal login that the **empty request list and detail
+  panel load without errors** at /admin/store/requests. Owner explicitly confirmed
+  no products/requests/uploads created and intake not enabled. Authenticated Live
+  rendering is passed on that evidence; not an agent-created/forged owner session.
+- Initial Node Live runner encountered an HTTPS connection timeout before its
+  page/API checks. Only unfinished checks were completed through Chrome; no local
+  suites, migrations or completed owner rendering check repeated. No application
+  fix was needed for the runner's connectivity issue.
+- Migration evidence remains the successful owner-authorized Wrangler apply:
+  **0020 only**, verified bitreca-db ID above, **14 commands**, additive schema
+  with no seeds/old-table changes. The declined follow-up SQL query was not
+  retried, and no fresh post-migration ledger/count inventory is claimed. Preflight
+  catalogue counts were zero; no production request/data generation was performed.
+- **Limits remain explicit:** no enabled production submission, real S4 Turnstile
+  action, request/snapshot persistence, review-status mutation or reply dispatch
+  verified on Live. S2 production writes/uploads and populated Live catalogue/media
+  remain unverified. Only local isolated fixtures exercised those paths. The only
+  Live intake POST was the empty denied gate probe. This is not an operational
+  order launch; no final price/delivery/payment or acceptance policy was invented.
+- Final roadmap-only evidence update committed/pushed as authorized. Previous
+  release records and limitations remain intact; earlier pending wording is
+  historical. Live runner/report/screenshots outside repo:
+  bitreca-store-s4-live.mjs, bitreca-store-s4-live-browser.mjs and
+  bitreca-store-s4-live-20261107 in user temp directory. Local QA server stopped.
+  S5 decisions remain in the section above. **Stop before S5; do not enable intake.**
 
 ## Boundaries
 
