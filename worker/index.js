@@ -10,6 +10,7 @@ import { legacyDeletionEnabled, handleLegacyDelete, retryLegacyDelete } from './
 import { handleContactRequest } from './contact-enquiry.js'
 import { handleAdminEnquiries } from './admin-enquiries.js'
 import { handleAdminStore } from './admin-store.js'
+import { handlePublicStore } from './public-store.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -341,6 +342,9 @@ if (
     )
   }
 }
+
+    const publicStore = await handlePublicStore(request, env)
+    if (publicStore) return publicStore
 
     // Production clean-scope fence: the separately enabled, authenticated
     // protocol-evidence endpoint may import a signature while data stays frozen.

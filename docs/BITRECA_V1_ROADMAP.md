@@ -4,6 +4,7 @@ Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
 verified. Production catalogue remains empty; Live writes/uploads are unverified.
+S3 enquiry-only public catalogue is implemented/tested locally; release pending.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -18,7 +19,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1 Verified Live; S2 deployed, authenticated Live interface and access protection verified | 0019 applied; release b6814c7; owner confirmed empty lists and New editors after normal login | Production writes/uploads explicitly unverified; S3/public catalogue and ordering unstarted |
+| Hardware / Dropshipping Store | S1/S2 evidence retained; S3 public catalogue implemented and locally verified | Production empty; S3 Git release/Live empty-state verification pending | S2 production writes/uploads remain unverified; no checkout/orders; S4 unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1403,6 +1404,96 @@ catalogue remains empty for owner entry. This confirmation adds no Live write
 claim and required no repeated checks, records, uploads or production setting
 changes. Owner authorized this final roadmap-only commit/push. All previous
 deployment/planning evidence is retained. Stop after S2; S3 remains unstarted.
+
+## Store S3 — implementation and local verification (2026-11-07)
+
+Owner authorized public enquiry-only catalogue/details, scoped release and Live
+empty-state/access checks, explicitly requiring no production records/uploads or
+enquiries. This supersedes the planning-stage populated Live item criterion:
+populated verification uses isolated fixtures, not invented Live merchandise.
+S2 production writes/uploads remain explicitly unverified.
+
+### Public visibility boundary
+
+- Reuses 0019/existing D1/R2. No migration, configuration, secret or resource
+  changes. New GET /api/store/categories and /api/store/products provide bounded
+  keyset pages (20 categories / 12 products), with validated category/cursor filters.
+  Direct detail GET /api/store/products/:slug joins product/category publication
+  state. Both must be published; drafts/archives/private categories are omitted
+  from lists and return generic 404 for direct detail/media/filter access.
+- Explicit product field allowlist: slug, title, sku, description, category_slug,
+  category_title, image_url, availability, availability_checked_at, price_minor,
+  currency, price_note; detail additionally specifications. Categories expose
+  only slug/title/description. Lists have nextCursor and optional selected public
+  category metadata. No SELECT * or database-row spread in public serialization.
+  Supplier/source references, internal notes, raw image keys, creation hashes,
+  IDs, admin versions/status fields/timestamps are not returned.
+- New GET/HEAD /api/store/products/:slug/image checks eligible publication on
+  every request before reading that product's current Store image from R2. No
+  arbitrary key/media listing; detached/missing/private images return 404.
+  JSON/images use no-store and nosniff; image MIME is restricted to the validated
+  Store image-key extension. No immutable caching or conditional 304 bypass.
+  Existing protected media/admin handlers and legacy project media remain unchanged.
+- SQL values bound; fixed query columns, strict methods/parameters/cursors and
+  generic safe failures. All public catalogue endpoints are read-only.
+
+### UI and enquiry integration
+
+- /store now browses owner-published categories/products with filter and product/
+  category pagination. /store/:slug provides detail, plain specifications, safe
+  responsive image/fallback, category/back links and price/availability context.
+  Loading, independent category/product retry, empty and not-found states included.
+  Invalid HTML/malformed data/private-field payloads are rejected by client guards.
+- Prices only from owner-entered minor-unit/currency fields, with owner price/tax
+  context on both cards and details. Known currencies use standard Intl minor-unit
+  conventions; unrecognized codes fall back to explicit raw minor units, not an
+  assumed conversion. Null prices say Price not listed. Unknown availability
+  remains unspecified; known availability is labelled owner-marked with its check
+  date, never silently upgraded to a current stock or delivery guarantee.
+- Product-specific Contact link passes only public slug/title/SKU via router
+  state. Minimal Contact initialization prepares editable message/reference and
+  Not sure yet service; name/email remain blank. No message is submitted, no
+  personal data placed in enquiry URLs, no new Contact API/schema/payload keys.
+- AdminStore copy-only notices updated because S2's historical "published stays
+  private" description would be false after S3. They now explain eligible public
+  publication and private drafts/archives/internal fields. No management workflow
+  change or repeat S2 QA. One obsolete S2 test assertion that all public Store
+  APIs must be absent was narrowed to retained admin/raw-media protection.
+- No checkout, cart, payments, order acceptance, supplier integration or new
+  stock/price/delivery promise. Existing general-contact/software links retained.
+
+### Verified local checks / release boundary
+
+- **7 S3-focused tests passed**, including actual bundled workerd/D1/R2: exact
+  allowlists; all product/category publication combinations, including deliberately
+  inconsistent memory-only fixtures; direct media GET/HEAD; publication withdrawal;
+  detachment/missing media; no cache escape; pagination/filter-bound cursors;
+  invalid parameters/methods; safe failures; strict client/image/price guards;
+  literal text and bounded product-specific enquiry fields. No S1/S2/Contact
+  Inbox suite was repeated; fixtures never imported by production code.
+- Scoped ESLint passed, including the two necessary Contact/admin copy integration
+  files. Required final npm.cmd run build passed for Worker/client; release assets
+  index-BQyFDH-T.js and index-CPeeD1S6.css. Whitespace/staged scope checked before push.
+- Chrome built-UI checks at **1440/768/390px** against a loopback-only real-handler/
+  in-memory SQLite/R2 server: listing/detail screenshots, no overflow, accessible
+  focus, category filtering, 12/12/2 pagination and back navigation, portrait/
+  missing/broken image behavior, hidden/unknown detail not-found, plain script-like
+  content and price/date wording. Empty/loading/error/retry/HTML/malformed JSON,
+  independent category retry and category 20-row paging passed.
+- Contact CTA prefilled the correct public product reference while leaving name/
+  email blank; zero application mutation requests, no saved-success UI and zero
+  local enquiry submissions. These are new integration checks, not full Contact QA.
+- Temporary artifacts outside repo: bitreca-store-s3-server.mjs,
+  bitreca-store-s3-qa.mjs and bitreca-store-s3-qa-20261107. Synthetic images are
+  generated local PNGs, not product assets. Local server stopped after QA.
+- Pre-release production count-only SELECTs confirmed **0 categories / 0 products**,
+  metadata rows_written=0/changed_db=false. No migrations, production records,
+  images or enquiries created. Earlier deployment evidence and S2 write/upload
+  limitation retained. No time-spent claim or physical-device certification.
+- Live empty catalogue verification and release SHA follow after deployment.
+  Populated Live catalogue, real product media and product-specific Live enquiry
+  remain unavailable/unverified while production is intentionally empty. This is
+  not a populated shop and cannot accept orders. Stop after S3; do not begin S4.
 
 ## Boundaries
 

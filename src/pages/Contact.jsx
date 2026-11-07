@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { storeEnquiryFields } from '../utils/publicStore'
 import ContactTurnstile from '../components/ContactTurnstile'
 import { contactInterests as interests, contactRecipient, contactWhatsAppUrl, formatContactBrief, validateContact as validate } from '../../shared/contact-enquiry'
 import './Contact.css'
@@ -7,7 +8,8 @@ import './Contact.css'
 const emptyFields = { name: '', email: '', service: '', message: '', phone: '', whatsappConsent: false, website: '' }
 
 function Contact() {
-  const [fields, setFields] = useState(emptyFields)
+  const { state } = useLocation()
+  const [fields, setFields] = useState(() => ({ ...emptyFields, ...storeEnquiryFields(state) }))
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState({ kind: 'idle', text: '' })
   const [manualBrief, setManualBrief] = useState('')

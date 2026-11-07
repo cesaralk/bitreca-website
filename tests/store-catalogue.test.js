@@ -105,10 +105,10 @@ test('product lifecycle, category guards, private source/notes and optimistic ed
   assert.equal((await edit(f, cookie, 'products', created.id, p, 4)).status, 409)
 })
 
-test('published records and private Store images have no public API or legacy media escape', async t => {
+test('admin records and raw Store images have no public admin or legacy media escape', async t => {
   const f = fixture(t), cookie = await f.login(), c = await create(f, cookie, 'categories', category({ status: 'published' }))
   assert.equal(c.response.status, 201)
-  for (const path of ['/api/store/categories', '/api/store/products', '/api/products', '/api/store/products/' + c.id, '/api/media/store-catalogue/' + c.id + '.png', '/api/media/store-catalogue%2f' + c.id + '.png']) assert.equal((await f.call(path)).status, 404)
+  for (const path of ['/api/products', '/api/store/products/' + c.id, '/api/media/store-catalogue/' + c.id + '.png', '/api/media/store-catalogue%2f' + c.id + '.png']) assert.equal((await f.call(path)).status, 404)
   assert.equal((await f.call('/api/admin/store/categories/' + c.id)).status, 401)
 })
 

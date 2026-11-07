@@ -12,6 +12,7 @@ import Home from './pages/Home'
 import Services from './pages/Services'
 import Products from './pages/Products'
 import Store from './pages/Store'
+import StoreProduct from './pages/StoreProduct'
 import Projects from './pages/Projects'
 import PortfolioForest from './pages/PortfolioForest'
 import ProjectDetails from './pages/ProjectDetails'
@@ -44,6 +45,7 @@ function AppContent() {
         <Route path="/services" element={<Services />} />
         <Route path="/products" element={<Products />} />
         <Route path="/store" element={<Store />} />
+        <Route path="/store/:slug" element={<StoreProduct />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/portfolioforest" element={<PortfolioForest />} />
         <Route path="/portfolio/demo" element={<PortfolioTemplate />} />

@@ -73,3 +73,44 @@ html:has(.hardware-store-page) { scroll-behavior: auto; }
   .hardware-store-page .hardware-store-primary { transition: none; }
   html:has(.hardware-store-page) { scroll-behavior: auto; }
 }
+
+/* S3: owner-published enquiry-only catalogue. */
+.catalogue-categories, .catalogue-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 24px; }
+.catalogue-categories a, .hardware-store-page button, .catalogue-pagination > a { min-height: 44px; padding: 10px 16px; border: 1px solid #365582; border-radius: 8px; background: var(--bg-secondary); font: inherit; color: #dbeafe; cursor: pointer; }
+.catalogue-categories a[aria-current="page"] { border-color: #60a5fa; background: #142c4e; }
+.hardware-store-page button:hover:not(:disabled), .catalogue-categories a:hover { background: #142c4e; }
+.hardware-store-page button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 4px; }
+.hardware-store-page button:disabled { cursor: default; opacity: .5; }
+.catalogue-category-state { font-size: 14px; margin-bottom: 28px; }
+.catalogue-state { padding: 36px; border: 1px solid var(--hardware-store-line); border-radius: 14px; background: var(--bg-secondary); }
+.catalogue-state p:last-child { margin-bottom: 0; }
+.catalogue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.catalogue-card { min-width: 0; overflow: hidden; border: 1px solid var(--hardware-store-line); border-radius: 14px; background: var(--bg-secondary); }
+.catalogue-card-content { padding: 24px; }
+.catalogue-card-content :is(h3, p, a) { overflow-wrap: anywhere; }
+.hardware-store-page .catalogue-card h3 { font-size: 24px; }
+.catalogue-card h3 a:hover { color: var(--brand-blue-light); }
+.catalogue-description { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.hardware-store-page .catalogue-price { color: #e2e8f0; font-weight: 700; margin-bottom: 10px; }
+.catalogue-availability { font-size: 14px; }
+.catalogue-price-note { font-size: 13px; white-space: pre-wrap; }
+.catalogue-image { aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; background: #101b2d; }
+.catalogue-image img { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.catalogue-image-fallback { padding: 24px; text-align: center; }
+.catalogue-image-fallback > span { font-size: 42px; color: var(--brand-blue-light); }
+.catalogue-image-fallback p { margin-block: 12px 0; font-size: 14px; }
+.catalogue-detail { padding-block: 48px 88px; }
+.catalogue-detail > a:first-child { margin-bottom: 32px; }
+.catalogue-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+.catalogue-detail-grid > * { min-width: 0; }
+.hardware-store-page .catalogue-detail h1 { font-size: clamp(32px, 3.5vw, 48px); letter-spacing: -1.4px; overflow-wrap: anywhere; }
+.catalogue-detail-grid .catalogue-image { border: 1px solid var(--hardware-store-line); border-radius: 14px; }
+.catalogue-plain-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.hardware-store-page .catalogue-detail-price { color: var(--text-primary); font-size: 24px; font-weight: 700; }
+.catalogue-sku { font-size: 13px; overflow-wrap: anywhere; }
+.catalogue-enquiry { margin-block: 28px; }
+.catalogue-enquiry p { font-size: 13px; margin-top: 14px; }
+.catalogue-order-notice { border-left: 2px solid var(--brand-blue); padding-left: 16px; font-size: 14px; }
+.catalogue-specifications { margin-top: 56px; padding-top: 36px; border-top: 1px solid var(--hardware-store-line); }
+@media (max-width: 1000px) { .catalogue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .catalogue-detail-grid { gap: 28px; } }
+@media (max-width: 700px) { .catalogue-grid, .catalogue-detail-grid { grid-template-columns: 1fr; } .catalogue-state { padding: 24px; } .catalogue-detail { padding-block: 32px 60px; } }
