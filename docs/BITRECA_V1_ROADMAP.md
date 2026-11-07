@@ -1,6 +1,7 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-07. Task #6 Contact Inbox/Admin is **Verified Live** following
+Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
+Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
@@ -12,7 +13,7 @@ milestones need inspection and user agreement before work starts.
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
-| About: factual company introduction | Implemented; focused local QA passed | Local release prepared; Live verification pending | Authorized Git deployment and targeted Live check |
+| About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Dropshipping Store: content and intended V1 behavior | Pending; outside Task 4 scope | Deployment unverified | Scope/effort to be agreed separately |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
@@ -908,6 +909,36 @@ Verification:
 
 Live deployment/verification is pending this pre-commit record; no Live result
 is claimed yet. Stop after About; no Store work was started.
+
+## About — Verified Live (2026-11-07)
+
+- Release SHA **`e59a5c1e1eb235fb1ab79dca7798a59632011d9b`**, title
+  `Complete responsive About page with factual Bitreca introduction`.
+  Exact three-file staged manifest and whitespace passed; normal push to main
+  succeeded from 7764e72. No unrelated files or configuration changes.
+- [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/7f98d64e-3465-4b3e-830e-da4f273c26d3)
+  completed with success for the release. Read-only history showed version
+  **`a2b5776c-1652-4c21-8858-d5b178776ca6`** at 100%, deployed
+  `2026-11-07T07:39:50.849193Z`.
+- `https://bitreca.com/about` returned HTTP 200 with expected release assets
+  `/assets/index-Ar5wbe2d.js` and `/assets/index-CaPd-E2O.css`.
+- Live Chrome checks passed at **1440/768/390px**: correct sections and one H1,
+  valid labels, no horizontal overflow, visible keyboard focus, Enter navigation
+  to Services/Projects/Contact, fragment target IDs, responsive menu behavior and
+  reduced-motion transition setting. Live screenshots/report retained beside
+  local artifacts in bitreca-about-qa-20261107; mobile screenshot reviewed.
+- No uncaught page exceptions or application mutation requests. Existing
+  Cloudflare `POST /cdn-cgi/rum` analytics beacons were observed; temporary runner
+  initially counted those as mutations, then correctly classified them separately.
+  No application change or production setting change was needed.
+- Read-only runtime metadata confirmed the existing D1 binding and all Contact
+  settings remained present, with inbox enabled. No Contact Inbox submission,
+  authentication or admin QA was repeated, and no production data was changed.
+- **Verified Live.** This final roadmap-only commit/push includes actual release
+  evidence; earlier pending wording is historical. Batch #1/#2 and Contact Inbox
+  evidence remains intact. No blocker in the checked scope. Physical-device,
+  screen-reader and cross-browser certification were not performed. No new Store
+  work; stop after About.
 
 ## Boundaries
 
