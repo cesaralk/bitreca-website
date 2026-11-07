@@ -26,6 +26,7 @@ import AdminLayout from './components/AdminLayout'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminEnquiries from './pages/AdminEnquiries'
+import AdminStore from './pages/AdminStore'
 import PortfolioTemplate from './pages/PortfolioTemplate'
 
 function AppContent() {
@@ -53,6 +54,7 @@ function AppContent() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin/enquiries" element={<ProtectedAdminRoute><AdminLayout><AdminEnquiries /></AdminLayout></ProtectedAdminRoute>} />
+        <Route path="/admin/store" element={<ProtectedAdminRoute><AdminLayout><AdminStore /></AdminLayout></ProtectedAdminRoute>} />
 
 <Route
   path="/admin/login"

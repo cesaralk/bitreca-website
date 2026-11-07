@@ -9,6 +9,7 @@ import { loadLegacyReconciliation } from './portfolio-legacy-reconciliation.js'
 import { legacyDeletionEnabled, handleLegacyDelete, retryLegacyDelete } from './portfolio-legacy-deletion.js'
 import { handleContactRequest } from './contact-enquiry.js'
 import { handleAdminEnquiries } from './admin-enquiries.js'
+import { handleAdminStore } from './admin-store.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -480,6 +481,10 @@ if (url.pathname.startsWith('/api/admin/') && url.pathname !== '/api/admin/login
 // authentication system or any change to other admin/portfolio routes.
 if (url.pathname === '/api/admin/enquiries' || url.pathname.startsWith('/api/admin/enquiries/')) {
   return handleAdminEnquiries(request, env)
+}
+
+if (url.pathname === '/api/admin/store' || url.pathname.startsWith('/api/admin/store/')) {
+  return handleAdminStore(request, env)
 }
 
 // Upload media to R2

@@ -1,7 +1,8 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
-Store S1 introduction/category directory is **Verified Live**; later Store milestones are unstarted.
+Store S1 introduction/category directory is **Verified Live**. S2 private admin
+catalogue is implemented; authorized migration applied, code release pending.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -16,7 +17,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1 Verified Live | Introduction/category directory at release f1c2c04; no catalogue, checkout or order acceptance | S1 complete; S2 remains unstarted and requires separate authorization/inputs |
+| Hardware / Dropshipping Store | S1 Verified Live; S2 implementation tested, release pending | Introduction at f1c2c04 remains public; additive 0019 applied, no production records | Deploy S2 private admin; S3/public catalogue and ordering unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1230,6 +1231,107 @@ and all later milestones remain unstarted. No measured task-time claim.
   started. Physical-device/cross-browser/screen-reader certification was not
   performed. This final roadmap-only update is committed/pushed separately as
   authorized; earlier pending wording is historical. Stop after S1.
+
+## Store S2 — implementation and authorized migration (2026-11-07)
+
+Owner authorized S2 schema/private admin workflows, additive migration and scoped
+Git release. Earlier S1/planning statements are historical. No S3/public
+catalogue API, checkout, order acceptance, payment, supplier integration or
+operating policy was implemented. No sample catalogue data is seeded.
+
+### Implementation and privacy
+
+- New /admin/store uses existing ProtectedAdminRoute, AdminLayout and useAdminApi;
+  existing sidebar Store link now resolves. New Worker dispatch is after existing
+  session and mutation-origin checks. Authentication implementation is unchanged.
+- Category/product create, paginated twenty-row lists/status filtering, private
+  detail/edit, draft/published/archive states and optimistic version checks.
+  Category choice pagination supports more than twenty categories. Public Store
+  remains S1 regardless of admin publication status; published means owner-approved
+  for a future catalogue, not a public listing in S2. No destructive delete API.
+- Simple products include unique normalized SKU/slug, category, title/description,
+  plain specifications, private Store image key, optional explicit price_minor/
+  currency/price context, availability/check date and private supplier reference/
+  internal notes. Draft/unknown/no-price are defaults; no assumed currency,
+  supplier, stock or commercial policy. Publishing requires description/image,
+  published category and price context if a price is supplied. Non-unknown
+  availability requires a valid non-future check date.
+- Strict field whitelist, type/length/date/slug/SKU/price validation, bounded JSON,
+  bound SQL, generic sanitized errors, no new content/SQL/token logging, no-store
+  responses. Client-generated UUID plus creation digest protects create retries;
+  changed duplicate content conflicts, and versioned edits prevent lost updates.
+- Store-only SQL triggers enforce category/product lifecycle even across races:
+  unpublish published products before unpublishing a category; archive its active
+  products before archiving it. Archived SKU/slug remains reserved. No cascades.
+- Reuses existing bitreca_media binding under separate store-catalogue/UUID
+  namespace, with new authenticated upload/read endpoints. Raw JPEG/PNG/WebP
+  uploads bounded at 2 MB/five seconds and checked for file signature. No SVG,
+  external URL, path traversal or public image endpoint. Existing public project
+  media handler rejects Store keys and is unchanged. Lists exclude private notes
+  and supplier references; full details and images require owner authorization.
+- Read-only bucket settings confirmed managed r2.dev access disabled and no
+  custom public domains. S3 must explicitly whitelist public product fields and
+  review published image access separately; never expose private detail payloads.
+- Uploaded/replaced/detached images are retained, not deleted automatically. Owner
+  must use approved imagery and avoid unnecessary personal/secrets in notes. No
+  media purge, hard record deletion or shared portfolio cleanup integration.
+
+### Focused verification
+
+- **10 Store-focused tests passed:** nine in-memory SQLite/auth/API tests plus
+  actual bundled workerd D1/R2/session lifecycle test. Covers additive schema and
+  preserved sentinel rows/auth, validation, anonymous/forged/expired/revoked
+  denial, mutation origin, create/replay/conflict, unique identifiers, category
+  state guards, version conflicts, private list/detail/media, no public routes,
+  upload types/signatures/limits, pagination/filter/body errors, concurrent
+  creates, lost acknowledgement recovery and safe database failure responses.
+- Runtime harness was bundled using installed esbuild after direct Miniflare
+  loading failed to resolve shared modules; no app dependency/config change.
+  Additive assertion distinguishes ON DELETE RESTRICT from destructive SQL.
+  No historical or Contact Inbox tests rerun.
+- Scoped ESLint passed for all changed JS/JSX/tests with no warnings after fixing
+  a new cleanup-ref warning. Required build passed: index-DFVrRiCS.js and
+  index-DPBgnH_Y.css, with Worker/client bundles built successfully.
+- Built UI with real Worker handlers/SQLite/auth and memory R2 at localhost:6202:
+  Chrome **1440/768/390px** category/product creation, edit, private upload/preview,
+  publish/archive, list filtering, conflict/reload and keyboard focus passed.
+  Category pagination 20+5, choices load-more, list failure/recovery and revoked
+  session redirect passed. Script-like titles stayed literal; no uncaught browser
+  exception or overflow. Screenshots at desktop/mobile reviewed. All records,
+  credentials and files were explicitly synthetic/in-memory, never production.
+- Temporary helpers/artifacts outside repository: bitreca-store-s2-server.mjs,
+  bitreca-store-s2-qa.mjs and bitreca-store-s2-qa-20261107 in user temp directory.
+  No completed S1/Contact Inbox QA repeated; no physical-device/cross-browser or
+  screen-reader certification claimed. No unmeasured effort/time-spent claim.
+
+### Migration / release boundary
+
+Configured bitreca_db verified against production bitreca-db,
+**8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a**, by local configuration and read-only
+active runtime metadata. Remote ledger showed 0018 latest, no Store tables;
+`wrangler d1 migrations list bitreca-db --remote` showed **0019 as sole pending**.
+Inspected 0019: only two new tables, five indexes and three Store-only triggers,
+no seeds, existing table changes or data deletion.
+
+Owner-authorized `wrangler d1 migrations apply bitreca-db --remote` succeeded
+for **0019_add_store_catalogue.sql only**, executing eleven commands including
+the migration bookkeeping. No older migration or 0018 replay. No credentials,
+configuration, DNS, binding or resource changes. Production records remain for
+owner entry; code deployment/Live checks follow after they actually occur.
+
+Release files: migrations/0019_add_store_catalogue.sql; shared/store-catalogue.js;
+worker/admin-store.js; worker/index.js (import/protected dispatch only);
+src/pages/AdminStore.jsx; src/pages/AdminStore.css; src/App.jsx (protected route);
+tests/store-catalogue.test.js; tests/store-catalogue-runtime.test.js; this roadmap.
+
+Rollback: revert only the reviewed code/version if needed; retain new Store
+tables, records and uploaded files. No destructive migration reversal or deletion
+of existing portfolio/project/auth/enquiry data. Keep S1 unchanged. Production
+catalogue writes must remain untested if verifying them would violate the empty
+owner-entry requirement; report that limitation rather than create fake listings.
+Authenticated Live UI verification may need the owner to log in; do not retrieve
+credentials, forge a session or claim an authenticated Live result without it.
+Stop after S2; S3 remains unstarted.
 
 ## Boundaries
 
