@@ -1,7 +1,7 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
-Store S1 introduction/category directory is implemented; release verification is pending.
+Store S1 introduction/category directory is **Verified Live**; later Store milestones are unstarted.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -16,7 +16,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1 implemented; focused local QA passed | Introduction/category directory release pending; no catalogue, checkout or order acceptance | Deploy and verify S1 only; S2 remains unstarted |
+| Hardware / Dropshipping Store | S1 Verified Live | Introduction/category directory at release f1c2c04; no catalogue, checkout or order acceptance | S1 complete; S2 remains unstarted and requires separate authorization/inputs |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1197,6 +1197,39 @@ Verified locally against the final production build:
 Live verification is pending this pre-commit record. This is an introduction,
 not a populated catalogue and not an operational shop. S2 tables/admin management
 and all later milestones remain unstarted. No measured task-time claim.
+
+## Store S1 — Verified Live (2026-11-07)
+
+- Release **`f1c2c04b8053e32a3013c17dc44c669ded0e1c12`**, title
+  `Complete Store introduction and hardware category directory`. Exact three-file
+  manifest/whitespace passed; ordinary main push succeeded from 459ba05.
+- [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/d1390c08-625e-43c0-be75-169b070fd7ce)
+  completed successfully. Read-only deployment history shows version
+  `5328f93b-2021-46f6-bcf5-32914f108421` at 100%, deployed
+  `2026-11-07T08:13:48.872228Z`.
+- `https://bitreca.com/store` returned HTTP 200 with release assets
+  `/assets/index-hxX8CCHl.js` and `/assets/index-DMY04gwX.css`.
+- Live Chrome checks passed at **1440/768/390px**: truthful unavailable-checkout/
+  no-orders notice; five category guides; labelled sections and one H1; six
+  keyboard anchor jumps scrolled to visible targets; visible Tab focus;
+  mobile/tablet menu; Contact/Products links; no horizontal overflow; reduced
+  motion settings. Screenshots/report saved alongside local artifacts; Live
+  mobile screenshot reviewed.
+- Six WhatsApp hrefs verified for official recipient, reviewable category/general
+  text, new-tab notice and noopener/noreferrer. No external WhatsApp message,
+  Contact enquiry, order or application mutation was sent. No uncaught browser
+  exceptions. Existing Cloudflare analytics are not application mutation checks.
+- Runtime metadata confirms existing D1 binding and Contact settings remain
+  present with inbox enabled. No production configuration, schema, API, admin
+  feature or completed page was modified or re-QA'd. All earlier deployment and
+  planning evidence remains intact.
+- **S1 Verified Live; no blockers in this milestone.** This is an introduction
+  and category directory, not a populated catalogue or a store ready for orders.
+  Supplier, fulfilment, currency, delivery and payment decisions in the plan
+  remain unanswered. S2 catalogue tables/admin and later milestones are not
+  started. Physical-device/cross-browser/screen-reader certification was not
+  performed. This final roadmap-only update is committed/pushed separately as
+  authorized; earlier pending wording is historical. Stop after S1.
 
 ## Boundaries
 
