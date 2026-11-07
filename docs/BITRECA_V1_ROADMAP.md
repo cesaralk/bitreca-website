@@ -2,8 +2,8 @@
 
 Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
-catalogue is deployed; anonymous Live protections verified, authenticated Live
-interface confirmation pending. Production catalogue remains empty for owner entry.
+catalogue is deployed with authenticated Live interface and anonymous protections
+verified. Production catalogue remains empty; Live writes/uploads are unverified.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -18,7 +18,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S1 Verified Live; S2 deployed with focused local QA and Live access protection verified | 0019 applied; release b6814c7; zero categories/products; authenticated Live UI confirmation pending | Owner checks private empty UI without saving; Live writes unverified; S3/public catalogue and ordering unstarted |
+| Hardware / Dropshipping Store | S1 Verified Live; S2 deployed, authenticated Live interface and access protection verified | 0019 applied; release b6814c7; owner confirmed empty lists and New editors after normal login | Production writes/uploads explicitly unverified; S3/public catalogue and ordering unstarted |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1379,6 +1379,30 @@ Stop after S2; S3 remains unstarted.
   release wording is historical. Live protection report/helper outside repo:
   bitreca-store-s2-live.mjs and bitreca-store-s2-live-20261107. Temporary local
   server stopped after QA. No total task-time claim. Stop after S2.
+
+## Store S2 — owner-confirmed authenticated Live interface (2026-11-07)
+
+Owner confirmed after normal login at /admin/store:
+
+- Categories and Products both show empty lists.
+- New category and New product editors open successfully.
+- No record was saved and no image was uploaded.
+
+**S2 is deployed with its authenticated Live interface verified.** This owner
+confirmation supersedes the earlier pending-authenticated-interface statements,
+which remain intact as historical release evidence. Release SHA remains
+**b6814c7ebdb650789de5076670362ec48c965c9e**; migration 0019 and the verified
+anonymous/API protections are unchanged. The preceding roadmap evidence commit
+408bfcb0c8a1c2a32720c642341c6f827b51d80f was pushed and its Cloudflare build
+completed successfully.
+
+**Production write/upload workflows remain explicitly unverified:** category/
+product create/edit, image upload, publish/unpublish/archive and conflict handling
+were tested only in isolated local SQLite/workerd/R2/browser fixtures. Production
+catalogue remains empty for owner entry. This confirmation adds no Live write
+claim and required no repeated checks, records, uploads or production setting
+changes. Owner authorized this final roadmap-only commit/push. All previous
+deployment/planning evidence is retained. Stop after S2; S3 remains unstarted.
 
 ## Boundaries
 
