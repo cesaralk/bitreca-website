@@ -16,6 +16,8 @@ retained. This verifies request intake/review, not payment or fulfilment. S5 is
 **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
 Permanent Store product deletion is **Verified Live** for the authorized disposable
 draft/image check; migration 0021, release and preservation evidence are below.
+Shared public navigation and Footer are **Verified Live** at b5fcb58; focused
+desktop/mobile navigation and unchanged carousel placement passed on production.
 Task #6 Contact Inbox/Admin is **Complete — Verified Live**. The original success
 and the owner-confirmed 2026-11-08 submission/inbox/status recheck are recorded below.
 Projects Batch #2 remains Live. Batch #1 remains
@@ -34,7 +36,7 @@ milestones need inspection and user agreement before work starts.
 | Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; COD/Wish Money selected by owner, with no online gateway; real supplier/fulfilment, pricing/tax and practical manual-payment instructions/reconciliation remain outside this Contact task |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
-| Shared navigation/footer and cross-page entry behavior | Local focused QA complete — release pending | Existing Navbar/Footer finalized; desktop/mobile route, anchor, focus, menu and placement checks passed | Commit/deploy and targeted read-only Live navigation verification pending; no page-body or workflow QA rerun |
+| Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
 
 Current owner decision (2026-11-08): V1 uses **Cash on Delivery and Wish Money**;
@@ -2146,7 +2148,7 @@ tests and previous browser/build evidence were reused. No broad QA was repeated.
 
 ## Shared navigation and footer — finalization (2026-11-08)
 
-**Local focused QA complete — release/Live verification pending.** Starting main
+**Complete — Verified Live.** Starting main
 **25892bdbd935500722bd2cc04a3e1f90b68d5597** was clean and matched origin/main after
 fetch. Existing page/Contact/Store/PortfolioForest QA and deployment evidence were
 reused; only shared navigation/footer behavior was tested, not completed features.
@@ -2210,11 +2212,43 @@ reused; only shared navigation/footer behavior was tested, not completed feature
   historical suites run. GET-only local synthetic fixtures/read-only browser guard
   recorded zero application mutations and no uncaught browser exceptions. Reports
   and screenshots remain outside repo in `bitreca-nav-final-20261108` under temp.
-- Intended release is exactly **Navbar.jsx, Navbar.css, Footer.jsx, Footer.css and
-  this roadmap**. Commit/deployment/read-only Live evidence will follow after the
-  release; no Live claim for these new changes yet. No measured task-duration claim.
+- Release is exactly **Navbar.jsx, Navbar.css, Footer.jsx, Footer.css and this
+  roadmap**. No measured task-duration claim.
 
-Remaining V1 scope after successful Live confirmation: S5 owner-approved real
+### Release and read-only Live evidence
+
+- Commit **`b5fcb5888de60e516e2d332f291522353944de83`**, title
+  `Finalize shared navigation, mobile menu and footer links`, reviewed five-file
+  scope and whitespace check passed. Ordinary push from 25892bd to main succeeded.
+  [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/072cbc32-63de-4656-b6c7-5abdc3d844f6)
+  completed successfully. Verified version
+  **`28dbaf11-4aed-4630-abe4-457e7558d8ed`** served 100%, deployed at
+  `2026-11-08T17:16:19.091596Z` (19:16:19 Asia/Beirut).
+- **https://bitreca.com, Chrome 1440/390px:** actual keyboard activation through
+  Home, Services, Products, Store, Projects, PortfolioForest, About and Contact.
+  Correct destination/heading focus, one active-page marker, closed mobile menu,
+  correct 80/70px header and zero horizontal overflow at every destination.
+- Footer About link returned to page top; all four service links reached and
+  focused their real section cards. Approved email and WhatsApp URLs and safe
+  new-tab attributes checked without opening/sending external messages. Footer
+  keyboard focus remained visible; desktop/mobile Footer layout had no overflow.
+- PortfolioForest main remained the next element after Navbar; its existing first
+  gallery still contains the carousel and meets the Navbar bottom. This is a
+  placement check, not a repeat of carousel controls, portfolio publishing,
+  hosting or permanent-deletion QA. Approved page contents were not redesigned.
+- Live browser guard recorded **zero application mutation attempts** and **zero
+  uncaught browser exceptions**. No forms submitted, customers contacted, portfolio/
+  product/request/message/stock data changed, uploads or admin actions performed.
+  GET-only navigation/data reads are the only application operations in this check.
+- Post-deployment runtime metadata matched the existing protected-binding
+  fingerprint exactly: **Store intake=true**, Contact settings and D1/R2/auth/
+  PortfolioForest flags unchanged. No configuration, secret, migration or resource
+  operation was part of this release. No online gateway is needed or configured.
+- Final roadmap-only evidence update is committed/pushed separately. All earlier
+  deployment/Contact/Store/deletion evidence remains intact. Scope is **Complete —
+  Verified Live** with no navigation/Footer blocker; stop after this task.
+
+Remaining V1 scope: S5 owner-approved real
 catalogue/suppliers, fulfilment/delivery, operational policies and practical manual
 COD/Wish Money instructions/reconciliation. No online gateway is required. This
 task does not begin operational launch or certify a full site-wide content audit.
