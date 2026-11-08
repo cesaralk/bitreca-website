@@ -1,14 +1,17 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-07. About is **Verified Live**; release evidence is below.
+Updated: 2026-11-08. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
-verified. Production catalogue remains empty; Live writes/uploads are unverified.
-S3 enquiry-only public catalogue is deployed, with its intentionally empty Live
-catalogue and access/not-found behavior verified. No populated Live claim.
+verified. Owner-authorized demo category/product create, edit, upload and publication
+workflows now pass on Live; earlier empty-catalogue limitations are historical.
+S3 enquiry-only public catalogue is deployed, with three clearly labelled demo
+products, category browsing, details, images and Contact prefill verified on Live.
+This validates demo content only; it is not a real merchandise or fulfilment claim.
 S4 is **Deployed — order intake disabled**, with migration 0020 applied. Live
 disabled behavior/access protections and owner-confirmed authenticated rendering
-passed; enabled production writes remain unverified. S5 is unstarted.
+passed; enabled production request writes remain unverified. S5 is
+**Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -23,7 +26,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S4 Deployed — order intake disabled | Migration 0020 applied; release 02a40f4; Live false gate/access checks and authenticated rendering passed | Enabled submissions/Turnstile, production writes/uploads and populated Live behavior unverified; S5 not started |
+| Hardware / Dropshipping Store | S4 Deployed — order intake disabled; S5 Demo validation in progress — operational launch blocked by supplier/fulfilment decisions | Migration 0020 applied; release 02a40f4; authorized demo create/edit/upload/publication, anonymous privacy, populated catalogue and Contact prefill verified Live on 2026-11-08 | Demo-only catalogue; enabled request submissions/Turnstile, request/status writes, archiving and operational fulfilment remain unverified; intake stays disabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1104,6 +1107,10 @@ Live without a real customer order. Report **workflow deployed, not order-ready*
 
 #### S5 — Controlled manual-order launch and operational handover (8–16 hours)
 
+Current status: **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
+The owner-authorized 2026-11-08 demo validation below does not authorize enabling
+intake, accepting orders, configuring payments or making supplier commitments.
+
 Publish approved delivery, payment, cancellation/returns/warranty and privacy
 information in the Store flow; enable the approved method only after owner
 acceptance. Order request receipt must say pending review, not paid/accepted.
@@ -1721,6 +1728,118 @@ all earlier deployment evidence. Stop after S4; do not configure payments or sta
   bitreca-store-s4-live.mjs, bitreca-store-s4-live-browser.mjs and
   bitreca-store-s4-live-20261107 in user temp directory. Local QA server stopped.
   S5 decisions remain in the section above. **Stop before S5; do not enable intake.**
+
+## Store demo catalogue — authorized production validation (2026-11-08)
+
+**S5: Demo validation in progress — operational launch blocked by supplier/fulfilment decisions.**
+**S4 remains Deployed — order intake disabled.** These demos are visible for
+website testing, not available to purchase. This section supersedes only the
+earlier empty-production/create-edit-upload/publication/populated-catalogue
+limitations for the workflows actually checked below. All preceding release,
+migration, Batch #1/#2, Contact and Store evidence remains intact and historical.
+
+### Authorized records and identifiers for later archiving
+
+The owner explicitly authorized these three demo products and original DEMO
+placeholder images. Existing supported fields store prices as integer USD cents;
+no schema, Worker, authentication, binding, secret or deployment-setting changes.
+
+| Product / public detail | Category | Product UUID | SKU | Illustrative price / stored minor units | Final status / version |
+| --- | --- | --- | --- | --- | --- |
+| [DEMO — Laptop Stand](https://bitreca.com/store/demo-laptop-stand) | Accessories | `352acb68-426f-40d6-b07e-9072e554f3e7` | `BITRECA-DEMO-LAPTOP-STAND` | USD 15 / `1500` | published / 2 |
+| [DEMO — Wireless Mouse](https://bitreca.com/store/demo-wireless-mouse) | Accessories | `30d6f5ba-17e6-449f-85fe-886eebcc7a2d` | `BITRECA-DEMO-WIRELESS-MOUSE` | USD 12 / `1200` | published / 2 |
+| [DEMO — Desk Lamp](https://bitreca.com/store/demo-desk-lamp) | Home & Desk | `f5b991e6-fbe4-4a83-9113-fb12328abd36` | `BITRECA-DEMO-DESK-LAMP` | USD 20 / `2000` | published / 4 |
+
+- Created [Accessories](https://bitreca.com/store?category=accessories), category
+  UUID `5b3d2e37-3f3a-4fdc-8614-41e5cc064d45`, initially draft then published,
+  final version 2. Its description includes the exact demo disclaimer below.
+- Reused existing published [Home & Desk](https://bitreca.com/store?category=home-desk),
+  UUID `7899e64b-7aa8-45f9-a978-570ce6d276f3`, version 1, without editing it.
+  Existing Computer Accessories category and unrelated draft Laptop Stand were
+  preserved. Existing-record IDs, statuses, versions and other list fields matched
+  the preflight inventory after publication; no duplicate demo records were made.
+- All three product descriptions are exactly:
+  **"Demo item for website testing only. Not available for purchase. Price is illustrative."**
+  Price notes independently explain illustrative pricing, not an offer for sale
+  or tax/payment/delivery terms. Specifications assert no actual capabilities.
+  Availability stays `unknown`, checked date null, supplier reference blank;
+  private notes identify the authorized demo purpose. No inventory was invented.
+- Original geometric SVG drawings were rendered to 1120×840 PNG placeholders,
+  all under 71 KB, visibly marked **DEMO**, **NOT AVAILABLE FOR PURCHASE** and
+  **Illustrative price only**. Uploaded through the authenticated Store image
+  input, using the existing private media API/R2 path; no external imagery used.
+  Product-to-image keys, in the table's order:
+  `store-catalogue/c4929e09-90e3-40c7-9672-ac7e1d4ec8bb.png`,
+  `store-catalogue/d2df7b69-9dd5-4a3d-91e1-8e13f79b5a27.png`,
+  `store-catalogue/6287889b-b3d9-40a3-b26e-0baae6f775ac.png`.
+  Retain these identifiers for separately authorized unpublish/archive cleanup;
+  do not archive the reused category or unrelated records indiscriminately.
+
+### Production workflows now verified
+
+- Owner signed in normally in a dedicated Chrome session. Automation used the
+  existing authenticated admin editors at `/admin/store` to create drafts,
+  select categories, enter facts/prices, upload images, save and publish. No
+  direct database mutation, fabricated session or credential extraction.
+- Successful category create, category description edit, product creates,
+  product status edits, image uploads/private previews, and publication were
+  confirmed by successful saved records and incremented versions. Exactly one
+  new category and three products were created, alongside existing owner data.
+- The Desk Lamp was observed at published version 2 after its initial confirmed
+  draft/version-1 save and before privacy QA. The cause was not attributed.
+  Only that demo was returned to draft (version 3); all its other fields were
+  checked unchanged. Draft privacy then passed before final publication/version 4.
+  This is not evidence of a draft exposure defect: its observed status was published.
+- In a fresh anonymous browser context, admin catalogue/media reads returned
+  **401**. While all demos were confirmed drafts, the public list omitted all
+  three; each direct detail and image API returned **404**, and each public detail
+  UI rendered **Product not available**. Generic `/api/media/store-catalogue/...`
+  paths returned **404**. Draft Accessories was absent from public categories,
+  and filtering it returned **404**. The unrelated existing draft stayed private.
+- After publication, anonymous product details/images returned **200**, with
+  exact public-field allowlist and no supplier/internal fields. All three public
+  PNG SHA-256 digests matched the original uploaded files. Accessories returned
+  exactly two demos; Home & Desk exactly one. Private media remained **401** and
+  generic media paths **404**, even for published demos.
+- Live Chrome checks at **1440, 768 and 390 CSS pixels** verified the populated
+  `/store`, both demo-category views and all three direct product pages: correct
+  titles, exact disclaimers, illustrative USD prices, loaded images/DEMO alt
+  text, visible keyboard focus and no horizontal overflow. Desktop/mobile
+  catalogue and tablet/mobile detail screenshots visually reviewed.
+- Each of the three product Contact CTAs was activated with **Enter at each
+  viewport**. `/contact` opened with the correct title, SKU, canonical product
+  URL and **Store enquiry — not an order** message; name/email stayed empty.
+  No enquiry was submitted. Contact's existing QA was not repeated.
+- All demo detail quantity/add-to-review controls were disabled. Server config
+  GET remained **enabled=false, siteKey=null** before and after validation.
+  Anonymous UI checks recorded **zero application mutation attempts** and no
+  uncaught browser exceptions. No enquiries, order requests, payments, supplier
+  contacts, new secrets or intake-setting changes.
+- No application defect was found; no code fix, migration, new build or repeat
+  of historical/local suites was needed. Only this roadmap changes in Git.
+  Temporary scripts, originals, manifests and reports/screenshots are outside
+  the repository under `bitreca-store-demo-20261108` in the user's temp directory.
+  Local automation connection/guard setup failures occurred before the relevant
+  mutation or privacy assertions; they did not justify application changes.
+
+### Remaining limits and launch gate
+
+Catalogue **create/edit/upload/publish and populated demo browsing now pass on
+Live** within the checks above. Arbitrary later data edits, archiving, concurrent
+owner-edit conflicts, upload-failure recovery and real merchandise/supplier
+accuracy were not all exercised on production; earlier isolated-test evidence
+remains relevant but is not a new Live claim. No enabled request intake, real S4
+Turnstile submission, request/snapshot/status write or manual-reply workflow was
+tested, and no test enquiry/order request was created. Keep
+`STORE_ORDER_REQUESTS_ENABLED=false`; do not configure payments or accept orders.
+
+Operational launch remains blocked on real supplier/catalogue ownership and
+availability review, fulfilment/delivery areas and fees, manual final pricing/
+currency/tax/acceptance, payment/reconciliation, cancellation/returns/warranty,
+privacy/retention, monitoring and explicit launch authorization. Demo USD prices
+do not decide the real Store's commercial currency or policies. These are the
+previously recorded S5 decisions, not requirements silently satisfied by demos.
+Stop after this authorized demo validation; no further S5 implementation/launch.
 
 ## Boundaries
 
