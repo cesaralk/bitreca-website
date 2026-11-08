@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { contactRecipient, contactWhatsAppUrl } from '../../shared/contact-enquiry'
 import './Footer.css'
 
 function Footer() {
@@ -18,9 +19,13 @@ function Footer() {
               Building websites, applications, software and technology
               designed for what comes next.
             </p>
+            <address className="footer-contact">
+              <a href={`mailto:${contactRecipient}`}>{contactRecipient}</a>
+              <a href={contactWhatsAppUrl({})} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp +961 70 864 221 (opens a new tab)">WhatsApp: +961 70 864 221</a>
+            </address>
           </div>
 
-          <div className="footer-links">
+          <nav className="footer-links" aria-label="Footer navigation">
 
             <div className="footer-column">
               <h3>Company</h3>
@@ -36,18 +41,19 @@ function Footer() {
               <Link to="/services">Services</Link>
               <Link to="/products">Products</Link>
               <Link to="/store">Store</Link>
+              <Link to="/portfolioforest">PortfolioForest</Link>
             </div>
 
             <div className="footer-column">
               <h3>Services</h3>
 
-              <Link to="/services">Web Development</Link>
-              <Link to="/services">Applications</Link>
-              <Link to="/services">Custom Software</Link>
-              <Link to="/services">Game Development</Link>
+              <Link to="/services#websites">Web Development</Link>
+              <Link to="/services#applications">Applications</Link>
+              <Link to="/services#custom-software">Custom Software</Link>
+              <Link to="/services#game-development">Game Development</Link>
             </div>
 
-          </div>
+          </nav>
 
         </div>
 

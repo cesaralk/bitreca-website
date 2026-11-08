@@ -34,7 +34,7 @@ milestones need inspection and user agreement before work starts.
 | Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; COD/Wish Money selected by owner, with no online gateway; real supplier/fulfilment, pricing/tax and practical manual-payment instructions/reconciliation remain outside this Contact task |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
-| Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
+| Shared navigation/footer and cross-page entry behavior | Local focused QA complete — release pending | Existing Navbar/Footer finalized; desktop/mobile route, anchor, focus, menu and placement checks passed | Commit/deploy and targeted read-only Live navigation verification pending; no page-body or workflow QA rerun |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
 
 Current owner decision (2026-11-08): V1 uses **Cash on Delivery and Wish Money**;
@@ -2143,6 +2143,81 @@ tests and previous browser/build evidence were reused. No broad QA was repeated.
   Cash on Delivery and Wish Money; no online gateway task is required. Practical
   manual-payment instructions/reconciliation are not implemented by this Contact
   documentation task. Do not start those remaining milestones here.
+
+## Shared navigation and footer — finalization (2026-11-08)
+
+**Local focused QA complete — release/Live verification pending.** Starting main
+**25892bdbd935500722bd2cc04a3e1f90b68d5597** was clean and matched origin/main after
+fetch. Existing page/Contact/Store/PortfolioForest QA and deployment evidence were
+reused; only shared navigation/footer behavior was tested, not completed features.
+
+### Confirmed gaps and scoped changes
+
+- Eight public root destinations already existed. Preserved their URLs/order and
+  branding; changed to NavLink for one accurate active-page/aria-current marker,
+  including the existing parent paths for nested content. Menu button now names
+  Open/Close, identifies the controlled links and has explicit type/focus styling.
+- Baseline Escape left the mobile menu expanded. Baseline Footer navigation after
+  scrolling left the new About heading above the viewport (scrollY 2519 and BODY
+  focus). Existing page-local navbar exceptions also produced different tablet
+  wrapping/heights. Shared Navbar styles now own its root layout consistently:
+  80px desktop, 70px menu header at/below 1024px, without editing page styles.
+- Menu closes on link selection, Escape (restoring toggle focus), outside pointer
+  or keyboard click, focus leaving navigation, Back/history and resizing to desktop.
+  Short landscape screens get a bounded scrollable link list; reopening starts
+  from the first link. Confirmed/fixed both retained scroll and keyboard Footer
+  navigation keeping the overlay open. A final Tab-out check confirmed focus had
+  been obscured by the open menu; its targeted fix closes the menu and keeps the
+  newly focused main-content link visible.
+- Forward route navigation scrolls to the new page and focuses its heading;
+  existing fragment destinations scroll/focus the matching section. Ordinary
+  Back navigation keeps browser scroll restoration. Existing menu/hamburger and
+  link animation styles remain, with reduced-motion support for these components.
+- Footer now includes the existing PortfolioForest destination and approved
+  `info@bitreca.com` / WhatsApp `+961 70 864 221`, reusing shared contact constants
+  and the short manual WhatsApp deep link. No social profile URLs were supplied
+  or invented; shared Footer has no social placeholders. No address, company
+  achievement, gateway or payment terms were added.
+- Four Footer service labels link to existing `/services#websites`, `#applications`,
+  `#custom-software`, `#game-development` sections. Footer navigation has a distinct
+  landmark, visible keyboard focus, safe external-link attributes and improved
+  small-text readability; navy/blue identity and responsive column structure remain.
+
+### Verified locally
+
+- Chrome at **1440 and 390px**: actual keyboard navigation through all eight public
+  routes, one correct active marker, closed menu after navigation, heading focus,
+  no horizontal overflow; Footer-to-page returns to the top; all four service
+  anchors scroll/focus the correct existing card. Official email/WhatsApp hrefs
+  and new-tab protection checked without sending/opening external messages.
+- Intermediate **1100/1025/1024/960/900/820/769/768px** checked shared geometry in
+  About and PortfolioForest contexts: correct breakpoint/header height, no overlap
+  or Footer overflow. **844×390 landscape**: all menu destinations reachable by
+  scrolling, Escape works, reopening resets scroll. Resize, outside click, Footer
+  keyboard navigation, history closure and reduced-motion checks passed.
+- On **/portfolioforest** at desktop/mobile, Navbar's next element is still the
+  original forest main, whose first gallery contains the original carousel; main
+  top meets navbar bottom. **App, Home, all page files and PortfolioForest sources
+  are unchanged.** No carousel, hosting, auth, deletion, inbox/request, stock,
+  database, Worker, migration, dependency or Cloudflare setting changes.
+- The full local route/layout matrix passed, then only the final Tab-out fix and
+  following menu navigation were rechecked. Settled desktop/mobile Footer and
+  landscape-menu screenshots visually reviewed. Initial harness issues required
+  proper native Enter/keypress, animation/document-load waits and a restarted local
+  safety timeout; they were not application defects or production operations.
+- Final `npm.cmd run build`, scoped Navbar/Footer ESLint and `git diff --check`
+  passed. Client assets **index-DDyA2pzj.js / index-CXy13QTv.css**. No unrelated or
+  historical suites run. GET-only local synthetic fixtures/read-only browser guard
+  recorded zero application mutations and no uncaught browser exceptions. Reports
+  and screenshots remain outside repo in `bitreca-nav-final-20261108` under temp.
+- Intended release is exactly **Navbar.jsx, Navbar.css, Footer.jsx, Footer.css and
+  this roadmap**. Commit/deployment/read-only Live evidence will follow after the
+  release; no Live claim for these new changes yet. No measured task-duration claim.
+
+Remaining V1 scope after successful Live confirmation: S5 owner-approved real
+catalogue/suppliers, fulfilment/delivery, operational policies and practical manual
+COD/Wish Money instructions/reconciliation. No online gateway is required. This
+task does not begin operational launch or certify a full site-wide content audit.
 
 ## Boundaries
 

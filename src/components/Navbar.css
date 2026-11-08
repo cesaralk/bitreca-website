@@ -1,9 +1,12 @@
-.navbar {
+#root > .navbar {
   height: 80px;
+  min-height: 80px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 24px;
 
   padding: 0 7%;
 
@@ -17,8 +20,9 @@
   letter-spacing: 3px;
 }
 
-.navbar-links {
+#root > .navbar .navbar-links {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 32px;
 }
@@ -33,6 +37,9 @@
 .navbar-links a:hover {
   color: var(--brand-blue);
 }
+
+.navbar-links a[aria-current="page"] { color: var(--brand-blue-light); }
+.navbar :is(a, button):focus-visible { outline: 3px solid #93c5fd; outline-offset: 4px; }
 
 /* ---------- MOBILE MENU BUTTON ---------- */
 
@@ -65,10 +72,11 @@
 
 /* ---------- MOBILE NAVIGATION ---------- */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
 
-  .navbar {
+  #root > .navbar {
     height: 70px;
+    min-height: 70px;
     position: relative;
     z-index: 1000;
     padding: 0 6%;
@@ -86,9 +94,9 @@
     z-index: 1002;
   }
 
-  .navbar-links {
+  #root > .navbar .navbar-links {
     position: absolute;
-    top: 70px;
+    top: 100%;
     left: 0;
     right: 0;
 
@@ -96,6 +104,9 @@
     flex-direction: column;
     align-items: stretch;
     gap: 0;
+    max-height: calc(100dvh - 70px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
 
     padding: 18px 6% 28px;
 
@@ -112,7 +123,7 @@
       transform 0.3s ease;
   }
 
-  .navbar-links.open {
+  #root > .navbar .navbar-links.open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -143,4 +154,8 @@
   .menu-toggle.active span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root > .navbar .navbar-links, .menu-toggle span { transition: none; }
 }
