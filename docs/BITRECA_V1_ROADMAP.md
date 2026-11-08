@@ -16,8 +16,9 @@ retained. This verifies request intake/review, not payment or fulfilment. S5 is
 **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
 Permanent Store product deletion is **Verified Live** for the authorized disposable
 draft/image check; migration 0021, release and preservation evidence are below.
-Task #6 Contact Inbox/Admin is **Verified Live** following
-owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
+Task #6 Contact Inbox/Admin is **Complete — Verified Live**. The original success
+and the owner-confirmed 2026-11-08 submission/inbox/status recheck are recorded below.
+Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
 in the Batch #1 section below. Earlier task sections are historical local QA records.
 Estimates are implementation/review effort, not delivery promises. Later
@@ -27,14 +28,20 @@ milestones need inspection and user agreement before work starts.
 | --- | --- | --- | --- |
 | Homepage Hero typography/mobile CTA changes and testimonial removal | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Services: four categories, process, FAQs, contact CTAs and responsive styles | APPROVED; Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
+| Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Complete — Verified Live | 0018 already applied; implementation 3e05fdb/fix 1259994 retained; 2026-11-08 recheck: one 201 stored response plus owner-confirmed matching inbox message, In Progress/Archived and persistence after refresh | No Contact activation blocker; no automatic outbound messaging; completed implementation/QA reused |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; real merchandise/supplier, delivery, pricing/tax/payment and operational policies remain unresolved; no payment collection or fulfilment-readiness claim |
+| Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; COD/Wish Money selected by owner, with no online gateway; real supplier/fulfilment, pricing/tax and practical manual-payment instructions/reconciliation remain outside this Contact task |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
-| V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
+| V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
+
+Current owner decision (2026-11-08): V1 uses **Cash on Delivery and Wish Money**;
+no online payment gateway is required. This records method selection, not a new
+payment integration or operational launch. Supplier/fulfilment/delivery decisions,
+real catalogue/availability review, currency/tax policies and owner-approved manual
+payment instructions/reconciliation remain outside the Contact Inbox task.
 
 ## Services scope and validation
 
@@ -2080,6 +2087,62 @@ request, unrelated data/settings or PortfolioForest/deletion workflow changes.
   Old request/catalogue code remains compatible with the nullable live link.
   Preserve intake=true and all other settings. Pending cleanup requires a reviewed
   forward retry/fix; do not claim it complete or use a destructive bucket sweep.
+
+## Contact Inbox — existing activation and one requested recheck (2026-11-08)
+
+**Already Verified Live; no reimplementation or reactivation needed.** The current
+repository baseline is **417b4efc1d535989167f7ff84e04b5c64b2a06a6**. Existing Contact
+implementation **3e05fdb**, fix **1259994fff6bb04ce2e8b86c4e4bf795ad736daf**, owner
+confirmed reference **f22e5c3e-641c-4514-b102-e000d886e03a**, completed 17 focused
+tests and previous browser/build evidence were reused. No broad QA was repeated.
+
+- Current application code still stores validated, real-Turnstile-verified messages
+  idempotently in `contact_enquiries`, protected by the existing body/rate/origin
+  controls. Private `/admin/enquiries` supports list/filter/detail, versioned
+  status updates and manual reply links. No auto outbound messaging is enabled.
+- Current reads of **both production origins** returned **200, enabled=true,
+  mode=inbox, public site key present**. The application's Contact schema readiness
+  path passed. Anonymous Admin Inbox read returned **401**; public enquiry
+  collection GET **405**. Runtime metadata matched the previously verified binding
+  fingerprint, including Contact settings, protected resources and Store intake=true.
+- **Migration status:** 0018 was already applied; latest recorded remote ledger
+  includes 0001–0021 with no pending entries. That prior evidence was reused, not
+  presented as a newly executed migration audit. No new migration/configuration,
+  secret, schema, application code or manual deployment was needed or performed.
+- As expressly requested, owner completed **one additional real Contact submission**
+  using their own details and the clearly labelled message
+  `CONTACT INBOX RECHECK — 2026-11-08 — DISPOSABLE TEST ONLY` (with archive/no-reply
+  instructions). Sanitized diagnostics recorded exactly **one POST /api/enquiries**,
+  **201, stored**, at `2026-11-08T14:17:16.298Z` (16:17:16 Asia/Beirut), reference
+  **`dfa24322-6775-4bf0-a61d-5a925b7806b9`**. Public receipt matches; no resubmission,
+  token extraction, test key, forged identity, automatic reply or Store request.
+- The automation browser's admin session remained unauthenticated (**401**), so
+  automation did not read or update private messages. Owner then explicitly
+  confirmed in their usual authenticated Admin Inbox: the correct saved UUID and
+  test message were found, status saved as **In Progress → Archived**, and remained
+  **Archived after refresh**. Owner confirmed **no other enquiries were modified**.
+  This is owner-confirmed private verification, not an agent-authenticated read,
+  and no unobserved version numbers or metadata hashes are invented. The disposable
+  test remains archived and preserved; no genuine message was deleted or changed.
+  No second submission was made to solve browser-session access. No message was
+  sent/replied to, or falsely marked Replied. **No Contact activation blocker remains.**
+- The genuine outstanding issue found was stale **CONTACT_ENQUIRY_INTEGRATION.md**
+  wording still presenting historical setup as current BLOCKED/local-only work.
+  Its current-status section now records the deployed feature and clearly labels
+  the dated original procedures as historical. No old setup command was rerun.
+- Only this roadmap and the integration guide change. Documentation-only checks
+  apply; no new build/ESLint or completed test suite is needed for unchanged code.
+  Git push uses the existing workflow and may trigger its normal Cloudflare build;
+  no separate application deployment or production setting change is required.
+- **Completed:** Contact Inbox implementation/activation, earlier verified release
+  and this one requested public-to-protected recheck with owner-confirmed status
+  persistence. Current Contact workflow is **Complete — Verified Live**. No further
+  configuration, migration, application fix or activation is required.
+  **Remaining V1 scope:** shared navigation/footer/cross-page review and S5 owner
+  supplier/fulfilment/policy/operational handover decisions. Owner has now selected
+  Cash on Delivery and Wish Money; no online gateway task is required. Practical
+  manual-payment instructions/reconciliation are not implemented by this Contact
+  documentation task. Do not start those remaining milestones here.
 
 ## Boundaries
 

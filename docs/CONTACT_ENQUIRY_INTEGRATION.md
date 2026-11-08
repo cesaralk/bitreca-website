@@ -1,4 +1,42 @@
-﻿# Contact Inbox + Admin — implementation and release gate
+# Contact Inbox + Admin — production status and integration reference
+
+Updated 2026-11-08. **Contact Inbox is Verified Live.** The dated implementation
+and preflight notes below are historical evidence, not outstanding setup steps.
+
+## Current production status
+
+- Existing implementation `3e05fdb` and Siteverify fix
+  **`1259994fff6bb04ce2e8b86c4e4bf795ad736daf`** remain in the current deployment.
+  Owner-confirmed successful public-to-private inbox reference:
+  **`f22e5c3e-641c-4514-b102-e000d886e03a`** (recorded 2026-11-07).
+- Migration **0018 is already applied** to production `bitreca-db`
+  (`8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`); the latest recorded ledger also includes
+  Store migrations through 0021. **Do not reapply 0018, repeat the old activation
+  sequence, reinstall secrets or disable the working inbox.**
+- Fresh 2026-11-08 config GETs on bitreca.com and www.bitreca.com returned **200,
+  enabled=true, mode=inbox**, with a public site key. The existing code checks both
+  Contact tables/required columns before reporting enabled. Anonymous private inbox
+  read returned **401**; public collection GET **405**. Existing runtime bindings
+  and the enabled Store request gate match the prior verified baseline.
+- Real Turnstile, origin checks, strict validation/body limits, rate limits,
+  idempotent D1 storage, existing admin authentication and message-management code
+  remain unchanged. No automatic email/WhatsApp reply or Resend/paid email setup is
+  required. Direct WhatsApp/mailto/copy options remain available. No missing Contact
+  configuration, code or migration prerequisite was found.
+- The owner's one additional disposable message on 2026-11-08 returned **201,
+  stored**, reference **`dfa24322-6775-4bf0-a61d-5a925b7806b9`**. Owner confirmed
+  that the exact test was found in their authenticated Admin Inbox, changed to
+  In Progress then Archived, and remained Archived after refresh. No other enquiry
+  was modified. Private verification is owner-confirmed; the automation browser
+  had no authenticated session and is not claimed to have read/updated the inbox.
+  The test is retained archived, not deleted. **No activation blocker remains.**
+  Reuse this successful result; do not send another test or repeat old setup.
+
+See [BITRECA_V1_ROADMAP.md](BITRECA_V1_ROADMAP.md) for actual release/test evidence.
+Do not make a production change solely because a historical section below says
+"local", "pending" or "blocked".
+
+## Historical implementation snapshot — 2026-11-05
 
 Updated 2026-11-05. Supersedes the previous Resend delivery plan. Implementation
 is local only at production baseline `3ed49f470ae25f4a7a4900a8c5a188299f2473cf`.
@@ -121,7 +159,10 @@ contact tables, and account for database backups and request-ID retention. The
 existing portfolio permanent-deletion workflow is unrelated and must not be used.
 No claim of legal compliance or instant erasure from backups is made.
 
-## Required owner configuration — not applied
+## Historical owner-configuration procedure — already completed for production
+
+Reference for a separately authorized new environment/recovery only. The working
+production settings already exist; do not run these steps again for this task.
 
 1. Create/reuse a **Free** Managed Turnstile widget with only `bitreca.com` and
    `www.bitreca.com` allowed. Use a separate widget for any approved test hostname.
@@ -145,7 +186,11 @@ No claim of legal compliance or instant erasure from backups is made.
    settings and RESEND_API_KEY are ignored by the replacement implementation;
    do not enable them. Current wrangler.jsonc remains untouched.
 
-## Single minimal deployment plan — STOP until owner authorizes
+## Historical initial deployment plan — completed, not a new release checklist
+
+The original authorization, migration, release, corrected Siteverify rollout and
+successful Live check are recorded in the roadmap. This dated plan does not direct
+a second migration, secret installation or activation of current production.
 
 **Gate:** owner reviews code, additive schema, privacy/retention and thresholds;
 confirms free Turnstile setup and separate private rate key; then explicitly
@@ -206,9 +251,10 @@ No release action below was performed during implementation.
   No outbound messages, production data, old-page visual suites or live test.
 - Build, scoped ESLint and whitespace evidence is recorded in the roadmap.
 
-Production activation is **BLOCKED** until owner review/authorization, required
-free widget/secrets/settings, migration-ledger check and approved live test gate.
-The implementation is prepared; missing security setup is not bypassed.
+The original implementation handoff was **BLOCKED** pending owner authorization,
+free widget/secrets/settings, migration-ledger check and the real Live test. Those
+prerequisites were subsequently completed; **current production is Verified Live**,
+as stated above. Security setup was not bypassed.
 
 ## Primary references consulted
 
