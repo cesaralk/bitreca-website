@@ -8,10 +8,11 @@ workflows now pass on Live; earlier empty-catalogue limitations are historical.
 S3 enquiry-only public catalogue is deployed, with three clearly labelled demo
 products, category browsing, details, images and Contact prefill verified on Live.
 This validates demo content only; it is not a real merchandise or fulfilment claim.
-S4 request intake is **Activation in progress — Live end-to-end verification pending**.
-The owner authorized enabling manual-review requests on 2026-11-08; migration 0020
-and previous disabled/access/QA evidence are retained. Enabled production request
-writes and protected status updates are not yet verified. S5 is
+S4 manual-review request workflow is **Verified Live**, with intake enabled by
+owner authorization on 2026-11-08. Activation release 3e1fe50, one real Turnstile
+submission, three item snapshots, authenticated receipt/status updates and
+anonymous access protection passed. Migration 0020 and all previous evidence are
+retained. This verifies request intake/review, not payment or fulfilment. S5 is
 **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
@@ -27,7 +28,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | Request intake activation in progress — Live end-to-end verification pending; S5 Demo validation in progress — operational launch blocked by supplier/fulfilment decisions | Migration 0020 applied; S4 release 02a40f4 and demo evidence retained; owner authorized enabling manual-review intake on 2026-11-08 | Real Turnstile request, protected Admin Requests receipt/status verification and activation release evidence pending; no payment collection or fulfilment-readiness claim |
+| Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; real merchandise/supplier, delivery, pricing/tax/payment and operational policies remain unresolved; no payment collection or fulfilment-readiness claim |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1844,7 +1845,7 @@ Stop after this authorized demo validation; no further S5 implementation/launch.
 
 ## Store request intake activation — owner authorized (2026-11-08)
 
-**Activation in progress — Live end-to-end verification pending.** The owner
+**Request workflow Verified Live — operational fulfilment remains blocked.** The owner
 explicitly authorized enabling the existing order-request workflow, focused fixes,
 Git release and one real Turnstile test request, followed by authenticated Admin
 Requests and status-management verification. This supersedes prior instructions
@@ -1878,15 +1879,67 @@ Receiving a request remains separate from accepted orders, payment and fulfilmen
   Runtime pre-deployment binding metadata fingerprint saved outside the repository
   for post-deployment comparison, without storing secret values. No historical
   suites or completed responsive checks repeated.
-- Deployment reference and Live prerequisite checks will be recorded after they
-  occur. One human completes a real Turnstile
-  request with their own contact details and a clear test note; never extract or
-  forge tokens. Success requires a saved reference and matching private admin
-  request/item snapshots, then permitted status changes verified after reload.
-- Do not mark **Verified Live** until that end-to-end path passes. If validation
-  fails, disable the gate, preserve all request/demo/history tables and records,
-  diagnose only the confirmed failure and coordinate retries to avoid duplicates.
-  No payment collection or operational fulfilment launch is authorized.
+- Activation release **`3e1fe506f651c72fbc996654ce460b6e17f38bc7`**, title
+  `Activate manual-review Store request intake`, exactly three reviewed files.
+  Ordinary push from 004af09 to main succeeded. [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/44b0b030-42f3-435b-acad-bb07d59c08d3)
+  completed successfully; at activation verification version
+  **`abf2c694-527f-4806-80b7-42c48c7f375c`** served 100%, deployed at
+  `2026-11-08T08:42:16.264196Z` (10:42:16 Asia/Beirut).
+- Post-deployment production runtime metadata confirms the gate is **true**.
+  Every other binding's metadata matches the pre-deployment snapshot exactly;
+  D1/R2/authentication/Contact/protected flags remain unchanged. No new secret,
+  paid service, migration or production product edit.
+- Live config GET on **bitreca.com and www.bitreca.com** returned **200,
+  enabled=true**, a public site key and unchanged quantity limits. These reads
+  also exercised the existing schema readiness check; no migration was reapplied.
+  Each demo's selection control enabled with quantity 1 while availability stayed
+  unknown. Three products were selected using the public UI, and only a clearly
+  labelled test note was prefilled; no customer detail or challenge was automated.
+- Owner completed the actual public form/security step in the dedicated visible
+  Chrome session and confirmed normal admin login. Exactly **one observed POST**
+  `/api/store/order-requests` returned **201, stored_for_review** at
+  `2026-11-08T08:54:38.396Z` (10:54:38 Asia/Beirut). Public receipt and authenticated
+  stored record reference match **`15bdd7e4-1f28-416c-9cb8-807e6fc2c59f`**.
+  The real production endpoint retained its required Siteverify success,
+  hostname/action checks; no stub, test key, token extraction, security bypass or
+  second public submission/replay was used. Saved receipt explicitly says manual
+  review, not accepted order, reservation, quote or payment.
+- Protected `/admin/store/requests` displayed the matching request, test note,
+  recorded acknowledgement and **three immutable item snapshots / three units**:
+  Laptop Stand, Wireless Mouse and Desk Lamp, each quantity 1. Snapshot listed
+  prices were 1500/1200/2000 USD minor units, with illustrative context and unknown
+  availability. Initial status/version **new/1**. Customer details remained in the
+  protected workflow; only HTTP/status/UUID and non-personal test facts are recorded
+  here or in temporary diagnostic reports. No name/email/phone, request body,
+  cookies, credentials or Turnstile token were written to reports/source/output.
+- Existing admin UI status controls successfully changed **New (v1) → Reviewing
+  (v2) → Awaiting customer (v3) → Reviewing (v4) → Closed (v5) → Archived (v6)**.
+  Each change was confirmed by a subsequent authenticated read with the expected
+  version, and submitted contact/acknowledgement/note/item snapshots stayed
+  identical. Reload and Archived filter found the test. Only this UUID was changed;
+  it remains archived as identifiable release evidence, not deleted or active
+  customer work. Status changes explicitly confirmed no automatic customer message,
+  acceptance, payment or supplier action. Manual reply links were checked without
+  opening them or sending anything; WhatsApp visibility matched recorded consent.
+- In a separate anonymous context, request list and this actual UUID's private
+  detail returned **401**; public request collection GET returned **405** and
+  public UUID lookup **404**. No private request listing/details exposed. Runtime
+  config still reported enabled=true. All demo descriptions, USD illustrative
+  prices and unknown availability were checked unchanged after the request.
+- **Verified Live applies only to receiving and managing manual-review requests.**
+  No payment method or collection is configured/enabled; no supplier, stock,
+  delivery, tax, final-price or commercial policy is invented. Actual manual
+  reply dispatch, production idempotent retries/failure recovery/concurrent writes
+  and commercial fulfilment were not exercised by this single test; reuse the
+  existing isolated test evidence where relevant. Real merchandise, suppliers,
+  fulfilment areas/fees, operational policies/retention and payment/reconciliation
+  decisions remain with the owner. An enabled request is not an accepted sale.
+- Rollback if later intake validation fails: disable the existing gate in runtime
+  and reviewed Git configuration so deployment cannot reopen it accidentally;
+  preserve all request/demo/history tables and submissions. Do not drop tables,
+  reverse migrations, delete test evidence or alter unrelated settings. No other
+  S5 operational work is started. Temporary sanitized reports/scripts are outside
+  the repository in `bitreca-store-order-activation-20261108` under user temp.
 
 ## Boundaries
 
