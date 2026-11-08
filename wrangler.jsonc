@@ -36,7 +36,7 @@
     }
   ],
   "vars": {
-    "STORE_ORDER_REQUESTS_ENABLED": "false",
+    "STORE_ORDER_REQUESTS_ENABLED": "true",
     "PORTFOLIO_ENVIRONMENT": "production",
     "PORTFOLIO_BUCKET_NAME": "bitreca-portfolios-prod-20261031",
     "PORTFOLIO_DATABASE_ID": "8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a",

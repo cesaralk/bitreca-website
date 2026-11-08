@@ -8,9 +8,10 @@ workflows now pass on Live; earlier empty-catalogue limitations are historical.
 S3 enquiry-only public catalogue is deployed, with three clearly labelled demo
 products, category browsing, details, images and Contact prefill verified on Live.
 This validates demo content only; it is not a real merchandise or fulfilment claim.
-S4 is **Deployed — order intake disabled**, with migration 0020 applied. Live
-disabled behavior/access protections and owner-confirmed authenticated rendering
-passed; enabled production request writes remain unverified. S5 is
+S4 request intake is **Activation in progress — Live end-to-end verification pending**.
+The owner authorized enabling manual-review requests on 2026-11-08; migration 0020
+and previous disabled/access/QA evidence are retained. Enabled production request
+writes and protected status updates are not yet verified. S5 is
 **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
@@ -26,7 +27,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Verified Live | 0018 applied; implementation 3e05fdb and fix 1259994 deployed; owner confirmed saved enquiry in authenticated inbox | No remaining activation blocker for verified workflow; no automatic outbound messaging |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | S4 Deployed — order intake disabled; S5 Demo validation in progress — operational launch blocked by supplier/fulfilment decisions | Migration 0020 applied; release 02a40f4; authorized demo create/edit/upload/publication, anonymous privacy, populated catalogue and Contact prefill verified Live on 2026-11-08 | Demo-only catalogue; enabled request submissions/Turnstile, request/status writes, archiving and operational fulfilment remain unverified; intake stays disabled |
+| Hardware / Dropshipping Store | Request intake activation in progress — Live end-to-end verification pending; S5 Demo validation in progress — operational launch blocked by supplier/fulfilment decisions | Migration 0020 applied; S4 release 02a40f4 and demo evidence retained; owner authorized enabling manual-review intake on 2026-11-08 | Real Turnstile request, protected Admin Requests receipt/status verification and activation release evidence pending; no payment collection or fulfilment-readiness claim |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1840,6 +1841,52 @@ privacy/retention, monitoring and explicit launch authorization. Demo USD prices
 do not decide the real Store's commercial currency or policies. These are the
 previously recorded S5 decisions, not requirements silently satisfied by demos.
 Stop after this authorized demo validation; no further S5 implementation/launch.
+
+## Store request intake activation — owner authorized (2026-11-08)
+
+**Activation in progress — Live end-to-end verification pending.** The owner
+explicitly authorized enabling the existing order-request workflow, focused fixes,
+Git release and one real Turnstile test request, followed by authenticated Admin
+Requests and status-management verification. This supersedes prior instructions
+to keep intake disabled for this task only; all historical evidence is retained.
+Receiving a request remains separate from accepted orders, payment and fulfilment.
+
+- Production runtime preflight confirmed the existing Turnstile site key/secret,
+  allowed-origins and rate-limit-secret bindings and unchanged `bitreca_db` target
+  `bitreca-db / 8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`. No secret values exposed,
+  credentials changed, new paid service or schema/migration required. Before this
+  release, runtime intake gate is explicitly false.
+- Scoped release changes only `STORE_ORDER_REQUESTS_ENABLED` from `"false"` to
+  `"true"` in `wrangler.jsonc`, with existing `keep_vars: true`, and removes one
+  stale Admin Requests empty-list assertion that production intake is always
+  disabled. The empty state continues to explain manual review, not acceptance.
+- Existing public/authenticated APIs, quantity/body/rate limits, server-side
+  Turnstile hostname/action validation, atomic snapshots and idempotency are
+  unchanged. Reuse the completed 15 S4 tests and responsive/keyboard/local-state
+  evidence; do not repeat broad page or Contact Inbox QA.
+- Demo products, exact disclaimers, USD illustrative prices, images and
+  `availability=unknown` remain unchanged. Unknown availability is eligible under
+  the existing server rule `availability <> 'unavailable'`; it does not assert
+  stock. Owner-marked unavailable or unpublished products/categories cannot be
+  requested. No stock adjustment/reservation, delivery/tax/payment terms or
+  automatic customer/supplier messages are introduced.
+- Focused parsed-config comparison passed: only the gate changes false -> true;
+  all other configuration, `keep_vars`, resources, routes and protected flags are
+  identical to baseline. Exact admin-page comparison confirmed only the empty-list
+  sentence changes. Scoped AdminStoreRequests ESLint, `git diff --check` and
+  `npm.cmd run build` passed; client assets index-CMJfDvfs.js/index-BsVmwd5n.css.
+  Runtime pre-deployment binding metadata fingerprint saved outside the repository
+  for post-deployment comparison, without storing secret values. No historical
+  suites or completed responsive checks repeated.
+- Deployment reference and Live prerequisite checks will be recorded after they
+  occur. One human completes a real Turnstile
+  request with their own contact details and a clear test note; never extract or
+  forge tokens. Success requires a saved reference and matching private admin
+  request/item snapshots, then permitted status changes verified after reload.
+- Do not mark **Verified Live** until that end-to-end path passes. If validation
+  fails, disable the gate, preserve all request/demo/history tables and records,
+  diagnose only the confirmed failure and coordinate retries to avoid duplicates.
+  No payment collection or operational fulfilment launch is authorized.
 
 ## Boundaries
 
