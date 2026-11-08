@@ -31,5 +31,13 @@
 .admin-store-image { display: block; width: 100%; max-width: 320px; max-height: 240px; object-fit: contain; background: #070f1d; margin-block: 14px; border-radius: 8px; }
 .admin-store-help { font-size: 13px; border-left: 2px solid #3b82f6; padding-left: 14px; margin-bottom: 24px; }
 .admin-store-notice { white-space: pre-wrap; margin-bottom: 0; }
+.admin-store-deletion { border-top: 1px solid #644052; margin-top: 32px; padding-top: 24px; }
+.admin-store button.admin-store-danger { background: #491e2c; border-color: #ae526c; color: #ffe5eb; }
+.admin-store button.admin-store-danger:hover:not(:disabled) { background: #6b293d; }
+.admin-store-delete-dialog { width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 24px; border: 1px solid #ae526c; border-radius: 14px; background: #0c172a; color: #e2e8f0; overflow-wrap: anywhere; }
+.admin-store-delete-dialog::backdrop { background: #020610cf; }
+.admin-store-delete-dialog form { margin: 0; }
+.admin-store-delete-dialog dd { margin: 6px 0 16px; font-weight: 700; }
+.admin-store-delete-dialog .admin-store-actions { margin-top: 24px; }
 @media (max-width: 1100px) { .admin-store-grid { grid-template-columns: 1fr; } }
 @media (max-width: 500px) { .admin-store-list, .admin-store-editor { padding: 18px; } .admin-store-actions > button { width: 100%; } }

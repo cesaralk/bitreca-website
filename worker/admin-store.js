@@ -1,5 +1,6 @@
 import { storeUuid, storeImageKey, storeStatuses, validateStoreRecord } from '../shared/store-catalogue.js'
 import { readContactJson, contactJson as json, contactBodyError } from './contact-http.js'
+import { deleteStoreProduct, pendingStoreDeletions } from './store-product-deletion.js'
 
 const tables = { categories: 'store_categories', products: 'store_products' }
 const summaries = { categories: 'id, title, slug, status, created_at, updated_at, version', products: 'id, title, sku, slug, category_id, status, availability, created_at, updated_at, version' }
@@ -51,12 +52,14 @@ async function media(request, env, tail) {
 
 // Dispatch ONLY after the existing admin origin/session gate in worker/index.js.
 export async function handleAdminStore(request, env) {
+  if (new URL(request.url).pathname === '/api/admin/store/product-deletions') return pendingStoreDeletions(request, env)
   const url = new URL(request.url), match = /^\/api\/admin\/store\/(categories|products|media)(?:\/([^/]+))?$/.exec(url.pathname)
   if (!match) return json(404, { success: false, message: 'Catalogue route not found.' })
   const [, kind, id] = match
   try {
     if (kind === 'media') return await media(request, env, id)
     if (id && !storeUuid.test(id)) return json(404, { success: false, message: 'Record not found.' })
+    if (kind === 'products' && id && request.method === 'DELETE') return deleteStoreProduct(request, env, id)
     const db = env.bitreca_db, table = tables[kind]
     if (request.method === 'GET') {
       if (id) {
@@ -81,7 +84,7 @@ export async function handleAdminStore(request, env) {
       const records = result.results.slice(0, 20), last = records.at(-1)
       return json(200, { success: true, records, nextCursor: result.results.length > 20 ? btoa(JSON.stringify({ time: last.created_at, id: last.id })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') : null })
     }
-    if (!(request.method === 'POST' && !id || request.method === 'PUT' && id)) return json(405, { success: false, message: 'Use create/edit with archive or draft status. Deletion is unavailable.' }, { Allow: id ? 'GET, PUT' : 'GET, POST' })
+    if (!(request.method === 'POST' && !id || request.method === 'PUT' && id)) return json(405, { success: false, message: 'Use supported catalogue actions. Only individually confirmed products support permanent deletion.' }, { Allow: id ? kind === 'products' ? 'GET, PUT, DELETE' : 'GET, PUT' : 'GET, POST' })
     let body
     try { body = await readContactJson(request, 49152) } catch (status) { return contactBodyError(status) }
     if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !['id', 'version', 'data'].includes(key)) || !storeUuid.test(body.id) || (id && (body.id !== id || !Number.isSafeInteger(body.version) || body.version < 1)) || (!id && body.version !== undefined)) return json(400, { success: false, message: 'Invalid record ID or version.' })
@@ -106,6 +109,7 @@ export async function handleAdminStore(request, env) {
     return json(200, { success: true, id })
   } catch (error) {
     const message = String(error?.message || '')
+    if (/STORE_IMAGE_DELETING|STORE_PRODUCT_DELETED/.test(message)) return json(409, { success: false, message: 'This product ID or image belongs to a permanent deletion. Use a new product reference or upload a new image.' })
     if (/STORE_CATEGORY_STATE|FOREIGN KEY constraint failed/.test(message)) return json(409, { success: false, message: 'Category state prevents this change. Publish the category before its products; unpublish or archive its products before changing the category.' })
     if (/UNIQUE constraint failed/.test(message)) return json(409, { success: false, message: 'SKU or slug is already in use. Archived records retain their identifiers.' })
     return unavailable()
