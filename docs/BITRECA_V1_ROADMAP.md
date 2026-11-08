@@ -14,8 +14,8 @@ submission, three item snapshots, authenticated receipt/status updates and
 anonymous access protection passed. Migration 0020 and all previous evidence are
 retained. This verifies request intake/review, not payment or fulfilment. S5 is
 **Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
-Permanent Store product deletion has passed local focused QA; migration/release
-and the one authorized disposable-product Live check are in progress below.
+Permanent Store product deletion is **Verified Live** for the authorized disposable
+draft/image check; migration 0021, release and preservation evidence are below.
 Task #6 Contact Inbox/Admin is **Verified Live** following
 owner confirmation of successful submission and authenticated inbox access. Projects Batch #2 remains Live. Batch #1 remains
 pushed and verified Live; evidence is recorded
@@ -31,7 +31,7 @@ milestones need inspection and user agreement before work starts.
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; real merchandise/supplier, delivery, pricing/tax/payment and operational policies remain unresolved; no payment collection or fulfilment-readiness claim |
-| Admin Store permanent product deletion | Local focused QA passed; release in progress | Migration 0021 and code prepared; production target/pending list verified | Snapshot-preserving migration result, deployment and one disposable draft deletion still to verify; existing products must remain intact |
+| Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page accessibility/responsive review | Pending; existing components reused for Services | Deployment unverified | 45–90 min |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Email activation deferred; Projects/Store not started |
@@ -1946,7 +1946,7 @@ Receiving a request remains separate from accepted orders, payment and fulfilmen
 
 ## Admin Store — permanent product deletion (2026-11-08)
 
-**Local focused QA passed — production migration/release verification in progress.**
+**Verified Live — authorized disposable draft and its private image removed.**
 Owner explicitly authorized permanent product deletion, not archiving, including
 products referenced by historical requests; required migration, Git release and
 one dedicated disposable-product production check. Existing products are outside
@@ -2021,13 +2021,60 @@ request, unrelated data/settings or PortfolioForest/deletion workflow changes.
   records intake=true and all current settings for a later unchanged comparison.
 - Authorized Wrangler remote apply succeeded for **0021 only** on verified
   **bitreca-db / 8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a**, **22 commands in 83.43ms**.
-  This is the migration execution result, not an estimate of task effort. Code
-  SHA/deployment and disposable Live test results will follow after verification;
-  no production product deletion is claimed yet.
+  This is the migration execution result, not an estimate of task effort.
 - Post-migration read-only verification passed: 0021 is recorded, no pending
   migrations remain, `PRAGMA foreign_key_check` has no violations, and all four
   Store table counts/hashes match the pre-migration snapshot exactly. Production
   binding metadata fingerprint also matches, with request intake still true.
+- Code release **`f5965763c14ae8088b17eb129540381b68bfff81`**, title
+  `Add confirmed permanent Store product deletion with safe media cleanup`, exactly
+  nine scoped source/style/component/migration/test/roadmap files. Normal push
+  from b0773aa to main succeeded. [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/4a9670b9-a7e5-4a63-8c9c-dc3f028bad87)
+  succeeded. Verified release version **`49b2f4ef-986f-47a4-b3cf-b458db01e264`**
+  served 100%, deployed `2026-11-08T10:44:24.282237Z`.
+- Owner logged in normally in a dedicated Chrome session; no credential/session
+  extraction or forged login. The browser connection closed before the first
+  automation attempt could create/upload/delete anything; reopening the same
+  profile retained a valid normal session. This was an automation interruption,
+  not a Store defect, and did not justify additional products or code changes.
+- Exactly **one disposable draft** created through the authenticated admin editor,
+  using existing Accessories category. It was never published or requested:
+  title **DISPOSABLE — Deletion validation only**;
+  SKU **`DELETE-DISPOSABLE-20261108`**;
+  slug **`disposable-deletion-validation-20261108`**;
+  product UUID **`8aae0dbc-816f-4add-95f0-6f4cd37a1903`**, saved version 1.
+  Price/currency remained null, availability unknown, supplier reference blank.
+  Uploaded a fresh private copy of an original DEMO placeholder under its own key
+  **`store-catalogue/10d2940e-4b55-48ae-9a28-16865aae771e.png`**; no existing demo
+  asset key was reused. Private image read returned 200 before deletion.
+- Live anonymous DELETE with omitted credentials returned **401** and left the
+  test intact. The new modal then showed its saved title/SKU; confirmation was
+  disabled until the exact SKU was typed. Explicit authenticated confirmation
+  displayed **Permanent deletion confirmed**. Test completed at
+  `2026-11-08T12:29:02.694Z` (14:29:02 Asia/Beirut). Subsequent authenticated product
+  GET **404**, private media GET **404**, public product/image GET **404**. Pending
+  cleanup list omitted the test, and request config stayed enabled=true. No second
+  product, publication, enquiry, request, stock assertion or payment was created.
+- Final read-only production preservation check passed after this deletion:
+  **3 categories / 4 original products / 1 request / 3 request items**, each table's
+  ordered-content SHA-256 exactly matching pre-migration data. This verifies the
+  disposable row is physically absent rather than archived alongside existing
+  rows; existing products, descriptions, pricing, availability, request status and
+  historical snapshots were not altered. Ledger has 0021 with no pending migration;
+  foreign-key check is clean. Binding fingerprints match both this task's baseline
+  and the previous activation baseline, with intake=true and other settings intact.
+- **Live scope limitation:** referenced/published product deletion, shared-image
+  retention, race/lost-ack and cleanup-failure recovery passed isolated SQLite and
+  actual workerd/D1/R2 tests as applicable; those failure/reference scenarios were
+  not manufactured in production. The single Live target was an unreferenced
+  draft. No existing product or real historical request was used as a destructive
+  fixture. Earlier request/Contact/page QA was reused, not repeated. Minimal
+  cleanup receipts are retained; older untracked uploads cannot be inferred to
+  belong to this product and are deliberately left intact.
+- Final roadmap evidence is committed/pushed separately after the release. All
+  preceding Batch #1/#2, Contact, About, Store and request-intake evidence remains
+  intact. Temporary reports/scripts/screenshots are outside the repository under
+  `bitreca-store-delete-20261108` in user temp. No total task-time claim is made.
 - Rollback: retain the migrated schema/history and cleanup receipts; roll code
   back if needed without reversing table copies or restoring deleted products.
   Old request/catalogue code remains compatible with the nullable live link.
