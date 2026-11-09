@@ -5,8 +5,10 @@ Current commercial launch priority: **software and digital services** — websit
 web/desktop/mobile applications, custom software/business systems and PortfolioForest
 portfolio websites. Physical Store selling, supplier operations and fulfilment are
 **deferred business work**; deployed Store workflows/intake/settings remain enabled.
-Marketing/SEO foundations are locally verified; release and Live evidence follow
-in the dedicated section below. Historical Store completion evidence is retained.
+Marketing/SEO foundations are **Verified Live** at d917e1c; public metadata/indexing
+files and software/PortfolioForest discovery passed scoped checks. Search Console
+verification/submission and analytics account review remain owner actions.
+Historical Store completion evidence is retained.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
 verified. Owner-authorized demo category/product create, edit, upload and publication
@@ -46,7 +48,7 @@ milestones need inspection and user agreement before work starts.
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
-| Software-services marketing and SEO foundations | Local focused QA complete — release pending | Initial HTML/client metadata, published-project sitemap, robots/private noindex, social assets and software/PortfolioForest discovery implemented; seven SEO tests, scoped ESLint/build and focused browser checks pass | Commit/deploy/Live metadata checks next; owner Search Console verification/submission and analytics account review remain; no Store launch work |
+| Software-services marketing and SEO foundations | Complete — Verified Live foundations | d917e1c deployed; distinct initial/client metadata, robots, 10-public-URL XML sitemap, noindex/private guards, share assets and desktop/mobile discovery verified; existing bindings/analytics/intake preserved | Owner Search Console verification, sitemap submission and rendered-indexing/account review pending; Google indexing/rankings not claimed; Store commerce deferred |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
 
 Current owner decisions (2026-11-09): supplier purchasing happens manually after
@@ -2387,7 +2389,7 @@ received. No measured task-duration claim.
 
 ## Software-services marketing and SEO readiness (2026-11-09)
 
-**Local focused QA complete — release pending.** Main f85221424774aac29da7dd5824a579d70b7d7eec
+**Complete — Verified Live foundations; owner Search Console actions pending.** Main f85221424774aac29da7dd5824a579d70b7d7eec
 was clean at start. Completed V1 page/Contact/Store/PortfolioForest/auth/deletion
 evidence reused; no broad regression cycle or business-workflow mutation test.
 
@@ -2470,10 +2472,56 @@ DNS/indexing actions are **pending owner action**, not application deployment bl
 Recommended content work is factual, consented real project detail and portfolio
 briefs; no new thin service pages, invented case studies or redesign is started.
 
-Commit/deployment, runtime-preservation and actual Live metadata/indexing-file
-results will be appended after release. No migration or data write is required.
-Physical Store commercial operations remain deferred; its deployed functionality
-and current runtime state are preserved. No measured task-time claim.
+Release and actual Live verification:
+
+- Implementation **`d917e1c0a47c3d4c23f6330dbc8142443cb3c2e6`**, title
+  `Add software-services SEO foundations and PortfolioForest discovery`, exactly
+  20 reviewed files; ordinary main push from f852214 succeeded. [Cloudflare build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/01aedd54-c288-463b-8a41-141484f738b0)
+  completed **successfully**. Authoritative runtime read at
+  **2026-11-09T16:58:52.215Z** showed version
+  **`b709e3ee-5227-4bec-afa8-f54d55550c47`** serving **100%**, deployed at
+  `2026-11-09T16:51:10.156167Z`.
+- Read-only Live checks at **2026-11-09T16:58:41.960Z** verified all seven priority
+  pages plus Store: HTTP200 HTML, exactly one appropriate title/description/canonical,
+  factual parseable JSON-LD, Open Graph/Twitter metadata and indexable public-page
+  HTTP directives. The pre-existing Cloudflare analytics beacon remains on all.
+  WWW/query entry declares the query-free apex canonical.
+- `/robots.txt`: **200 text/plain**, correct sitemap reference and rendering rules.
+  `/sitemap.xml`: **200 application/xml**, **10 canonical public URLs** (eight
+  landing pages and two published project details), **zero private URLs**.
+  Existing `/projects/portfolios` has published project metadata and HTTP200;
+  deliberately invalid missing-project path returns **404/noindex**. No record
+  was created or altered to perform these checks.
+- Admin login/enquiries/Store requests, request-review and portfolio demo HTML all
+  have HTTP/meta **noindex**. Anonymous enquiry/request admin API reads remain
+  **401**. Existing Contact and Store intake configuration endpoints both remain
+  **enabled=true**. These are scoped SEO-dispatch/privacy preservation reads, not
+  repetitions of completed workflow/Turnstile submissions or status/deletion QA.
+- Social card is public **200 image/png, 1200×630**; BITRECA favicon is public200.
+  Public metadata/share URLs resolve. No new analytics integration/account/token,
+  DNS/security/resource change, migration or customer-data write was performed.
+- Live Chrome at **1440/390px** verified software-focused Home and deferred Store
+  wording, actual keyboard links **Home → PortfolioForest → Contact**, updated
+  canonical/title after navigation, unchanged first-gallery placement and no
+  overflow. Read-only guard recorded **zero application mutation attempts** and
+  **zero uncaught browser exceptions**. No form/enquiry/order/upload was submitted.
+- All **pre-existing runtime binding metadata** matches baseline SHA-256
+  `a7289aa35dfa6265b7380890c9574c570aee589cd36cbfdb32f2a29d2736b4fd` exactly.
+  Only the required `ASSETS` handle for the existing static bundle is added.
+  Store intake=true; existing Contact/D1/R2/auth/PortfolioForest/security flags
+  are unchanged. Scope guard confirms Hero CSS and the original Worker API/
+  mutation implementation unchanged apart from SEO dispatch. All earlier roadmap
+  detail/deployment evidence remains intact.
+- Final evidence is committed/pushed separately as a roadmap-only update. No
+  application SEO deployment blocker remains. Search Console property ownership,
+  sitemap submission, Google-selected canonical/indexing and analytics-dashboard
+  event/account access are **not verified or claimed complete**; exact owner steps
+  remain in the handover checklist. Deployment alone is not Google indexing.
+
+Software-service marketing foundations are deployed. Physical Store commercial
+operations remain deferred; its existing functionality/settings are preserved.
+Recommended future content is owner-approved real project detail and portfolio
+briefs. No new milestone or account setup is started. No measured task-time claim.
 
 ## Boundaries
 
