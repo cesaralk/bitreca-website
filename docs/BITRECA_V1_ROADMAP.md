@@ -13,7 +13,7 @@ owner authorization on 2026-11-08. Activation release 3e1fe50, one real Turnstil
 submission, three item snapshots, authenticated receipt/status updates and
 anonymous access protection passed. Migration 0020 and all previous evidence are
 retained. This verifies request intake/review, not payment or fulfilment. S5 is
-**Minimum manual fulfilment implemented — 0022 applied; release pending**.
+**Minimum manual fulfilment deployed — Live interface/access checks passed**.
 Owner confirmed supplier-on-demand sourcing, fixed captured selling prices,
 personal/third-party delivery and manual COD/Wish Money tracking. Earlier demo
 evidence remains historical; the 2026-11-09 preflight found zero product records.
@@ -36,7 +36,7 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Complete — Verified Live | 0018 already applied; implementation 3e05fdb/fix 1259994 retained; 2026-11-08 recheck: one 201 stored response plus owner-confirmed matching inbox message, In Progress/Archived and persistence after refresh | No Contact activation blocker; no automatic outbound messaging; completed implementation/QA reused |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | Request workflow Verified Live; minimum manual fulfilment locally verified, release pending | Activation 3e1fe50 retained; additive 0022 applied and original data hashes preserved; fulfilment tests/browser checks passed with isolated fixtures | Release and read-only Live verification next; owner enters actual merchandise and handles supplier purchasing, delivery/payment collection and policies manually; no gateway |
+| Hardware / Dropshipping Store | Request workflow Verified Live; minimum manual fulfilment deployed, authenticated Live interface/access checks passed | Release c3f5fa4; 0022 applied, original data hashes/runtime settings preserved; ten focused tests, isolated 1440/768/390px workflow checks and read-only Live checks passed | Production fulfilment writes intentionally unverified; owner enters real merchandise (current catalogue empty), purchases from suppliers and handles delivery/payment collection and policies manually; no gateway |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
@@ -2259,7 +2259,8 @@ task does not begin operational launch or certify a full site-wide content audit
 
 ## Minimum Store order fulfilment — resumed implementation (2026-11-09)
 
-**Scoped local QA passed — 0022 applied; release pending.** Resumed the exact
+**Deployed — Live interface/access checks passed; fulfilment writes verified with
+isolated fixtures only.** Resumed the exact
 uncommitted fulfilment work from main 996372175c4012ab76fd3b304241472fe08790d7;
 no restart, discarded work or repeated completed page/workflow QA. Earlier Batch
 #1/#2, Contact Inbox, Store/deletion and navigation deployment evidence is preserved.
@@ -2338,9 +2339,39 @@ Production migration evidence:
   files, two focused tests and this roadmap. No temp helpers, credentials, auth,
   PortfolioForest, deletion implementation, resources or production config changes.
 
-Commit/deployment/read-only Live verification will be recorded after execution.
-Authenticated production fulfilment writes are intentionally not claimed from
-isolated tests; no genuine request will be used as a test record.
+Production release and verification:
+
+- Implementation **`c3f5fa43846f179ce38d58afd6bdaf17169c4a91`**, title
+  `Add manual Store fulfilment and protected fixed-price confirmation`, ordinary
+  main push succeeded from 9963721. [Cloudflare Git build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/324bdcd2-6bfb-4a0c-9e5e-183810ef86ef)
+  eventually completed **successfully**. Initially no Git check/build appeared;
+  Builds API inspection returned 403 under the existing token. No CI permissions,
+  build settings or credentials were changed. During that delay the authorized
+  fallback deployed the exact clean commit's prebuilt output through existing
+  Wrangler configuration, with `--keep-vars`; generated migration paths were
+  verified equivalent and resource/route/cron/variable definitions unchanged.
+- Wrangler deployment succeeded. At **2026-11-09T05:12:47.549Z** the authoritative
+  runtime read showed version **`f69e4a50-dff0-4367-8dd8-a8e5865c9fe4`** serving
+  **100%**, deployed at **2026-11-09T05:11:34.208674Z**. Migration 0022 recorded,
+  zero pending migrations, valid foreign keys, every original row hash and all
+  protected binding metadata unchanged. Store intake remains **true**; Contact,
+  D1/R2, PortfolioForest, authentication and deletion settings are preserved.
+- Read-only Live smoke at **2026-11-09T05:12:17.573Z**: `/admin/store/requests`
+  and `/store/request/review` return 200 with final `index-DLIHi5sc.js` /
+  `index-DeYghGEM.css`; both asset SHA-256 values match the reviewed local build.
+  Anonymous request list/detail/fulfilment subroute reads return **401**, private
+  no-store responses and no records. Public request config returns enabled=true.
+  No Contact/PortfolioForest/navigation/deletion historical QA was repeated.
+- Owner confirmed after normal login: **Order fulfilment, Delivery tracking and
+  Payment receipt controls load without errors** on the existing request; **no
+  changes saved**. This is authenticated Live rendering evidence, not a production
+  status/payment/delivery write. No disposable production order, enquiry, upload,
+  purchase, supplier message or payment was created. No customer record modified.
+- Final Live evidence is a separate roadmap-only commit/push. All earlier evidence
+  remains intact. No fulfilment software deployment blocker remains; production
+  fulfilment writes, actual sourcing/delivery and money receipt remain explicitly
+  unverified. Earlier real Turnstile intake evidence remains valid and was reused.
+
 Remaining operating work: owner merchandise/pricing/availability entry (current
 catalogue empty), real manual supplier purchasing, delivery arrangements/charge
 agreement, COD/Wish Money receipt/reconciliation and owner-approved operating
