@@ -13,6 +13,7 @@ import { handleAdminStore } from './admin-store.js'
 import { handlePublicStore } from './public-store.js'
 import { handleStoreOrderRequest } from './store-order-requests.js'
 import { handleAdminStoreRequests } from './admin-store-requests.js'
+import { handleSeo } from './seo.js'
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0
 }
@@ -322,6 +323,8 @@ export default {
   },
   async fetch(request, env) {
     const url = new URL(request.url)
+    const seoResponse = await handleSeo(request, env)
+    if (seoResponse) return seoResponse
 
     if (url.pathname === '/api/enquiries' || url.pathname === '/api/contact/config') {
       return handleContactRequest(request, env)

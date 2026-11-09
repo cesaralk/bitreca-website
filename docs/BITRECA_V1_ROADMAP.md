@@ -1,6 +1,12 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-09. About is **Verified Live**; release evidence is below.
+Current commercial launch priority: **software and digital services** — websites,
+web/desktop/mobile applications, custom software/business systems and PortfolioForest
+portfolio websites. Physical Store selling, supplier operations and fulfilment are
+**deferred business work**; deployed Store workflows/intake/settings remain enabled.
+Marketing/SEO foundations are locally verified; release and Live evidence follow
+in the dedicated section below. Historical Store completion evidence is retained.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
 verified. Owner-authorized demo category/product create, edit, upload and publication
@@ -40,6 +46,7 @@ milestones need inspection and user agreement before work starts.
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
+| Software-services marketing and SEO foundations | Local focused QA complete — release pending | Initial HTML/client metadata, published-project sitemap, robots/private noindex, social assets and software/PortfolioForest discovery implemented; seven SEO tests, scoped ESLint/build and focused browser checks pass | Commit/deploy/Live metadata checks next; owner Search Console verification/submission and analytics account review remain; no Store launch work |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
 
 Current owner decisions (2026-11-09): supplier purchasing happens manually after
@@ -2377,6 +2384,96 @@ catalogue empty), real manual supplier purchasing, delivery arrangements/charge
 agreement, COD/Wish Money receipt/reconciliation and owner-approved operating
 policies. This software release does not claim actual goods delivered or money
 received. No measured task-duration claim.
+
+## Software-services marketing and SEO readiness (2026-11-09)
+
+**Local focused QA complete — release pending.** Main f85221424774aac29da7dd5824a579d70b7d7eec
+was clean at start. Completed V1 page/Contact/Store/PortfolioForest/auth/deletion
+evidence reused; no broad regression cycle or business-workflow mutation test.
+
+Confirmed audit findings:
+
+- Production Home/Services/PortfolioForest returned the same `bitreca-website`
+  title, without descriptions or canonicals/social metadata. `/robots.txt` and
+  `/sitemap.xml` returned 200 **HTML SPA shells**, not real indexing files. Repo
+  inspection confirmed no implemented metadata/indexing layer. The favicon was
+  the unrelated framework icon. Existing heading structure, project-image alt,
+  image fallback/aspect-ratio/loading and internal navigation largely sound.
+- Home marketed hardware as currently selected/available alongside software and
+  lacked a service-card path to PortfolioForest. PortfolioForest explained its
+  directory but lacked a clear prospective-client service/Contact next step.
+- Production already injects a **Cloudflare analytics beacon**. No new tracker is
+  needed or approved. No Google verification meta tag or public apex TXT marker was
+  visible; Search Console ownership/account/dashboard status cannot be established
+  from these public checks and is not claimed absent or completed.
+
+Implemented scope:
+
+- Shared truthful page metadata for the seven priority software/public routes plus
+  the existing Store landing page, canonicals to HTTPS bitreca.com (without query/
+  fragment/trailing-slash duplicates), Open Graph/Twitter large-image metadata and
+  plain Organization/WebSite/WebPage JSON-LD. No fake location/team/reviews/ratings/
+  history/results, offers, customer counts or product prices. Published project
+  details read only public slug/title/description from the existing D1 model.
+- Existing Worker adds a separate **GET/HEAD-only SEO handler**. To serve metadata
+  to non-JavaScript sharing/crawling clients, the existing asset bundle is exposed
+  through `ASSETS`, with explicit HTML/indexing `run_worker_first` paths. Existing
+  `/api/*` retained, static resources stay asset-served, and no all-route wildcard.
+  This is the required SEO asset-routing change; no DNS, secret, resource identity,
+  paid service, auth, request gate, payment or production-security flag changes.
+- Private HTML/demo/request-review pages get HTTP/meta noindex; their auth/API
+  controls remain authoritative. Real XML sitemap lists only canonical public
+  landing pages and eligible published projects, with no private API/customer/
+  admin/demo/request URL or invented lastmod. robots.txt permits public rendering
+  resources and lets private HTML be crawled to see noindex. Published detail
+  missing/draft is HTTP404/noindex; metadata DB failure is temporary503/noindex.
+- Client navigation updates existing head tags without duplicates or extra project
+  fetches. Contact form/customer details never enter metadata. Unknown Store product
+  metadata remains generic; no catalogue data/publication/intake change or Store
+  commercial activation is part of this SEO milestone.
+- Software-first Home H1/copy and targeted service links; PortfolioForest is the
+  fourth Home service card (games remain on Services). Store region retained with
+  explicit deferred-selling copy; Stockly’s unsupported Home “Available” badge is
+  replaced by factual software-product wording. Services clarifies application
+  platforms and links portfolio clients to PortfolioForest. Forest gets concise
+  value copy and a Contact CTA; gallery/carousel structure/behavior stays intact.
+  Homepage Hero CSS, layout, animations and approved page designs are unchanged.
+- Original code-rendered navy/blue 1200×630 PNG sharing card plus editable SVG and
+  a BITRECA B favicon. Share PNG is not added to the homepage’s visual loading path.
+  No dependencies or tracking scripts added. App body remains the existing SPA;
+  full SSR/route-splitting is not introduced or claimed necessary without evidence.
+
+Verified local checks:
+
+- **7 focused SEO tests pass**, including actual workerd/D1/HTMLRewriter fixtures:
+  unique metadata, safe stored-text/JSON-LD escaping, preserved asset/security
+  headers, query-free/www canonicals, published-only metadata/sitemap, private/
+  preview noindex, HEAD, unavailable DB responses and unchanged API/mutation gates.
+- Scoped ESLint and production Vite build pass. Client assets:
+  `index-C3L9ZUPg.js` / `index-DRffJlhj.css`; initial bundle 482.59kB / 138.22kB gzip.
+  This is a build size, not a Lighthouse/Core Web Vitals or ranking claim.
+- Isolated Chrome at **1440/768/390px** verified software copy, service anchors,
+  PortfolioForest keyboard discovery/Contact CTA, correct client metadata, unchanged
+  first-gallery placement and no horizontal overflow; screenshots reviewed. Unique
+  head tags, one main H1, existing alt attributes and published/404 project metadata
+  checked across relevant routes. Hero CTA focus passed. GET-only local guard saw
+  zero attempted application writes. A test expected the wrong existing Projects
+  H1; only remaining metadata checks were resumed after fixing that expectation,
+  without repeating the completed responsive matrix. No application defect there.
+- Read-only public audit found the existing analytics beacon and no visible Google
+  HTML/TXT verification; values/tokens were not printed, committed or changed.
+
+Owner handover: [SEO_LAUNCH_CHECKLIST.md](SEO_LAUNCH_CHECKLIST.md) contains exact
+Search Console/DNS verification, sitemap submission, rendered-page inspection and
+existing analytics account steps, linked to primary documentation. These account/
+DNS/indexing actions are **pending owner action**, not application deployment blockers.
+Recommended content work is factual, consented real project detail and portfolio
+briefs; no new thin service pages, invented case studies or redesign is started.
+
+Commit/deployment, runtime-preservation and actual Live metadata/indexing-file
+results will be appended after release. No migration or data write is required.
+Physical Store commercial operations remain deferred; its deployed functionality
+and current runtime state are preserved. No measured task-time claim.
 
 ## Boundaries
 

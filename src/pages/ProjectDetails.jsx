@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import PublicProjectImage from '../components/PublicProjectImage'
 import usePublicProjects from '../hooks/usePublicProjects'
 import { safeProjectUrl } from '../utils/publicProjects'
+import { projectSeo, projectStateSeo } from '../../shared/seo'
+import { applyPageSeo } from '../utils/pageSeo'
 import './Projects.css'
 import './ProjectDetails.css'
 
@@ -10,6 +12,7 @@ function ProjectDetails() {
   const { slug } = useParams()
   const { data: project, status, retry } = usePublicProjects(slug)
   const heading = useRef(null)
+  useEffect(() => { applyPageSeo(status === 'ready' ? projectSeo(project) : projectStateSeo(`/projects/${slug}`, status)) }, [project, slug, status])
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
     heading.current?.focus({ preventScroll: true })

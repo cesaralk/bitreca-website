@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import './PortfolioForest.css'
 
 // These palettes follow the colors used by the corresponding client sites.
@@ -242,12 +243,13 @@ export default function PortfolioForest() {
           <p className="forest-eyebrow">BITRECA / PORTFOLIOFOREST</p>
           <h1>Distinct stories.<br /><span>One forest.</span></h1>
           <p className="forest-intro">
-            Explore the people, the ambition, and the work behind every portfolio.
-            Every story has its own colors.
+            Portfolio websites that bring your work, skills and story together.
+            Explore the published directory, or discuss a portfolio website of your own.
           </p>
           <a className="forest-explore-cta" href="#portfolio-carousel">
             Explore portfolios <span aria-hidden="true">{"\u2197"}</span>
           </a>
+          <Link className="forest-enquiry-link" to="/contact">Discuss your portfolio website <span aria-hidden="true">→</span></Link>
         </div>
           <div className="forest-showcase-carousel">
           <div className="forest-gallery-heading">

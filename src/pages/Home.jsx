@@ -41,14 +41,14 @@ useEffect(() => {
           </p>
 
           <h1>
-            Technology Built
+            Software Built
             <span> for What's Next.</span>
           </h1>
 
           <p className="hero-description">
-            Bitreca creates websites, applications, software,
-            games and technology solutions built around real ideas
-            and real business needs.
+            Websites, web, desktop and mobile applications, and custom
+            business systems. Bitreca builds useful software and portfolio
+            websites around your requirements.
           </p>
 
         <div className="hero-buttons">
@@ -104,10 +104,10 @@ useEffect(() => {
     </h2>
 
     <p>
-      Bitreca brings software development and technology together.
-      From websites and business applications to custom software,
-      games and computer hardware, we build and provide technology
-      designed to solve real needs.
+      Bitreca brings software development and digital services together.
+      From business websites and applications to custom systems and
+      PortfolioForest portfolio websites, we build digital tools
+      around your goals.
     </p>
 
   </div>
@@ -143,6 +143,7 @@ useEffect(() => {
       <Reveal delay={0}>
         <ServiceCard
           title="Website Development"
+          to="/services#websites"
           description="Modern, responsive websites designed around your brand, audience and business goals."
         />
       </Reveal>
@@ -150,6 +151,7 @@ useEffect(() => {
       <Reveal delay={100}>
         <ServiceCard
           title="Applications"
+          to="/services#applications"
           description="Web, desktop and mobile applications built to make work simpler and experiences better."
         />
       </Reveal>
@@ -157,14 +159,16 @@ useEffect(() => {
       <Reveal delay={200}>
         <ServiceCard
           title="Custom Software"
+          to="/services#custom-software"
           description="Software designed around real workflows, from business systems to specialized digital tools."
         />
       </Reveal>
 
       <Reveal delay={300}>
         <ServiceCard
-          title="Game Development"
-          description="Interactive games and digital experiences built with creativity, technology and engaging ideas."
+          title="PortfolioForest"
+          to="/portfolioforest"
+          description="Portfolio websites that bring your work, skills and story together. Explore published portfolios or discuss your own."
         />
       </Reveal>
 
@@ -201,8 +205,8 @@ useEffect(() => {
     <ProductCard
       name="Stockly POS"
       category="Business Software"
-      status="Available"
-      description="A complete point-of-sale and business management system designed for retail businesses, combining sales, inventory, purchases, services, reporting and daily operations in one platform."
+      status="Software product"
+      description="Point-of-sale and business management software for retail, bringing sales, inventory, purchases, services, reporting and daily operations together."
     />
 
   </div>
@@ -221,15 +225,16 @@ useEffect(() => {
         </p>
 
         <h2>
-          Hardware for the
-          <span> technology around you.</span>
+          Store directory.
+          <span> A future focus.</span>
         </h2>
       </div>
 
       <div className="store-heading-right">
         <p>
-          Explore computer components, upgrades and accessories
-          selected for work, gaming and everyday technology.
+          Physical-product selling and fulfilment are deferred.
+          The Store remains available to browse; software and
+          digital services are our commercial launch focus.
         </p>
 
         <a href="/store" className="store-view-all">
@@ -244,31 +249,31 @@ useEffect(() => {
       <StoreCategory
         icon="◈"
         title="Storage"
-        description="SSD and HDD solutions for speed, capacity and reliability."
+        description="A category for storage products when owner listings are added."
       />
 
       <StoreCategory
         icon="▤"
         title="Memory"
-        description="RAM upgrades for smoother multitasking and better performance."
+        description="A category for memory products when owner listings are added."
       />
 
       <StoreCategory
         icon="◇"
         title="Graphics"
-        description="Graphics hardware for gaming, creative work and demanding applications."
+        description="A category for graphics products when owner listings are added."
       />
 
       <StoreCategory
         icon="▣"
         title="Displays"
-        description="Monitors for productivity, entertainment and gaming."
+        description="A category for display products when owner listings are added."
       />
 
       <StoreCategory
         icon="⌁"
         title="Peripherals"
-        description="Keyboards, mice and accessories for your complete setup."
+        description="A category for peripherals when owner listings are added."
       />
 
     </div>

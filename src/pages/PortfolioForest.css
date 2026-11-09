@@ -737,6 +737,10 @@
 }
 
 /* Carousel overlap refinement */
+.forest-enquiry-link { display: block; width: fit-content; margin-top: 18px; color: #93c5fd; font-weight: 600; line-height: 1.6; }
+.forest-enquiry-link:focus-visible { outline: 3px solid #93c5fd; outline-offset: 5px; }
+
+/* Carousel overlap refinement */
 .forest-showcase-carousel .forest-slide[data-placement="current"] {
   z-index: 5;
 }

@@ -7,6 +7,7 @@ import {
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import PageMetadata from './components/PageMetadata'
 
 import Home from './pages/Home'
 import Services from './pages/Services'
@@ -40,6 +41,7 @@ function AppContent() {
 
   return (
     <>
+    {(!isPortfolio || location.pathname === '/portfolio/demo') && <PageMetadata />}
     {!isAdmin && !isPortfolio && <Navbar />}
 
       <Routes>

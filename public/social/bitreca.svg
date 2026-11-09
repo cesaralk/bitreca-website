@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#071225"/><stop offset="1" stop-color="#10274d"/></linearGradient></defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1110" cy="50" r="270" fill="none" stroke="#315e99" stroke-width="2"/>
+  <circle cx="1110" cy="50" r="210" fill="none" stroke="#244878" stroke-width="2"/>
+  <rect x="76" y="74" width="7" height="52" rx="3" fill="#60a5fa"/>
+  <g font-family="Arial, Helvetica, sans-serif"><text x="103" y="118" fill="#fff" font-size="46" font-weight="700" letter-spacing="6">BITRECA</text>
+    <text x="76" y="254" fill="#fff" font-size="66" font-weight="700">Software built</text><text x="76" y="332" fill="#60a5fa" font-size="66" font-weight="700">around your needs.</text>
+    <text x="76" y="420" fill="#c0cee2" font-size="28">Websites · Applications · Custom business systems</text>
+    <text x="76" y="466" fill="#c0cee2" font-size="28">PortfolioForest · Portfolio websites</text>
+    <text x="76" y="557" fill="#93c5fd" font-size="26">bitreca.com</text>
+  </g>
+</svg>

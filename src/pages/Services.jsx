@@ -3,7 +3,7 @@ import './Services.css'
 
 const services = [
   { id: 'websites', label: 'Web development', title: 'A better place for your business online.', description: 'Give people a clear way to understand your business, explore what you offer and take the next step. Build a new website or rethink one that no longer fits.', items: ['Business websites and landing pages', 'Responsive layouts and accessible interfaces', 'Content structure, enquiry flows and integrations'], fit: 'For launching online or improving an existing presence.', cta: 'Discuss a website' },
-  { id: 'applications', label: 'Applications', title: 'Turn everyday tasks into clear experiences.', description: 'Bring a product idea or a recurring workflow into an application people can use. Plan screens, interactions and features around the people doing the work.', items: ['Web applications and customer portals', 'Dashboards and internal team tools', 'Interactive prototypes and focused first releases'], fit: 'For a digital product, a customer experience or a tool your team needs.', cta: 'Discuss an application' },
+  { id: 'applications', label: 'Applications', title: 'Turn everyday tasks into clear experiences.', description: 'Bring a product idea or a recurring workflow into an application people can use. Plan screens, interactions and features around the people doing the work.', items: ['Web, desktop and mobile applications', 'Dashboards, customer portals and internal tools', 'Interactive prototypes and focused first releases'], fit: 'For a digital product, a customer experience or a tool your team needs.', cta: 'Discuss an application' },
   { id: 'custom-software', label: 'Custom software', title: 'Software shaped around how you work.', description: 'When ready-made tools leave gaps, define a solution around your processes. Connect information, reduce repetitive steps and give your team a clearer way to work.', items: ['Business workflow automation', 'System integrations and data exchange', 'Purpose-built operational tools'], fit: 'For processes that need more flexibility than an off-the-shelf product offers.', cta: 'Discuss custom software' },
   { id: 'game-development', label: 'Game development', title: 'Give your idea something people can play.', description: 'Explore the core interaction before expanding the experience. Start with a playable concept, refine the mechanics and define the scope for the intended platform.', items: ['Game concepts and playable prototypes', 'Gameplay systems and interface development', 'Interactive experiences and playtesting'], fit: 'For testing a game idea or planning an interactive experience.', cta: 'Discuss a game' },
 ]
@@ -63,6 +63,7 @@ function Services() {
               <ul>{service.items.map((item) => <li key={item}>{item}</li>)}</ul>
               <p className="services-fit">{service.fit}</p>
               <Link className="services-text-link" to="/contact">{service.cta} <span aria-hidden="true">↗</span></Link>
+              {service.id === 'websites' && <Link className="services-text-link" to="/portfolioforest">Explore PortfolioForest websites <span aria-hidden="true">→</span></Link>}
             </article>
           ))}
         </div>
