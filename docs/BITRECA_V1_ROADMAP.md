@@ -1,6 +1,6 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-08. About is **Verified Live**; release evidence is below.
+Updated: 2026-11-09. About is **Verified Live**; release evidence is below.
 Store S1 introduction/category directory is **Verified Live**. S2 private admin
 catalogue is deployed with authenticated Live interface and anonymous protections
 verified. Owner-authorized demo category/product create, edit, upload and publication
@@ -13,7 +13,10 @@ owner authorization on 2026-11-08. Activation release 3e1fe50, one real Turnstil
 submission, three item snapshots, authenticated receipt/status updates and
 anonymous access protection passed. Migration 0020 and all previous evidence are
 retained. This verifies request intake/review, not payment or fulfilment. S5 is
-**Demo validation in progress — operational launch blocked by supplier/fulfilment decisions**.
+**Minimum manual fulfilment implemented — 0022 applied; release pending**.
+Owner confirmed supplier-on-demand sourcing, fixed captured selling prices,
+personal/third-party delivery and manual COD/Wish Money tracking. Earlier demo
+evidence remains historical; the 2026-11-09 preflight found zero product records.
 Permanent Store product deletion is **Verified Live** for the authorized disposable
 draft/image check; migration 0021, release and preservation evidence are below.
 Shared public navigation and Footer are **Verified Live** at b5fcb58; focused
@@ -33,17 +36,18 @@ milestones need inspection and user agreement before work starts.
 | Contact: WhatsApp/mailto/copy fallback and private enquiry inbox | Complete — Verified Live | 0018 already applied; implementation 3e05fdb/fix 1259994 retained; 2026-11-08 recheck: one 201 stored response plus owner-confirmed matching inbox message, In Progress/Archived and persistence after refresh | No Contact activation blocker; no automatic outbound messaging; completed implementation/QA reused |
 | About: factual company introduction | Verified Live | Release e59a5c1 deployed; local and Live Chrome checks passed | No blocker in verified About scope |
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
-| Hardware / Dropshipping Store | Request workflow Verified Live; S5 operational launch blocked by supplier/fulfilment decisions | Activation 3e1fe50 deployed; one real Turnstile request, protected details/snapshots/status changes, archived test and anonymous protections verified; runtime gate true, other bindings unchanged | Manual-review requests only; COD/Wish Money selected by owner, with no online gateway; real supplier/fulfilment, pricing/tax and practical manual-payment instructions/reconciliation remain outside this Contact task |
+| Hardware / Dropshipping Store | Request workflow Verified Live; minimum manual fulfilment locally verified, release pending | Activation 3e1fe50 retained; additive 0022 applied and original data hashes preserved; fulfilment tests/browser checks passed with isolated fixtures | Release and read-only Live verification next; owner enters actual merchandise and handles supplier purchasing, delivery/payment collection and policies manually; no gateway |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
 | V1 release Batch #1 | Complete: one commit pushed; Cloudflare build successful | Verified Live at 8775054 | Historical Batch #1 scope retained below; later Contact Inbox, Projects and Store releases are separately verified; automatic outbound email is outside the current Inbox scope |
 
-Current owner decision (2026-11-08): V1 uses **Cash on Delivery and Wish Money**;
-no online payment gateway is required. This records method selection, not a new
-payment integration or operational launch. Supplier/fulfilment/delivery decisions,
-real catalogue/availability review, currency/tax policies and owner-approved manual
-payment instructions/reconciliation remain outside the Contact Inbox task.
+Current owner decisions (2026-11-09): supplier purchasing happens manually after
+requests; captured selling prices are honoured on confirmation; delivery is personal
+or through a third-party company; payment is **Cash on Delivery or Wish Money**.
+No gateway or supplier/delivery integration is required. Actual catalogue facts,
+delivery-charge agreement, customer confirmation, collection/reconciliation and
+operating policies remain owner responsibilities; software stages do not perform them.
 
 ## Services scope and validation
 
@@ -2252,6 +2256,96 @@ Remaining V1 scope: S5 owner-approved real
 catalogue/suppliers, fulfilment/delivery, operational policies and practical manual
 COD/Wish Money instructions/reconciliation. No online gateway is required. This
 task does not begin operational launch or certify a full site-wide content audit.
+
+## Minimum Store order fulfilment — resumed implementation (2026-11-09)
+
+**Scoped local QA passed — 0022 applied; release pending.** Resumed the exact
+uncommitted fulfilment work from main 996372175c4012ab76fd3b304241472fe08790d7;
+no restart, discarded work or repeated completed page/workflow QA. Earlier Batch
+#1/#2, Contact Inbox, Store/deletion and navigation deployment evidence is preserved.
+
+- Existing `store_order_requests` remains the only request/order record. Existing
+  New/Reviewing/Awaiting customer/Closed/Archived review controls and history remain.
+  Separate fulfilment stages track New, Supplier availability check, Customer
+  confirmed, Product sourcing, Ready for delivery, Out for delivery, Completed,
+  Cancelled and Unavailable. Stage filtering reuses existing bounded pagination.
+- Optional personal/third-party delivery, company, tracking reference, private notes
+  and delivery status are private authenticated metadata. No delivery API, supplier
+  ordering, messages, stock reservation/adjustment or automatic operational action.
+- COD/Wish Money are manual choices. Receipt defaults to Pending and requires an
+  explicit verified-receipt acknowledgement to become Confirmed. Completion,
+  delivered/cancelled/unavailable stages never infer or erase payment receipt.
+- Captured item quantities/prices/currencies remain immutable. Confirmation requires
+  every captured item to have a price in one currency, selected payment method,
+  explicit agreed delivery charge (zero means free) in that currency, and an admin
+  acknowledgement of actual customer agreement/availability. Supplier price changes
+  cannot reprice the request. Confirmed charge/currency/payment method/timestamp are
+  locked by API and DB guard; use notes/cancellation rather than silently changing
+  customer terms. Unpriced/mixed-currency history remains readable/manageable but
+  needs a new correctly priced request before confirmation. No historical rewrite.
+- Existing session/origin checks protect the new PATCH fulfilment subroute. Strict
+  field allowlist/enums/types, body/text/numeric limits and the shared request
+  version prevent injected prices, invalid transitions and concurrent stale edits.
+  No new public request reader; public submission, Turnstile and rate limits reused.
+  Review and fulfilment saves serialize through the same UI busy state/version.
+- Public request copy now explains fixed captured prices and manual COD/Wish Money
+  arrangements. Existing selection, validation, submission and receipt logic stays
+  unchanged. No new dependency, payment gateway or separate management platform.
+- Migration **0022_store_request_fulfilment.sql** only ADDs request columns/defaults,
+  one index and two confirmation guards. It changes no old review values, item
+  table/trigger, product deletion/auth/Contact/PortfolioForest schema or data. Old
+  code remains compatible; rollback code if necessary, retaining added columns,
+  agreement/payment metadata and all customer records. No destructive down migration.
+
+Verified local checks (completed earlier tests reused, then focused new validation
+regression checked on resume):
+
+- **10 focused tests pass** in the two fulfilment files, including actual
+  workerd/D1 migration on populated isolated history, full stage/receipt flow,
+  auth/origin, strict limits/types, stale/concurrent updates, honest DB failures,
+  immutable item prices and unaffected deletion-reference detachment. No historical
+  suites or Contact/PortfolioForest/navigation/product-deletion QA rerun.
+- Scoped ESLint passes, including the final delivery-charge label clarification.
+  Final production Vite build passes: `index-DLIHi5sc.js` / `index-DeYghGEM.css`.
+  `git diff --check` passes. No dependencies added.
+- Chrome isolated fixtures at **1440/768/390px**: complete supplier-to-completed
+  progression, personal/third-party metadata, COD/Wish Money, missing-confirmation
+  errors, locked agreed terms, payment remains pending through completion/delivery,
+  explicit receipt acknowledgement, keyboard checkbox/submit and visible focus,
+  associated labels, reload persistence, stage filtering and desktop stale-edit
+  blocking/reload. No horizontal overflow; form viewport screenshots reviewed.
+  Synthetic script-like titles/company data rendered as text. No production writes.
+- Read-only preflight verified runtime **bitreca-website -> bitreca-db /
+  8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a**, intake=true, keep_vars=true. API ledger and
+  Wrangler pending list agree **0022 only** (0001–0021 already applied). Baseline:
+  **1 request, 3 item snapshots, 3 categories, 0 products, 3 Contact enquiries**.
+  Sanitized hashes/column metadata are outside repo in temporary
+  `bitreca-store-fulfilment-20261108`; no customer content/secrets committed or logged.
+
+Production migration evidence:
+
+- Guarded Wrangler execution printed **0022 success**, **15 commands executed** on
+  `bitreca-db (8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a)`. The local wrapper timed out
+  after the successful result was printed; no blind retry or second apply was run.
+  Read-only recheck at **2026-11-09T04:55:14.430Z** confirms 0022 in the ledger,
+  zero pending migrations, valid foreign keys and all original row hashes unchanged
+  across the five baseline tables. Existing schema outside the added request
+  metadata and all runtime binding metadata match the preflight snapshot exactly;
+  intake remains **true**. Existing requests have the intended unstarted/pending
+  defaults; no customer confirmation, delivery or payment was inferred.
+- Final reviewed release manifest is **11 files**: migration, shared fulfilment
+  validator, new admin form, existing request admin JSX/CSS/API, two request-copy
+  files, two focused tests and this roadmap. No temp helpers, credentials, auth,
+  PortfolioForest, deletion implementation, resources or production config changes.
+
+Commit/deployment/read-only Live verification will be recorded after execution.
+Authenticated production fulfilment writes are intentionally not claimed from
+isolated tests; no genuine request will be used as a test record.
+Remaining operating work: owner merchandise/pricing/availability entry (current
+catalogue empty), real manual supplier purchasing, delivery arrangements/charge
+agreement, COD/Wish Money receipt/reconciliation and owner-approved operating
+policies. This software release does not claim actual goods delivered or money
+received. No measured task-duration claim.
 
 ## Boundaries
 

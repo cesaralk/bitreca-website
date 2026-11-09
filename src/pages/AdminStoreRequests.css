@@ -5,4 +5,19 @@
 .store-request-snapshots li { padding: 22px 0; border-bottom: 1px solid #284b7f; }
 .store-request-snapshots h4 { font-size: 20px; color: #fff; margin: 0 0 12px; }
 .store-request-snapshots p { margin-block: 8px; white-space: pre-wrap; }
+.store-requests-admin .enquiries-list > label + label { margin-top: 16px; }
+.store-fulfilment { margin-top: 28px; padding-top: 24px; border-top: 1px solid #284b7f; }
+.store-fulfilment fieldset { min-width: 0; margin: 0 0 24px; padding: 18px; border: 1px solid #526179; border-radius: 8px; }
+.store-fulfilment legend { color: #dbeafe; font-size: 14px; padding-inline: 8px; }
+.store-fulfilment label { margin-block: 12px; }
+.store-fulfilment :is(input,textarea) { box-sizing: border-box; min-width: 0; width: 100%; padding: 12px; border: 1px solid #526179; border-radius: 6px; background: #080f1c; color: #fff; font: inherit; font-size: 16px; }
+.store-fulfilment textarea { resize: vertical; }
+.store-fulfilment :is(input,textarea):focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+.store-fulfilment :disabled { opacity: .65; }
+.store-fulfilment .fulfilment-check { display: flex; flex-direction: row; align-items: start; gap: 12px; }
+.store-fulfilment .fulfilment-check input { width: 20px; height: 20px; flex: 0 0 20px; accent-color: #60a5fa; }
+.fulfilment-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.store-fulfilment .fulfilment-error { color: #fda4af; }
+.store-fulfilment [aria-invalid="true"] { border-color: #fda4af; }
+@media (max-width: 600px) { .fulfilment-grid { grid-template-columns: 1fr; gap: 0; } .store-fulfilment fieldset { padding: 14px; } }
 @media (max-width: 1150px) { .store-requests-admin .enquiries-layout { grid-template-columns: 1fr; } }
