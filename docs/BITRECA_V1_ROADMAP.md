@@ -2674,6 +2674,187 @@ owner authorized final review, scoped commit/push/deployment and read-only Live 
   this release does **not** establish or fix the unconfirmed original upload failure.
   No production create/upload/save/publish/delete action was performed or is implied.
 
+### New browser evidence — upload transport investigation, 2026-11-18
+
+**Status: recovery release remains Live; original image-upload delay unresolved.
+Investigation/proposal only. No new production upload, save or deployment.**
+
+- Owner reports two live Network entries named `media`, each cancelled after
+  **15.01 seconds**, with `Image upload response unconfirmed. No new image key
+  was received.` A product detail GET returned200 in **11.83 seconds**; other
+  Admin Store reads returned200. Product remains Draft and no new image key was
+  confirmed. These are owner-supplied browser observations, not a new database or
+  bucket snapshot. The previously verified `bitreca_media → bitreca-media` binding
+  is reused; earlier successful PUT/detail logs do not explain these new timings.
+- Actual upload path: file selection → one same-origin raw-image POST to
+  `/api/admin/store/media` through `adminApi` → existing origin/session gate
+  (crypto plus a primary D1 session SELECT) → bounded request-body read → image
+  signature validation → one R2 binding `put` →201 JSON with the generated key →
+  client key validation → update the editor's image reference. Upload alone does
+  not save/publish a product. No external image processor, multipart parser,
+  additional upload-provider call or automatic retry exists on this path.
+- **High confidence:** the 15.01-second cancellations match the existing frontend
+  `AbortSignal.timeout(15000)`. This budget includes browser queuing/connection,
+  request upload, server work and response consumption. It is not evidence of a
+  15-second R2/server limit or failed storage. The body reader's separate5-second
+  timer starts only **after authentication**, and covers body reading, not the
+  preceding session lookup or subsequent awaited R2 `put`. Neither of those
+  awaits has a separate application deadline here. The exact unconfirmed-upload
+  notice is consistent with a pre-response-header fetch timeout/network exception;
+  `adminApi` catches response-JSON errors as `data:null`, producing a different
+  generic upload error. No successful upload response/key can be inferred.
+- The slow detail GET traverses the same session check and then a product SELECT;
+  it does not call R2. This makes shared network/auth/D1 latency a candidate,
+  **not a diagnosis** of D1 slowness. No per-stage production durations or matching
+  upload invocation are available in the evidence supplied so far. Browser upload,
+  edge/network transit, auth, body read, R2 and return transport cannot yet be
+  separated from total elapsed time. A null/unconfirmed product image key does
+  not rule out an unattached R2 object after a lost response. No object is deleted
+  or assumed safe to retry/clean up on that basis.
+- Focused diagnostics executed against the **unchanged actual Worker routes** with
+  isolated in-memory SQLite and fake R2 only: normal upload201; synthetic11.83s
+  auth plus3.4s body read returned201 at15.27s; a body stall returned408 at5.01s
+  with zero R2 writes; synthetic slow R2 acknowledgement returned201 at15.33s.
+  Both long cases exceeded the frontend's15s budget with exactly one local put.
+  These Node fixtures demonstrate possible stage/budget combinations, **not** the
+  actual Cloudflare latency, browser-disconnect lifecycle or production outcome.
+  An additional actual `adminApi` check confirmed pre-header TimeoutError
+  propagation versus response-body errors being caught as null. Source assertions
+  confirmed one upload POST, no automatic retry/product write/new product ID, and
+  image-reference update only after a valid response key. All assertions passed.
+  Sanitized fixture report is outside Git at
+  `AppData/Local/Temp/bitreca-store-upload-path-20261118/report.json`.
+- **Smallest next step, before a behavioral fix:** inspect the already captured
+  entries' exact method/path, UTC timestamp, file size/type, Timing phases
+  (Queueing/Stalled, connection, Request sent, Waiting/TTFB, Content Download),
+  throttling setting and any response status/CF-Ray. Requested without another
+  attempt; no cookies, bodies, credentials or full HAR. [Chrome's timing
+  reference](https://developer.chrome.com/docs/devtools/network/reference/#timing-explanation)
+  explains those phases; TTFB includes both network round-trip and server work.
+  Correlate available existing invocation logs by time/ray; do not repeat the
+  previously denied logs-API/permission investigation.
+- **Proposed diagnostic change only if existing timings/logs are insufficient:**
+  narrowly scope sanitized entry/start/finish events to this upload POST, bracketing
+  the existing session check, body read and R2 acknowledgement, plus response
+  readiness. Use an opaque correlation ID, elapsed times, bounded byte counts and
+  fixed outcome categories; no cookies, credentials, file content/names, product
+  data or storage keys in logs. Log stage boundaries so a lost browser response
+  does not erase all timing evidence; optional authenticated response
+  `Server-Timing` must not be the only channel. [Cloudflare supports measuring
+  I/O](https://developers.cloudflare.com/workers/runtime-apis/performance/) with
+  `performance.now()`; these measure awaits rather than CPU profiling. Preserve
+  all existing gates, limits and one-write behavior. Any such patch must be
+  reviewed before deployment; none is implemented or released in this task.
+- No timeout increase, auth caching/bypass, storage rewrite, upload replay,
+  migration, configuration/permission change or production record/image operation.
+  No broad suites or prior recovery/Cloudflare investigations repeated. Only this
+  local roadmap entry changed; no commit/push/deploy. **Root cause confidence:**
+  high for the client cancellation mechanism; insufficient evidence to name the
+  production stage responsible for the delay. Original upload issue stays open.
+
+### Recoverable Store image upload candidate — 2026-11-18
+
+**Status: implemented locally for owner review; NOT committed, pushed or deployed.
+Production upload/publication acceptance remains pending.**
+
+- Reused the completed Save Recovery release, routing/auth/R2 review and previous
+  V1 evidence. New owner evidence: both media POSTs spent approximately15.01s in
+  Initial connection; the issue also reproduced in another Chrome profile with a
+  valid image within2MB. The successful authenticated detail GET spent11.04s in
+  Stalled,591ms connecting and196ms waiting for response headers. Later anonymous
+  health GETs in a fresh profile completed in434/139ms over direct h2. Those GETs
+  do not resolve or validate the upload problem. Exact transport cause stays
+  unconfirmed; no further owner diagnostic retries or production checks requested.
+- Confirmed application weaknesses addressed: a single15s abort cut off connection,
+  transfer and acknowledgement together; random server-only image keys left no
+  reference to check after a lost response. The local fix gives a selected image
+  a stable UUID plus original product ID and SHA-256 before sending. The original
+  product ID, Draft data and old image reference are not replaced by uploading.
+- Store-only XMLHttpRequest transport reports sending versus awaiting storage.
+  It allows up to30s without progress, bounded by90s total; verification GETs have
+  their own30s limit. This intentionally replaces the observed15s upload abort,
+  together with recovery/idempotency, rather than raising all API timeouts.
+  Existing product/category save deadlines and shared `adminApi` are unchanged.
+  XHR still uses Chrome's connection stack; no TCP/TLS bypass or confirmed repair
+  of the unidentified network fault is claimed.
+- New tracked uploads keep the existing raw JPEG/PNG/WebP body and2MB byte limit.
+  Server validates the reference, signature and actual SHA-256; buffers only the
+  bounded image; claims a durable D1 upload receipt; and uses R2 create-only
+  `If-None-Match:*` with a stored checksum
+  and product-reference metadata. Same-reference retries/concurrent attempts
+  cannot overwrite an existing object; only the winning receipt claim can initiate
+  an R2 write. A delayed replay cannot recreate an object after removal. Conflicts with different bytes/product
+  references or legacy/shared objects are rejected. Existing deletion receipts
+  are checked to reject retired product IDs/claimed image keys; no deletion code
+  or cleanup behavior is changed. Legacy untracked uploads/private image reads
+  remain supported. Only tracked body reads get a bounded30s window, replacing
+  their former5s window; legacy uploads retain5s.
+- After an upload response (including a lost/malformed response), an authenticated,
+  no-store `GET /api/admin/store/media/:file?verify=1` checks the exact stored
+  checksum, size, MIME type and product reference. Only a verified match can
+  update the editor image reference. This confirms a private uploaded image,
+  not a product save or publication. Missing/unreadable outcomes stay unconfirmed;
+  missing is not proof that an earlier write cannot finish later. No automatic
+  application POST replay or product creation occurs. **Check upload** is read-only;
+  **Retry same image** requires explicit action, a read finding no receipt/object,
+  and the same reference; an arriving earlier request competes for the same unique
+  receipt. A claimed but absent object returns202/unconfirmed and cannot initiate
+  another storage write. Unknown outcomes retain the selected file/reference in
+  memory and lock conflicting editor actions. **Keep previous image** explicitly
+  abandons only the attachment attempt, preserves all Draft entries/reference,
+  sends no upload and deletes nothing; an uncertain object may finish privately.
+  Pending file/reference recovery is not persisted across hard reload/navigation.
+- Focused automated checks cover client deadlines/progress, exact verification,
+  uncertain/malformed acknowledgements, explicit retry reads, authentication,
+  content/size/checksum limits, local workerd/emulated-R2 conditional concurrency,
+  retired/shared image conflicts, safe R2 exceptions and the original-ID
+  Draft-save/reload/publication/public-image path. All data is isolated/synthetic;
+  these do not validate real merchandise or production transport.
+- Focused local headless Chrome checks passed five scenarios: pre-write503 keeps
+  old preview/unsaved entries and performs no automatic retry; Check upload sends
+  no write and explicit same-reference retry succeeds; same-ID Draft save/reload
+  and publication render the correct public image; a16s upload acknowledgement
+  succeeds. A claimed but unconfirmed R2 write disables retry; Check upload sends
+  no second POST and explicit Keep previous image retains the Draft/old preview.
+  A TCP reset after local commit caused Chrome to resend at transport
+  level (two wire POSTs from one file selection), yet one new object remained and
+  verification succeeded. This fixture behavior supports immutable references;
+  it does not establish why the production connection stalls. Browser profile,
+  sanitized result report and synthetic images stay outside Git in
+  `AppData/Local/Temp/bitreca-store-upload-candidate-20261118/`.
+- Final verification: **18 focused tests pass** across the two new files (including
+  nine workerd runtime subtests), scoped ESLint passes, `npm run build` passes,
+  and scoped whitespace checks pass. Final client asset `index-gzGu5Hz3.js`;
+  CSS remains `index-DRffJlhj.css`. Browser checks use an isolated in-memory
+  SQLite/fake-R2 server; the separate workerd tests exercise R2 conditional/checksum
+  behavior in local emulation. No result is presented as production verification.
+- Candidate touches only `AdminStore.jsx`, new `storeImageUpload.js`, shared
+  `store-image-upload.js`, the media branch in `worker/admin-store.js`, two focused
+  test files, additive `0023_store_image_upload_receipts.sql` and this roadmap.
+  Existing uncommitted investigation notes and all earlier deployment evidence are
+  preserved. No dependency, secret, binding, permission or production-setting
+  changes. No production data was accessed or modified.
+- **Migration prepared, NOT applied:**0023 creates one empty receipt table only;
+  no ALTER/DROP/UPDATE/DELETE or existing-table changes. IDs, hash, size, MIME type,
+  key and timestamp only; no file names, credentials, customer or supplier details.
+  Product ID deliberately has no FK: uploads precede Draft creation and receipts
+  must not block permanent deletion or disappear with a product. Isolated
+  compatibility checks applied the schema to an existing Draft without changing
+  its row. Receipts must survive uncertain writes/retries; no automatic receipt
+  or image cleanup is introduced. This small schema addition was reported before
+  proceeding because conditional R2 creation alone did not prevent a delayed
+  replay recreating a previously removed key.
+- **Review/release gate:** no commit/push/deployment or production upload/save/
+  publishing was performed. After approval, release the scoped frontend/Worker
+  together after verifying the production target/pending ledger and applying only
+  approved0023. Existing code can run with the additive table before deployment.
+  Code rollback must leave the receipt table, images and products intact. A
+  separately authorized real-product acceptance must confirm uploaded
+  image, persistent Draft/reloaded preview, successful publication and correct
+  public product image. Do not mark the original incident resolved before that
+  acceptance. If the transport path remains unavailable beyond the bounded
+  deadlines, outcomes still remain honest and unconfirmed; no fabricated success.
+
 ## Boundaries
 
 Task 1 stopped after Services; Task 2 is Contact only. Services remains approved
