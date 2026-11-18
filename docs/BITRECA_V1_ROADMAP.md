@@ -2855,6 +2855,70 @@ Production upload/publication acceptance remains pending.**
   acceptance. If the transport path remains unavailable beyond the bounded
   deadlines, outcomes still remain honest and unconfirmed; no fabricated success.
 
+### Controlled Store image upload release — 2026-11-18
+
+**Status: Deployed — read-only Live release checks passed. Production image
+upload, Draft-save and publication acceptance were explicitly excluded and remain
+unverified. The original connection fault is not claimed resolved.**
+
+- Owner authorized the reviewed eight-file release and0023 only. The earlier
+  migration-list timeout caused no migration/commit/push/deployment. The single
+  authorized read-only retry succeeded and listed only
+  `0023_store_image_upload_receipts.sql`. Reused the completed Git synchronization,
+  production identity/runtime baseline,18 focused tests, five local Chrome
+  scenarios, scoped ESLint and build evidence. No repeated code review, browser
+  investigation, broad suite or local build. File fingerprints still matched the
+  approved candidate; no unrelated work was staged.
+- **Migration executed once by this release:** Wrangler4.139.0 reported success
+  on remote **`bitreca-db / 8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a`**, applying
+  only0023 (table creation plus its ledger entry). Subsequent read-only queries
+  confirmed exactly one ledger record: **id23**, name
+  `0023_store_image_upload_receipts.sql`, applied_at **`2026-11-18 21:21:15` UTC**.
+  `sqlite_master` exactly matches the approved CREATE TABLE; all seven columns
+  match; receipt count is **0**. Verification reported zero rows written. No
+  earlier migration was reapplied or business/customer records queried/changed.
+- Implementation commit **`48f6afddce4c4c8603fe004a7aacaf05557e610e`**, title
+  `Make Store image uploads recoverable without replaying storage writes`, contains
+  exactly the eight reviewed files. Normal push **640bb03 →48f6afd** to main
+  succeeded. This includes the prior uncommitted investigation/candidate roadmap
+  entries and preserves all Batch1/2 and later deployment evidence. Only the
+  staged scope/whitespace safeguard ran; completed QA was reused.
+- [Cloudflare Git build
+  68090686-da0e-46fd-8bca-e46aa835a146](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/68090686-da0e-46fd-8bca-e46aa835a146)
+  completed **successfully** for48f6afd. Runtime verification at
+  **`2026-11-18T21:51:27.574Z`** confirmed deployment
+  **`fa17c954-0ea2-43fb-b859-2b4f683290f9`**, Worker version
+  **`4b492241-13e3-4fbd-9117-4d266cd2b70b`**, serving **100%**, deployed at
+  `2026-11-18T21:49:27.852655Z`. Worker version matches the Git build result.
+- All runtime binding metadata matches the saved preflight SHA-256 exactly:
+  **`c16597c0534e9a0253cafc76539259a7fc709d2c252e6c61416197eebd83544e`**.
+  Store request intake remains **true**; `bitreca_media → bitreca-media` and the
+  existing production D1 identity are preserved. No secret values were read,
+  printed or installed; no variables, bindings, security settings or resources
+  were changed by this release. Existing `keep_vars:true` remains unchanged.
+- Read-only Live check report timestamp **`2026-11-18T21:53:00.340Z`**:
+  `/admin/store` returns200/noindex with the reviewed bundle;
+  **`index-gzGu5Hz3.js`** and **`index-DRffJlhj.css`** both return200 and their
+  SHA-256 values match the reviewed local build. New upload/recovery controls are
+  present in that bundle. `/api/health` returns200/success. Anonymous session,
+  Store product and upload-verification GETs return **401**, no-store and no
+  private data. No authenticated product data or image content was read.
+- All application release checks used **GET only**: no production product create,
+  upload, save, publish, delete, enquiry or order request. The only authorized D1
+  mutation was0023 and its migration ledger entry. No functional Store upload or
+  publication success is inferred from asset/health checks. The separate
+  owner-authorized real-product acceptance remains the gate for closing the
+  original incident; no additional owner diagnostic retry was requested here.
+- Sanitized migration execution/verification and runtime/Live evidence are saved
+  outside Git at `AppData/Local/Temp/bitreca-store-upload-release-20261118/`.
+  This release record is a roadmap-only follow-up commit/push. Its code-equivalent
+  deployment will be checked separately and its final active IDs reported in the
+  release handoff; no second functional/product test is authorized or needed.
+- If activation later fails, preserve receipt table/rows and all images/products;
+  stop uncertain writes and use read-only verification. Any code rollback must
+  retain0023 and existing data, preserve intake/settings, and use the established
+  Git workflow. No reverse migration, receipt clearing or automatic R2 cleanup.
+
 ## Boundaries
 
 Task 1 stopped after Services; Task 2 is Contact only. Services remains approved
