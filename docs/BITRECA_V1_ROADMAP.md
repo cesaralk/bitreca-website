@@ -1,9 +1,9 @@
 # Bitreca V1 roadmap
 
 Updated: 2026-11-18. About is **Verified Live**; release evidence is below.
-Admin Store timeout investigation: **controlled recovery release authorized — final
-review passed; deployment pending**. Original browser timeout/upload phase remains
-unconfirmed. Release verification is read-only; no production product mutation.
+Admin Store recovery release **43f71c1 is deployed — read-only assets/health verified**.
+Original browser timeout/upload phase remains **open and unconfirmed**. No
+production product create/upload/save/publish action was used for verification.
 Current commercial launch priority: **software and digital services** — websites,
 web/desktop/mobile applications, custom software/business systems and PortfolioForest
 portfolio websites. Physical Store selling, supplier operations and fulfilment are
@@ -49,7 +49,7 @@ milestones need inspection and user agreement before work starts.
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Hardware / Dropshipping Store | Request workflow Verified Live; minimum manual fulfilment deployed, authenticated Live interface/access checks passed | Release c3f5fa4; 0022 applied, original data hashes/runtime settings preserved; ten focused tests, isolated 1440/768/390px workflow checks and read-only Live checks passed | Production fulfilment writes intentionally unverified; owner enters real merchandise (current catalogue empty), purchases from suppliers and handles delivery/payment collection and policies manually; no gateway |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
-| Admin Store save/image timeout recovery | Controlled release authorized; final review passed, deployment pending | Four-file UI/helper/test/roadmap scope; previous focused QA reused; no automatic write retry, ID/image retention and strict read confirmation reviewed | Original browser upload/transport timeout remains open; no production upload/save/publish test; read-only release verification next |
+| Admin Store save/image timeout recovery | Deployed — read-only release verification passed | 43f71c1; four-file scope; completed focused QA reused; exact Live assets/API health/auth guards and unchanged runtime bindings verified | Original upload/transport timeout remains open for targeted browser Network evidence if it recurs; production write/recovery workflow not exercised |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
 | Software-services marketing and SEO foundations | Complete — Verified Live foundations | d917e1c deployed; distinct initial/client metadata, robots, 10-public-URL XML sitemap, noindex/private guards, share assets and desktop/mobile discovery verified; existing bindings/analytics/intake preserved | Owner Search Console verification, sitemap submission and rendered-indexing/account review pending; Google indexing/rankings not claimed; Store commerce deferred |
@@ -2529,8 +2529,8 @@ briefs. No new milestone or account setup is started. No measured task-time clai
 
 ## Admin Store publishing timeout — investigation and review candidate (2026-11-17–18)
 
-**Controlled release authorized after final review — deployment pending. Original
-production timeout phase/upload outcome not conclusively established.** Started with clean main
+**Controlled recovery release deployed — read-only health/assets verified. Original
+production timeout phase/upload outcome remains open and unconfirmed.** Started with clean main
 97a40f097fdc7a391b846e32f8daf40ef28e7048. Owner later explicitly requested the
 root-cause report and proposed fix **before any production deployment**. That review
 stage involved no commit, push, release or production write. On 18 November the
@@ -2646,11 +2646,33 @@ owner authorized final review, scoped commit/push/deployment and read-only Live 
   Intake=true. Previous active deployment `e2772c89-5971-4c64-8d34-ec63926746bb`,
   version `834df992-febe-44b0-a45c-6e77d2fb5ece` at100%. No customer records,
   images, logs, permissions or configuration investigated/modified in this preflight.
-- Commit, Git deployment and actual read-only Live verification will be recorded
-  after execution. **The original upload/transport incident remains open for
-  targeted browser Network evidence if it recurs.** This release must not be
-  described as fixing that unconfirmed failure. No production create/upload/save/
-  publish/delete action is part of release verification.
+- Implementation commit **`43f71c1b40661a9156488099fd703cb4771d5c4d`**, title
+  `Recover uncertain Admin Store saves without replaying writes`, exactly the
+  reviewed four files. Ordinary push from 97a40f0 to main succeeded. [Cloudflare
+  Git build](https://dash.cloudflare.com/4ec868eac2a3b9127531ad39d2501f15/workers/services/view/bitreca-website/production/builds/cd043315-82de-4d76-ac6b-bf7948f0335b)
+  completed **successfully** through the existing production workflow. No manual
+  deploy, migration, secret, permission or configuration operation was required.
+- Runtime verification at **2026-11-18T14:58:26.532Z** confirmed deployment
+  **`0a733fa4-a431-41c7-872a-acfe1cc6443e`**, Worker version
+  **`dd3ebfcb-dd0e-410e-a34e-84a88cad92d0`** serving **100%**, deployed at
+  `2026-11-18T14:54:10.582368Z`. All existing binding metadata matches the before
+  snapshot exactly; Store intake remains **true**. No private/customer records
+  or R2 images were read or changed during release verification.
+- Read-only Live checks at **2026-11-18T14:58:29.750Z**: `/admin/store` returns200
+  and noindex with the exact reviewed JS/CSS. Both static asset SHA-256 values
+  match the previously verified local build (`index-7rJdxO2i.js` /
+  `index-DRffJlhj.css`), including the recovery/error-phase code.
+  `/api/health` returns200/success. Anonymous session, Store product and category
+  API reads return **401**, no-store and no private record data. Only GET requests
+  were used; no production product, upload, publishing, enquiry or request write.
+- Final release evidence is a separate roadmap-only commit/push. No broad suites,
+  earlier Chrome recovery tests or Cloudflare incident investigations were repeated.
+  No authenticated Live mutation/recovery exercise is claimed from these read-only
+  checks. The completed isolated tests remain the behavior verification evidence.
+- **The original upload/transport incident remains open for targeted browser
+  Network evidence if it recurs.** The review confirmed a UI reload/recovery defect;
+  this release does **not** establish or fix the unconfirmed original upload failure.
+  No production create/upload/save/publish/delete action was performed or is implied.
 
 ## Boundaries
 
