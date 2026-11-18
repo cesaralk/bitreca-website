@@ -1,6 +1,9 @@
 # Bitreca V1 roadmap
 
-Updated: 2026-11-09. About is **Verified Live**; release evidence is below.
+Updated: 2026-11-18. About is **Verified Live**; release evidence is below.
+Admin Store timeout investigation: **controlled recovery release authorized — final
+review passed; deployment pending**. Original browser timeout/upload phase remains
+unconfirmed. Release verification is read-only; no production product mutation.
 Current commercial launch priority: **software and digital services** — websites,
 web/desktop/mobile applications, custom software/business systems and PortfolioForest
 portfolio websites. Physical Store selling, supplier operations and fulfilment are
@@ -46,6 +49,7 @@ milestones need inspection and user agreement before work starts.
 | Software Products: Stockly POS and repeatable product layout | Batch #1 complete | Verified Live at 8775054 | No new page work in this batch |
 | Hardware / Dropshipping Store | Request workflow Verified Live; minimum manual fulfilment deployed, authenticated Live interface/access checks passed | Release c3f5fa4; 0022 applied, original data hashes/runtime settings preserved; ten focused tests, isolated 1440/768/390px workflow checks and read-only Live checks passed | Production fulfilment writes intentionally unverified; owner enters real merchandise (current catalogue empty), purchases from suppliers and handles delivery/payment collection and policies manually; no gateway |
 | Admin Store permanent product deletion | Verified Live — scoped disposable draft/image check | Migration 0021 applied; release f596576 deployed; one confirmed product/image deletion passed; all original Store counts/hashes unchanged | Referenced/published/shared/failure branches verified in isolated tests; no existing product or historical request used as a Live deletion target; intake stays enabled |
+| Admin Store save/image timeout recovery | Controlled release authorized; final review passed, deployment pending | Four-file UI/helper/test/roadmap scope; previous focused QA reused; no automatic write retry, ID/image retention and strict read confirmation reviewed | Original browser upload/transport timeout remains open; no production upload/save/publish test; read-only release verification next |
 | Projects: public listing and slug details | Batch #2 complete; scoped QA reused | Verified Live at 3ed49f4 | No implementation/deployment blocker; no new scope |
 | Shared navigation/footer and cross-page entry behavior | Complete — Verified Live | Release b5fcb58 deployed; eight public routes, four service anchors, focus/active state, official Footer contacts and unchanged carousel placement checked Live at 1440/390px | No blocker in shared navigation/Footer scope; completed page/business workflows reused, not retested |
 | Software-services marketing and SEO foundations | Complete — Verified Live foundations | d917e1c deployed; distinct initial/client metadata, robots, 10-public-URL XML sitemap, noindex/private guards, share assets and desktop/mobile discovery verified; existing bindings/analytics/intake preserved | Owner Search Console verification, sitemap submission and rendered-indexing/account review pending; Google indexing/rankings not claimed; Store commerce deferred |
@@ -2522,6 +2526,131 @@ Software-service marketing foundations are deployed. Physical Store commercial
 operations remain deferred; its existing functionality/settings are preserved.
 Recommended future content is owner-approved real project detail and portfolio
 briefs. No new milestone or account setup is started. No measured task-time claim.
+
+## Admin Store publishing timeout — investigation and review candidate (2026-11-17–18)
+
+**Controlled release authorized after final review — deployment pending. Original
+production timeout phase/upload outcome not conclusively established.** Started with clean main
+97a40f097fdc7a391b846e32f8daf40ef28e7048. Owner later explicitly requested the
+root-cause report and proposed fix **before any production deployment**. That review
+stage involved no commit, push, release or production write. On 18 November the
+owner authorized final review, scoped commit/push/deployment and read-only Live checks.
+
+### Evidence and limits
+
+- Read-only production snapshot at **2026-11-17T06:34:18.708Z**: configured target
+  `bitreca-db / 8ff2d1f7-e747-4fe8-a6a3-87898e1ae79a` and bucket `bitreca-media`.
+  One product is Draft, version3, with **image_key=NULL**; its category is
+  **Published**. The configured bucket's `store-catalogue/` listing has **zero
+  objects**. Store counts: 1 product, 3 categories, 1 request, 3 immutable request
+  items. Product identity/details and row hashes remain outside source control;
+  private draft/supplier/customer content is not copied into this roadmap.
+- A missing confirmed image key prevents publication under existing validation.
+  The category's publication state is not the blocker in that snapshot. Other
+  current publication fields were not independently rechecked after authentication
+  became unavailable; no claim that image is the only possible validation error.
+- **Owner-provided existing Cloudflare logs**, 17 November 08:15–08:35 Beirut:
+  two same-product PUTs returned **200/ok in 123ms and 120ms**; detail GET returned
+  **200/ok in 92ms**; list GET returned **200/ok in 95ms**. No server exception was
+  seen. No media POST was found in the inspected window. These establish fast,
+  successful captured backend requests; they do **not** establish browser receipt,
+  which request originally aborted, a Published write, a successful upload, or
+  that an image was deleted by Draft saving. Missing log entries are not proof
+  that a request was never attempted or received.
+- Direct log inspection via the available token returned **403**, so no permission
+  change/bypass was attempted. A later additional read-only readiness/preservation
+  query stopped at Wrangler **Not logged in**. No login, credential or Cloudflare
+  setting change was initiated. Owner subsequently confirmed read-only that the
+  production binding is **bitreca_media → bitreca-media**, matching the inspected
+  bucket. Earlier snapshot facts are not represented as a fresh automated Live test.
+- Existing API create-idempotency (same UUID + creation hash), unique SKU/slug,
+  versioned updates, image-existence checks and category triggers were inspected
+  and preserved. No timeout increase or backend/schema/validation bypass is proposed.
+
+### Confirmed local defect and proposed fix
+
+- Reproduced with the actual current React UI and isolated SQLite/R2 fixtures:
+  upload → Draft save → reload → Published normally keeps the exact image key
+  and file. A file picker becoming empty is not evidence that the saved image is
+  missing; the attached-image preview remains in the normal case.
+- Injecting a delayed follow-up detail GET after a successful write reproduces
+  **signal timed out**, replaces the editor with an error (hiding the preview),
+  and leaves the outer save notice saying Saved. The fixture's image object and
+  database reference remain intact. This is a confirmed UI error/recovery defect;
+  the owner's fast production detail GET does not prove this exact delay occurred
+  in the original incident. The origin of the production network delay is unresolved.
+- Local patch preserves editor data/image reference during saved-record reloads,
+  distinguishes write confirmation from refresh failure, and exposes Reload record
+  even for a new record whose response/version is uncertain. Save stays blocked
+  while a failed refresh needs review. Upload/category/read/save timeout notices
+  identify their phase instead of displaying the same raw timeout alone.
+- After an uncertain save response, the UI performs **GET only** using the original
+  ID. Success requires the same ID, a newer version and every canonical submitted
+  field (including status and image_key) to match. A stale Draft/different image
+  cannot be presented as a verified Published save. No automatic mutation replay or
+  replacement UUID is generated by recovery; existing backend duplicate protection
+  is unchanged. Unmatched/unreadable outcomes retain entries/reference and remain
+  explicitly unconfirmed. **15-second mutation/upload deadlines remain unchanged**.
+- No selected file is treated as attached until upload returns a valid image key.
+  Notices distinguish saved-image preview from native file-picker state. This patch
+  cannot restore an image that has no confirmed stored object/reference, and does
+  not claim to repair an unobserved R2 upload/network failure.
+
+### Focused verification and release gate
+
+- **3 focused save-recovery tests pass**: canonical ID/data/image matching, stale
+  version/changed status rejection and explicit null optional fields. Scoped ESLint,
+  production build and whitespace checks pass. Final build:
+  `index-7rJdxO2i.js` / unchanged `index-DRffJlhj.css`.
+- Isolated Chrome tested actual 12-second detail-read and 15-second write-response
+  aborts: entries/image preview/ID remain, read-only reload recovers, lost create
+  response verifies through GET, and product count remains one. Draft reload →
+  Published preserves the same key/object in a published fixture category. The
+  missing-image case blocks publication without another write or object deletion.
+  An HTTP200 mutation response with deliberately malformed/truncated JSON is also
+  reconciled through the canonical GET without a second product or false image claim.
+  Changed controls have no overflow at 1440/390px. These are local fixtures, not
+  production writes or actual Cloudflare R2/latency validation.
+- Reused earlier API/security/deletion/Contact/fulfilment evidence. No unrelated
+  historical suites, production uploads/saves, duplicate creation, customer-request
+  edits, image cleanup, migration, permission or payment-setting changes. Only
+  `AdminStore.jsx`, `storeSaveRecovery.js`, its focused tests and this roadmap are
+  changed. All previous deployment records remain intact; temp diagnostics stay
+  outside the repository.
+- **Prior review gate completed without commit/push/deployment.** This bounded UI
+  recovery fix remains separate from the unresolved original upload/transport cause.
+  A client Network entry identifying the original timed-out method/path/phase (or
+  separately authorized controlled diagnostics) is needed before claiming that
+  original failure is resolved. No new production attempt is authorized/performed
+  here. The last recorded release baseline is 97a40f0; no new Live fix is claimed.
+  No task-duration estimate is presented as measured effort.
+
+### Controlled recovery release — 2026-11-18
+
+- Final four-file diff reviewed: `AdminStore.jsx`, `storeSaveRecovery.js`,
+  `store-save-recovery.test.js` and this roadmap only. All earlier detailed roadmap
+  evidence is preserved. Source guard confirms Worker/API, publishing validation,
+  authentication, deletion component and `wrangler.jsonc` unchanged. The existing
+  15-second upload/write timeouts remain intact; no dependency/schema change.
+- Recovery contains no POST/PUT replay: after an ambiguous response only the
+  original-ID GET runs, followed by exact canonical data/newer-version checks.
+  Unmatched/missing/stale records remain unconfirmed; failed reload keeps editor
+  data/image reference. Ordinary manual Reload explicitly shows stored state.
+- Reused the completed three focused tests, local Chrome recovery/image checks,
+  scoped ESLint, build and whitespace evidence above. No broad or historical suite
+  rerun. Final release whitespace/manifest checks passed; main matched origin/main
+  after a transient DNS fetch failure was retried successfully.
+- Read-only runtime preflight at **2026-11-18T14:45:46.344Z** succeeded using
+  existing authentication. Existing binding metadata baseline SHA-256:
+  `c16597c0534e9a0253cafc76539259a7fc709d2c252e6c61416197eebd83544e`.
+  Intake=true. Previous active deployment `e2772c89-5971-4c64-8d34-ec63926746bb`,
+  version `834df992-febe-44b0-a45c-6e77d2fb5ece` at100%. No customer records,
+  images, logs, permissions or configuration investigated/modified in this preflight.
+- Commit, Git deployment and actual read-only Live verification will be recorded
+  after execution. **The original upload/transport incident remains open for
+  targeted browser Network evidence if it recurs.** This release must not be
+  described as fixing that unconfirmed failure. No production create/upload/save/
+  publish/delete action is part of release verification.
 
 ## Boundaries
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAdminApi } from '../hooks/useAdminApi'
 import AdminProductDeletion from '../components/AdminProductDeletion'
+import { storeSaveMatches } from '../utils/storeSaveRecovery'
 import { emptyCategory, emptyProduct, storeAvailability, storeImageKey, storeStatuses, storeUuid, validateStoreRecord } from '../../shared/store-catalogue'
 import './AdminStore.css'
 
@@ -50,25 +51,43 @@ function StorePanel({ kind, onBusy }) {
       if (!result || !alive.current) return
       if (!result.response.ok || !Array.isArray(result.data?.records) || !result.data.records.every(validRecord)) throw new Error(apiError(result))
       setChoices(current => ({ loading: false, error: '', records: [...(more ? current.records : []), ...result.data.records].filter((row, index, rows) => rows.findIndex(other => other.id === row.id) === index), nextCursor: result.data.nextCursor }))
-    } catch (error) { if (alive.current) setChoices(current => ({ ...current, loading: false, error: error.message })) }
+    } catch (error) { if (alive.current) setChoices(current => ({ ...current, loading: false, error: error.name === 'TimeoutError' || error.name === 'AbortError' ? 'Category choices timed out. This does not remove the product or its image. Use Refresh category choices to retry.' : error.message })) }
   }
   function create() {
     selection.current++; setNotice(''); setErrors({}); setNeedsReload(false)
     setEditor({ id: crypto.randomUUID(), version: null, state: 'ready', data: kind === 'categories' ? emptyCategory() : emptyProduct() })
     if (kind === 'products') loadChoices()
   }
-  async function open(id) {
+  async function readRecord(id) {
+    const result = await request(`${root}/${id}`, { signal: AbortSignal.timeout(12000) })
+    if (!result) return null
+    if (!result.response.ok || !validRecord(result.data?.record) || result.data.record.id !== id) throw new Error(apiError(result))
+    return result.data.record
+  }
+  function applyRecord(record) {
+    const defaults = kind === 'categories' ? emptyCategory() : emptyProduct()
+    const data = Object.fromEntries(Object.keys(defaults).map(field => [field, record[field]]))
+    setEditor({ id: record.id, state: 'ready', version: record.version, data }); setNeedsReload(false)
+  }
+  async function open(id, preserve = false) {
     const attempt = ++selection.current
-    setEditor({ id, state: 'loading' }); setNotice(''); setErrors({}); setNeedsReload(false)
+    if (!preserve) { setEditor({ id, state: 'loading' }); setNeedsReload(false) }
+    if (!preserve) setNotice('')
+    setErrors({})
     try {
-      const result = await request(`${root}/${id}`, { signal: AbortSignal.timeout(12000) })
-      if (!result || !alive.current || attempt !== selection.current) return
-      if (!result.response.ok || !validRecord(result.data?.record)) throw new Error(apiError(result))
-      const record = result.data.record, defaults = kind === 'categories' ? emptyCategory() : emptyProduct()
-      const data = Object.fromEntries(Object.keys(defaults).map(field => [field, record[field]]))
-      setEditor({ id, state: 'ready', version: record.version, data })
+      const record = await readRecord(id)
+      if (!record || !alive.current || attempt !== selection.current) return false
+      applyRecord(record)
+      if (preserve) setNotice('Record reloaded. Review the saved status and image before making further changes.')
       if (kind === 'products') loadChoices()
-    } catch (error) { if (alive.current && attempt === selection.current) setEditor({ id, state: 'error', error: error.message }) }
+      return true
+    } catch (error) {
+      if (alive.current && attempt === selection.current) {
+        if (preserve) { setNeedsReload(true); setNotice('Saved details could not be loaded. Your entries, image reference and record ID are kept. Use Reload record to check again before saving.') }
+        else setEditor({ id, state: 'error', error: error.name === 'TimeoutError' || error.name === 'AbortError' ? 'Loading this record timed out. No record or image was removed. Retry record.' : error.message })
+      }
+      return false
+    }
   }
   function update(field, value) { setEditor(current => ({ ...current, data: { ...current.data, [field]: value } })); setErrors(current => ({ ...current, [field]: undefined })); setNotice('') }
   async function save(event) {
@@ -77,6 +96,8 @@ function StorePanel({ kind, onBusy }) {
     const validation = validateStoreRecord(kind, editor.data)
     setErrors(validation.errors)
     if (Object.keys(validation.errors).length) { setNotice('Check the highlighted fields.'); requestAnimationFrame(() => form.current?.querySelector('[aria-invalid="true"]')?.focus()); return }
+    const submitted = editor
+    let writeConfirmed = false, uncertain = false
     mutex.current = true; setBusy(true); onBusy(true); setNotice('Saving…')
     try {
       const result = await request(editor.version ? `${root}/${editor.id}` : root, { method: editor.version ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editor.id, ...(editor.version ? { version: editor.version } : {}), data: validation.data }), signal: AbortSignal.timeout(15000) })
@@ -84,10 +105,26 @@ function StorePanel({ kind, onBusy }) {
       if (!result.response.ok || result.data?.success !== true || result.data.id !== editor.id) {
         if (result.data?.errors) setErrors(Object.fromEntries(Object.entries(result.data.errors).filter(([name, value]) => Object.hasOwn(editor.data, name) && typeof value === 'string')))
         if (result.response.status === 409) setNeedsReload(true)
+        uncertain = result.response.ok || result.response.status >= 500
         throw new Error(apiError(result))
       }
-      await open(editor.id); refresh(); setNotice('Saved. Published products in published categories are visible in the enquiry-only catalogue. Supplier references and internal notes stay private.')
-    } catch (error) { if (alive.current) setNotice(error.message || 'Save outcome uncertain. Reload before retrying.') }
+      writeConfirmed = true
+      setNotice('Save confirmed. Refreshing saved details…')
+      const loaded = await open(submitted.id, true); refresh()
+      if (alive.current) setNotice(loaded ? 'Saved and reloaded. Review the saved status and image preview; the file picker does not indicate whether an image is attached.' : 'Save confirmed, but the detail reload failed or timed out. Your entries, image reference and record ID are kept. Use Reload record before saving again.')
+    } catch (error) {
+      if (!alive.current) return
+      if (!writeConfirmed && (uncertain || error.name === 'TimeoutError' || error.name === 'AbortError' || error instanceof TypeError)) {
+        setNeedsReload(true); setNotice('Save response unconfirmed. Checking the existing record without sending another write…')
+        try {
+          const record = await readRecord(submitted.id)
+          if (!record || !alive.current) return
+          if (storeSaveMatches(record, submitted.id, validation.data, submitted.version)) {
+            applyRecord(record); refresh(); setNotice('Saved state verified from the existing record after an unconfirmed response. No second save was sent. Review the saved status and image preview.')
+          } else setNotice('Save outcome is still unconfirmed: the stored record does not match this save. Your entries, image reference and original ID are kept. Reload and review before retrying; do not create a replacement product.')
+        } catch { if (alive.current) setNotice('Save outcome is still unconfirmed. Your entries, image reference and original ID are kept. Use Reload record to check before retrying; do not create a replacement product.') }
+      } else setNotice(error.message || 'Save outcome uncertain. Reload before retrying.')
+    }
     finally { mutex.current = false; if (alive.current) { setBusy(false); onBusy(false) } }
   }
   async function upload(event) {
@@ -100,7 +137,7 @@ function StorePanel({ kind, onBusy }) {
       if (!result || !alive.current) return
       if (!result.response.ok || !storeImageKey.test(result.data?.image_key)) throw new Error(apiError(result))
       update('image_key', result.data.image_key); setNotice('Image uploaded privately. Save the product to attach it. Only use images you have permission to publish.')
-    } catch (error) { if (alive.current) setNotice(error.message || 'Upload unconfirmed. Retry with a new file selection.') }
+    } catch (error) { if (alive.current) setNotice(error.name === 'TimeoutError' || error.name === 'AbortError' || error instanceof TypeError ? 'Image upload response unconfirmed. No new image key was received; any previously attached image is unchanged. Choosing a file alone does not attach it. Do not assume this image was saved or published.' : error.message || 'Upload unconfirmed. No new image was attached.') }
     finally { mutex.current = false; if (alive.current) { setBusy(false); onBusy(false) } }
   }
   function field(name) {
@@ -115,7 +152,7 @@ function StorePanel({ kind, onBusy }) {
     return <div className="admin-store-field" key={name}><label htmlFor={id}>{labels[name]}</label>{control}{error && <p id={`${id}-error`} className="admin-store-error">{error}</p>}</div>
   }
   return <div className="admin-store-grid"><section className="admin-store-list" aria-labelledby="store-list-title" aria-busy={list.state === 'loading'}><div className="admin-store-toolbar"><h2 id="store-list-title">{kind === 'categories' ? 'Categories' : 'Products'}</h2><button type="button" disabled={busy} onClick={create}>New {kind === 'categories' ? 'category' : 'product'}</button></div><label htmlFor="store-filter">Filter by status</label><select id="store-filter" disabled={busy} value={view.status} onChange={event => setView({ status: event.target.value, cursor: null, previous: [], revision: 0 })}>{['all', ...storeStatuses].map(status => <option key={status}>{status}</option>)}</select><button type="button" disabled={busy} onClick={refresh}>Refresh list</button>{list.state === 'loading' && <p role="status">Loading catalogue…</p>}{list.state === 'error' && <p role="alert">{list.error} Use Refresh list to retry.</p>}{list.state === 'ready' && <>{!list.records.length && <p>No {kind} in this view. Production records are entered by the owner; no sample items are supplied.</p>}<ul>{list.records.map(row => <li key={row.id}><button type="button" disabled={busy} onClick={() => open(row.id)} aria-pressed={editor?.id === row.id}><strong>{row.title}</strong><span>{row.sku || row.slug} · {row.status}</span></button></li>)}</ul><nav className="admin-store-pagination" aria-label={`${kind} pages`}><button type="button" disabled={busy || !view.previous.length} onClick={() => setView(current => ({ ...current, cursor: current.previous.at(-1), previous: current.previous.slice(0, -1) }))}>Previous</button><span>Page {view.previous.length + 1}</span><button type="button" disabled={busy || !list.nextCursor} onClick={() => setView(current => ({ ...current, cursor: list.nextCursor, previous: [...current.previous, current.cursor] }))}>Next</button></nav></>}</section>
-    <section className="admin-store-editor" aria-labelledby="store-editor-title"><h2 id="store-editor-title" ref={heading} tabIndex={-1}>{editor ? `${editor.version ? 'Edit' : 'New'} ${kind === 'categories' ? 'category' : 'product'}` : 'Record editor'}</h2>{!editor && <p>Select a record or create a draft. Draft and archived records stay private; published categories and eligible published products are public.</p>}{editor?.state === 'loading' && <p role="status">Loading record…</p>}{editor?.state === 'error' && <div role="alert"><p>{editor.error}</p><button type="button" onClick={() => open(editor.id)}>Retry record</button></div>}{editor?.state === 'ready' && <form ref={form} onSubmit={save} noValidate><p className="admin-store-help">Draft = private. Published = approved for the public catalogue; products also require a published category. Archived = private, with SKU/slug retained. Unpublish products before unpublishing a category; archive its active products before archiving it.</p>{['title', 'slug', 'description', ...(kind === 'products' ? productFields : []), 'status'].map(field)}{kind === 'products' && <p className="admin-store-help">No default currency or price. Leave both price and currency blank for enquiry pricing. If entered, verify the currency’s minor unit convention and approved price/tax context. Unknown availability makes no stock claim. Supplier references/internal notes are private and never included in list summaries.</p>}<div className="admin-store-actions"><button type="submit" disabled={busy || needsReload}>{busy ? 'Working…' : 'Save record'}</button>{editor.version && <button type="button" disabled={busy} onClick={() => open(editor.id)}>Reload record</button>}<button type="button" disabled={busy} onClick={() => { selection.current++; setEditor(null); setNotice(''); setErrors({}); setNeedsReload(false) }}>Close editor</button></div>{needsReload && <p role="alert">Save blocked to prevent conflicts. Reload the existing record, or close this new editor and refresh the list before retrying.</p>}</form>}<p role="status" aria-live="polite" className="admin-store-notice">{notice}</p>{kind === 'products' && <AdminProductDeletion productId={editor?.version ? editor.id : null} onBusy={value => { setBusy(value); onBusy(value) }} onDeleted={id => { if (editor?.id === id) { selection.current++; setEditor(null); setErrors({}); setNeedsReload(false) } refresh() }} />}</section></div>
+    <section className="admin-store-editor" aria-labelledby="store-editor-title"><h2 id="store-editor-title" ref={heading} tabIndex={-1}>{editor ? `${editor.version ? 'Edit' : 'New'} ${kind === 'categories' ? 'category' : 'product'}` : 'Record editor'}</h2>{!editor && <p>Select a record or create a draft. Draft and archived records stay private; published categories and eligible published products are public.</p>}{editor?.state === 'loading' && <p role="status">Loading record…</p>}{editor?.state === 'error' && <div role="alert"><p>{editor.error}</p><button type="button" onClick={() => open(editor.id)}>Retry record</button></div>}{editor?.state === 'ready' && <form ref={form} onSubmit={save} noValidate><p className="admin-store-help">Draft = private. Published = approved for the public catalogue; products also require a published category. Archived = private, with SKU/slug retained. Unpublish products before unpublishing a category; archive its active products before archiving it.</p>{['title', 'slug', 'description', ...(kind === 'products' ? productFields : []), 'status'].map(field)}{kind === 'products' && <p className="admin-store-help">No default currency or price. Leave both price and currency blank for enquiry pricing. If entered, verify the currency’s minor unit convention and approved price/tax context. Unknown availability makes no stock claim. Supplier references/internal notes are private and never included in list summaries.</p>}<div className="admin-store-actions"><button type="submit" disabled={busy || needsReload}>{busy ? 'Working…' : 'Save record'}</button>{(editor.version || needsReload) && <button type="button" disabled={busy} onClick={() => open(editor.id, true)}>Reload record</button>}<button type="button" disabled={busy} onClick={() => { selection.current++; setEditor(null); setNotice(''); setErrors({}); setNeedsReload(false) }}>Close editor</button></div>{needsReload && <p role="alert">Save blocked until the existing record is checked. Your entries and original record ID are retained; use Reload record before retrying an uncertain save.</p>}</form>}<p role="status" aria-live="polite" className="admin-store-notice">{notice}</p>{kind === 'products' && <AdminProductDeletion productId={editor?.version ? editor.id : null} onBusy={value => { setBusy(value); onBusy(value) }} onDeleted={id => { if (editor?.id === id) { selection.current++; setEditor(null); setErrors({}); setNeedsReload(false) } refresh() }} />}</section></div>
 }
 
 export default function AdminStore() {
